@@ -1,5 +1,12 @@
 from __future__ import annotations
 
+"""Ticker universe configuration for options trading.
+
+Provides a focused list of high-liquidity tickers suitable for options strategies,
+with an exclusion list for meme stocks.
+"""
+
+# High-liquidity tickers with deep options markets for strategy execution
 FOCUSED_UNIVERSE = [
     # Index ETFs (deepest options liquidity)
     'SPY', 'QQQ', 'IWM',
@@ -9,9 +16,10 @@ FOCUSED_UNIVERSE = [
     'GLD', 'TLT',
 ]
 
-MEME_EXCLUSION_LIST = ['GME', 'AMC']  # kept for safety checks
+# Meme stocks excluded from universe for volatility/risk management
+MEME_EXCLUSION_LIST = ['GME', 'AMC']
 
 
-def get_universe(use_cache: bool = False) -> list[str]:
+def get_universe() -> list[str]:
     """Return the focused high-liquidity universe. Static list — no caching needed."""
     return sorted(FOCUSED_UNIVERSE)
