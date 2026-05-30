@@ -126,10 +126,24 @@ class Strategy(ABC):
 ```
 
 Four concrete classes:
-- `NakedPut`: sell put; profitable if `S_T > K`; delta range 0.05–0.35; breakeven `K - mid`
-- `NakedCall`: sell call; profitable if `S_T < K`; delta range 0.05–0.35; breakeven `K + mid`
-- `LongPut`: buy put; profitable if `S_T < K - mid`; delta range 0.30–0.55; breakeven `K - mid`
-- `LongCall`: buy call; profitable if `S_T > K + mid`; delta range 0.30–0.55; breakeven `K + mid`
+- `NakedPut`: sell put; profitable if `S_T > K`; **delta range 0.16–0.30**; breakeven `K - mid`
+- `NakedCall`: sell call; profitable if `S_T < K`; **delta range 0.16–0.30**; breakeven `K + mid`
+- `LongPut`: buy put; profitable if `S_T < K - mid`; **delta range 0.40–0.60**; breakeven `K - mid`
+- `LongCall`: buy call; profitable if `S_T > K + mid`; **delta range 0.40–0.60**; breakeven `K + mid`
+
+**Delta range rationale (research-backed):**
+
+*Sellers — 0.16 to 0.30:*
+- 0.16-delta ≈ 1 SD OTM ≈ ~84% PoP — Tastytrade research shows this is the "premium-keeping sweet spot" (SPY/IWM/TLT 16-delta strangles retain ~25% of daily theta)
+- 0.20–0.30-delta range is the wheel-strategy consensus across Blue Collar Investor, OptionsTradingIQ, QuantWheel — produces 13–17% annualized yield on collateral at 30 DTE with 70–80% PoP
+- Below 0.16: premium too small relative to commission/spread drag
+- Above 0.30: assignment frequency rises sharply with diminishing PoP gain
+
+*Buyers — 0.40 to 0.60:*
+- For 3–45 DTE directional buys, 40–55 delta is the gamma sweet spot (max convexity per dollar of theta paid)
+- Below 0.40: theta decay overwhelms gamma; capital burns regardless of correct direction
+- Above 0.60: option behaves like the underlying (delta → 1); leverage benefit collapses, may as well buy stock
+- LEAPS literature on high-delta only justifies it at DTE > 180 — outside our DTE 3–45 window
 
 ### `Regime` signal
 ```python
@@ -166,10 +180,10 @@ class Regime:
 ### Filter sets per strategy
 ```python
 FILTER_SETS = {
-    'naked_put':  FilterSet(max_spread=0.20, min_vol=100, min_oi=500, delta=(0.05,0.35), min_pop=0.70, min_ev=0.0,  max_stress_mult=3.0),
-    'naked_call': FilterSet(max_spread=0.20, min_vol=100, min_oi=500, delta=(0.05,0.35), min_pop=0.70, min_ev=0.0,  max_stress_mult=3.0),
-    'long_put':   FilterSet(max_spread=0.20, min_vol=100, min_oi=500, delta=(0.30,0.55), min_pop=0.40, min_ev=0.10, max_stress_mult=inf),
-    'long_call':  FilterSet(max_spread=0.20, min_vol=100, min_oi=500, delta=(0.30,0.55), min_pop=0.40, min_ev=0.10, max_stress_mult=inf),
+    'naked_put':  FilterSet(max_spread=0.20, min_vol=100, min_oi=500, delta=(0.16,0.30), min_pop=0.70, min_ev=0.0,  max_stress_mult=3.0),
+    'naked_call': FilterSet(max_spread=0.20, min_vol=100, min_oi=500, delta=(0.16,0.30), min_pop=0.70, min_ev=0.0,  max_stress_mult=3.0),
+    'long_put':   FilterSet(max_spread=0.20, min_vol=100, min_oi=500, delta=(0.40,0.60), min_pop=0.40, min_ev=0.15, max_stress_mult=inf),
+    'long_call':  FilterSet(max_spread=0.20, min_vol=100, min_oi=500, delta=(0.40,0.60), min_pop=0.40, min_ev=0.15, max_stress_mult=inf),
 }
 ```
 
@@ -386,7 +400,25 @@ python -m main dashboard
 
 None at design time. Implementation may surface library-specific issues that get logged as the work proceeds.
 
-## 15. Out of Scope (deferred follow-ups)
+## 15. Research References (delta range backing)
+
+**Premium selling delta — 0.16 to 0.30:**
+- Tastytrade research summary on 16-delta strangles in SPY/IWM/TLT — keeps ~25% of daily theta (cited via [SteadyOptions analysis](https://steadyoptions.com/articles/selling-short-strangles-and-straddles-does-it-work-r516/))
+- [QuantWheel — Cash-secured put returns (2026)](https://quantwheel.com/learn/cash-secured-put-returns/) — 0.20–0.30 delta produces 13–17% annualized yield on collateral
+- [Blue Collar Investor — Delta-based put selling](https://www.thebluecollarinvestor.com/using-delta-to-create-low-risk-high-return-put-selling-trades-a-real-life-example-with-etsy-inc-nasdaq-etsy/) — empirical evidence for sub-30-delta as conservative-but-profitable zone
+- [OptionsTradingIQ — Best Delta for Put Spreads](https://optionstradingiq.com/best-delta-for-put-spreads/) — convergent practitioner finding on 20–30 delta sweet spot
+- [DataDrivenOptions — Best Delta for Put Spreads](https://datadrivenoptions.com/best-delta-put-spreads/) — additional support for the same range
+
+**Directional buying delta — 0.40 to 0.60:**
+- [OptionsTradingIQ — What Is a Good Delta for Options](https://optionstradingiq.com/what-is-a-good-delta-for-options/) — 15–45 delta range, with caveat that for short-DTE directional buys, higher delta is needed
+- [DayTrading.com — Options Strategies for Synthetic Leverage](https://www.daytrading.com/options-strategies-synthetic-leverage) — high-delta-LEAPS argument applies only to DTE > 180; outside our DTE 3–45 window
+- [OIC — Options Delta primer](https://www.optionseducation.org/advancedconcepts/delta) — theoretical basis for delta as probability/leverage proxy
+
+**Risk-adjusted return optimization (covered call analog, applies to naked):**
+- [DayTrading.com — Covered Call Strategy](https://www.daytrading.com/covered-call-strategy) — delta-hedged covered call Sharpe ratio improvement from 0.37 → 0.52
+- [Macroption — Covered Call analysis](https://www.macroption.com/covered-call/) — 20–30 delta as the institutional standard for covered-call writing
+
+## 16. Out of Scope (deferred follow-ups)
 
 - **Mode C — Swing-equity scanner** for fair-value / underpriced underlyings. Distinct module; follows the same layered pattern as a sibling to options scanning.
 - **Live trading / paper trading hookup** (Alpaca, Tradier). Read-only research scope preserved.
