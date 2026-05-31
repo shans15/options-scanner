@@ -1,25 +1,105 @@
 from __future__ import annotations
-"""
-Options Scanner — Entry Point
+import argparse
+import json
+import sys
+from pathlib import Path
 
-Run with:
-    streamlit run main.py
+from pipeline.run_scan import run_scan, ScanConfig
+from pipeline.universe_builder import UniverseFilters, build_universe_cached
+from ui.exporter import write_scan
 
-The APScheduler starts in a background thread and triggers scans at:
-    09:45, 11:00, 13:00, 15:00 ET (Monday-Friday)
 
-The Streamlit dashboard reads from output/scans/latest.json and auto-refreshes every 60s.
+OUTPUT_DIR = Path('output/scans')
 
-This is quantitative research tooling only. Not financial advice.
-"""
-import streamlit as st
 
-# Start scheduler once per process (singleton — safe across Streamlit reruns)
-if 'scheduler_initialized' not in st.session_state:
-    from scanner.scheduler import get_or_create_scheduler
-    get_or_create_scheduler()
-    st.session_state.scheduler_initialized = True
+def _print_summary(result) -> None:
+    n_total = len(result.candidates)
+    by_label = {}
+    for c in result.candidates:
+        by_label[c.label] = by_label.get(c.label, 0) + 1
+    print(f"Scanned {n_total} candidates across universe of {len(set(c.contract.ticker for c in result.candidates))} tickers.")
+    print(f"  TRADE: {by_label.get('TRADE', 0)}  WATCHLIST: {by_label.get('WATCHLIST', 0)}  NO_TRADE: {by_label.get('NO_TRADE', 0)}")
+    print(f"  Skipped: {len(result.skipped)} ({', '.join(f'{t}:{r}' for t,r in list(result.skipped.items())[:3])}{'...' if len(result.skipped) > 3 else ''})")
+    if result.candidates:
+        top = result.candidates[0]
+        print(f"  Top: {top.contract.ticker} {top.strategy.name} ${top.contract.strike} {top.contract.expiration} score={top.composite_score}")
 
-# Render the dashboard
-from output.dashboard import render_dashboard
-render_dashboard()
+
+def cmd_scan(args) -> int:
+    filters = UniverseFilters(
+        min_avg_volume=args.min_volume,
+        top_n=args.top,
+        require_options_chain=True,
+    )
+    config = ScanConfig(universe_filters=filters)
+    if args.fast:
+        config.n_monte_carlo_paths = 1000  # tradeoff: faster, less precise GARCH-MC PoP
+
+    sources_override = None
+    if args.tickers:
+        from data.sources.yahooquery_source import YahooQuerySource
+        from data.sources.yfinance_source import YfinanceSource
+        from data.sources.stooq_source import StooqSource
+        sources_override = [YahooQuerySource(), YfinanceSource(), StooqSource()]
+        import pipeline.run_scan as rs
+        rs.build_universe_cached = lambda *a, **kw: [t.strip().upper() for t in args.tickers.split(',')]
+
+    result = run_scan(config, sources_override=sources_override)
+    csv_path, json_path = write_scan(result, OUTPUT_DIR)
+    _print_summary(result)
+    print(f"Wrote: {csv_path}")
+    print(f"       {json_path}")
+
+    if args.then_dashboard:
+        return cmd_dashboard(args)
+    return 0
+
+
+def cmd_dashboard(_args) -> int:
+    import subprocess
+    return subprocess.call([sys.executable, '-m', 'streamlit', 'run', 'ui/dashboard.py'])
+
+
+def cmd_universe(args) -> int:
+    if args.action == 'rebuild':
+        from datetime import date as _date
+        cache_file = Path('cache/universe') / f"universe_{_date.today().isoformat()}.json"
+        if cache_file.exists():
+            cache_file.unlink()
+        from data.sources.yahooquery_source import YahooQuerySource
+        from data.sources.yfinance_source import YfinanceSource
+        from data.sources.stooq_source import StooqSource
+        sources = [YahooQuerySource(), YfinanceSource(), StooqSource()]
+        out = build_universe_cached(UniverseFilters(), sources)
+        print(f"Universe rebuilt: {len(out)} tickers")
+        print(', '.join(out))
+        return 0
+    print(f"Unknown universe action: {args.action}", file=sys.stderr)
+    return 1
+
+
+def main() -> int:
+    p = argparse.ArgumentParser(prog='options-scanner')
+    sub = p.add_subparsers(dest='cmd', required=True)
+
+    s = sub.add_parser('scan', help='Run an EOD scan')
+    s.add_argument('--top', type=int, default=50)
+    s.add_argument('--min-volume', type=int, default=1_000_000)
+    s.add_argument('--tickers', type=str, default=None, help='Comma-separated override list')
+    s.add_argument('--then-dashboard', action='store_true')
+    s.add_argument('--fast', action='store_true', help='Use 1000 GARCH-MC paths instead of 10000 for faster scans')
+    s.set_defaults(func=cmd_scan)
+
+    d = sub.add_parser('dashboard', help='Launch Streamlit dashboard')
+    d.set_defaults(func=cmd_dashboard)
+
+    u = sub.add_parser('universe', help='Manage universe cache')
+    u.add_argument('action', choices=['rebuild'])
+    u.set_defaults(func=cmd_universe)
+
+    args = p.parse_args()
+    return args.func(args)
+
+
+if __name__ == '__main__':
+    raise SystemExit(main())
