@@ -6,4 +6,4 @@ output/scans/*.csv
 output/scans/*.json
 data/universe_cache.json
 *.pkl
-.robinhood_session/
+cache/
