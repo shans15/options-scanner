@@ -45,17 +45,28 @@ class YfinanceSource(DataSource):
                 if df is None or df.empty:
                     continue
                 for _, row in df.iterrows():
-                    out.append(RawContract(
-                        ticker=ticker,
-                        expiration=exp,
-                        strike=float(row.get('strike', 0)),
-                        option_type=opt_type,
-                        bid=float(row.get('bid', 0) or 0),
-                        ask=float(row.get('ask', 0) or 0),
-                        volume=int(row.get('volume', 0) or 0),
-                        open_interest=int(row.get('openInterest', 0) or 0),
-                        implied_volatility=float(row.get('impliedVolatility', 0) or 0),
-                        dte=dte,
-                        spot_price=spot,
-                    ))
+                    try:
+                        # NaN is truthy so `NaN or 0` stays NaN; use explicit nan-guard
+                        def _safe_int(v, default=0):
+                            import math
+                            try:
+                                f = float(v)
+                                return default if math.isnan(f) else int(f)
+                            except (TypeError, ValueError):
+                                return default
+                        out.append(RawContract(
+                            ticker=ticker,
+                            expiration=exp,
+                            strike=float(row.get('strike', 0) or 0),
+                            option_type=opt_type,
+                            bid=float(row.get('bid', 0) or 0),
+                            ask=float(row.get('ask', 0) or 0),
+                            volume=_safe_int(row.get('volume', 0)),
+                            open_interest=_safe_int(row.get('openInterest', 0)),
+                            implied_volatility=float(row.get('impliedVolatility', 0) or 0),
+                            dte=dte,
+                            spot_price=spot,
+                        ))
+                    except Exception:
+                        continue
         return out

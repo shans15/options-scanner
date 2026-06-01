@@ -32,21 +32,37 @@ class YahooQuerySource(DataSource):
         out: list[RawContract] = []
         for idx, row in df.iterrows():
             try:
-                _symbol, exp_ts, opt_type_str, strike = idx
+                # yahooquery MultiIndex is (symbol, expiration, optionType) — 3 levels.
+                # strike lives in the 'strike' column, not in the index.
+                if len(idx) == 4:
+                    _symbol, exp_ts, opt_type_str, strike_idx = idx
+                    strike = float(strike_idx)
+                elif len(idx) == 3:
+                    _symbol, exp_ts, opt_type_str = idx
+                    strike = float(row.get('strike', 0))
+                else:
+                    continue
                 exp = pd.Timestamp(exp_ts).date()
                 dte = (exp - today).days
                 if dte < _DTE_MIN or dte > _DTE_MAX:
                     continue
                 option_type = 'put' if 'put' in str(opt_type_str).lower() else 'call'
+                import math
+                def _safe_int(v, default=0):
+                    try:
+                        f = float(v)
+                        return default if math.isnan(f) else int(f)
+                    except (TypeError, ValueError):
+                        return default
                 out.append(RawContract(
                     ticker=ticker,
                     expiration=exp,
-                    strike=float(strike),
+                    strike=strike,
                     option_type=option_type,
                     bid=float(row.get('bid', 0) or 0),
                     ask=float(row.get('ask', 0) or 0),
-                    volume=int(row.get('volume', 0) or 0),
-                    open_interest=int(row.get('openInterest', 0) or 0),
+                    volume=_safe_int(row.get('volume', 0)),
+                    open_interest=_safe_int(row.get('openInterest', 0)),
                     implied_volatility=float(row.get('impliedVolatility', 0) or 0),
                     dte=dte,
                     spot_price=spot,
