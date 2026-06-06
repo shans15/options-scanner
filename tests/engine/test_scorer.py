@@ -67,3 +67,11 @@ def test_scored_candidate_dataclass_carries_explainability():
     )
     assert sc.label == 'TRADE'
     assert sc.reason_for
+
+
+def test_scored_candidate_supports_optional_setup_fields():
+    from engine.scorer import ScoredCandidate
+    fields_present = ScoredCandidate.__dataclass_fields__
+    assert 'setup_name' in fields_present
+    assert 'setup_direction' in fields_present
+    assert 'setup_strength' in fields_present

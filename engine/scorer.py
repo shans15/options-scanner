@@ -1,6 +1,6 @@
 from __future__ import annotations
 from dataclasses import dataclass
-from typing import Literal
+from typing import Literal, Optional
 import numpy as np
 
 from domain.contract import Contract
@@ -31,6 +31,9 @@ class ScoredCandidate:
     label: Label
     reason_for: str
     reason_against: str
+    setup_name: Optional[str] = None
+    setup_direction: Optional[str] = None
+    setup_strength: Optional[float] = None
 
 
 def _regime_alignment_score(strategy: Strategy, regime: Regime) -> float:

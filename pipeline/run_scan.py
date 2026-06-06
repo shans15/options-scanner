@@ -34,6 +34,7 @@ class ScanConfig:
     n_monte_carlo_paths: int = 10_000
     today: date = field(default_factory=date.today)
     universe_filters: UniverseFilters = field(default_factory=UniverseFilters)
+    use_technical_filter: bool = True
 
 
 @dataclass
