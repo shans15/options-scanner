@@ -143,6 +143,39 @@ def test_run_scan_with_no_signal_ticker_produces_no_candidates_when_filter_on():
     assert result.candidates == []
 
 
+def test_run_scan_with_as_of_uses_sliced_close_as_spot():
+    """When as_of is set, the spot comes from the close of the as_of bar,
+    not from fetch_spot's live quote."""
+    bull_df = _bullish_ohlcv_history()
+    bull_df.index = pd.date_range('2025-01-01', periods=len(bull_df), freq='B')
+    last_date = bull_df.index[-1].date()
+    expected_spot = float(bull_df['close'].iloc[-1])
+
+    chain = [
+        _make_raw(option_type='put', strike=expected_spot * 0.98, mid=1.0, iv=0.22),
+        _make_raw(option_type='call', strike=expected_spot * 1.02, mid=1.0, iv=0.22),
+    ]
+    # Construct a source whose fetch_spot returns a DIFFERENT value, so we can
+    # prove the as_of path overrode it.
+    src = _FakeSource(
+        history=bull_df['close'], spot=999.99,  # bogus live quote
+        chain=chain, ohlcv=bull_df,
+    )
+
+    with patch('pipeline.run_scan.build_universe_cached', return_value=['X']), \
+         patch('pipeline.run_scan.has_earnings_within', return_value=False):
+        result = run_scan(
+            ScanConfig(today=date(2026, 5, 30), use_technical_filter=True, as_of=last_date),
+            sources_override=[src],
+        )
+
+    # Every candidate's contract.spot_price should be the as_of close, not 999.99
+    for c in result.candidates:
+        assert abs(c.contract.spot_price - expected_spot) < 0.5, (
+            f"Expected spot ~{expected_spot}, got {c.contract.spot_price}"
+        )
+
+
 def test_run_scan_legacy_regime_gate_when_filter_off():
     """When use_technical_filter=False, ScanConfig falls back to regime-based gating.
     With a regime favoring 'sell', only NakedPut/NakedCall candidates should appear."""

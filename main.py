@@ -2,6 +2,7 @@ from __future__ import annotations
 import argparse
 import json
 import sys
+from datetime import date
 from pathlib import Path
 
 from pipeline.run_scan import run_scan, ScanConfig
@@ -33,6 +34,16 @@ def cmd_scan(args) -> int:
     )
     config = ScanConfig(universe_filters=filters)
     config.use_technical_filter = not args.no_technical_filter
+    if args.as_of:
+        from datetime import datetime
+        try:
+            config.as_of = datetime.strptime(args.as_of, '%Y-%m-%d').date()
+        except ValueError:
+            print(f"Invalid --as-of date: {args.as_of!r} (expected YYYY-MM-DD)", file=sys.stderr)
+            return 2
+        if config.as_of < date.today():
+            print(f"Warning: --as-of {args.as_of} is in the past. Option chain is current; "
+                  f"strikes/expirations/IV may not match the historical reality.", file=sys.stderr)
     if args.fast:
         config.n_monte_carlo_paths = 1000  # tradeoff: faster, less precise GARCH-MC PoP
 
@@ -91,6 +102,9 @@ def main() -> int:
     s.add_argument('--fast', action='store_true', help='Use 1000 GARCH-MC paths instead of 10000 for faster scans')
     s.add_argument('--no-technical-filter', action='store_true',
                    help='Bypass Saty technical filter; use legacy RV/IV regime-only gating')
+    s.add_argument('--as-of', type=str, default=None, metavar='YYYY-MM-DD',
+                   help='Pin scan to a historical EOD snapshot. Spot becomes the close of that date, '
+                        'history is sliced. Option chain remains live (limitation).')
     s.set_defaults(func=cmd_scan)
 
     d = sub.add_parser('dashboard', help='Launch Streamlit dashboard')

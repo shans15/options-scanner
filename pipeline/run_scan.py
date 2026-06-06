@@ -57,6 +57,7 @@ class ScanConfig:
     today: date = field(default_factory=date.today)
     universe_filters: UniverseFilters = field(default_factory=UniverseFilters)
     use_technical_filter: bool = True
+    as_of: Optional[date] = None     # NEW
 
 
 @dataclass
@@ -87,7 +88,7 @@ def run_scan(config: ScanConfig, sources_override: Optional[list[DataSource]] = 
     skipped: dict[str, str] = {}
 
     if config.use_technical_filter:
-        setups_by_ticker = filter_by_technicals(universe, sources)
+        setups_by_ticker = filter_by_technicals(universe, sources, as_of=config.as_of)
         ticker_iter = list(setups_by_ticker.keys())
     else:
         setups_by_ticker = {t: [] for t in universe}
@@ -99,7 +100,11 @@ def run_scan(config: ScanConfig, sources_override: Optional[list[DataSource]] = 
                 skipped[ticker] = 'earnings_blackout'
                 continue
             history = fetch_with_fallback(sources, 'fetch_price_history', ticker, 365)
+            if config.as_of is not None and hasattr(history.index, 'date'):
+                history = history[history.index.date <= config.as_of]
             spot = fetch_with_fallback(sources, 'fetch_spot', ticker)
+            if config.as_of is not None and len(history) > 0:
+                spot = float(history.iloc[-1])
             raw_chain = fetch_with_fallback(sources[:2], 'fetch_option_chain', ticker)
         except DataFetchError as e:
             skipped[ticker] = f'fetch_failed: {e}'

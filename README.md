@@ -84,6 +84,9 @@ python -m main scan --top 100 --min-volume 500000
 # Manual ticker override (skips screener)
 python -m main scan --tickers SPY,QQQ,AAPL
 
+# Run as if it were the morning of 2026-06-05 (use Thursday 6/4 EOD)
+python -m main scan --as-of 2026-06-04 --tickers SPY,QQQ,AAPL
+
 # Scan and launch dashboard immediately after
 python -m main scan --then-dashboard
 
@@ -95,6 +98,8 @@ python -m main universe rebuild
 ```
 
 Dashboard opens at `http://localhost:8501`. It has a sidebar widget to filter the candidate table by setup name.
+
+`--as-of YYYY-MM-DD` pins the scanner to a specific EOD snapshot. Spot price comes from the close of that date, and the technical detectors only see bars on or before it. Option chains remain live (yahooquery doesn't expose historical chains), so use this primarily for the morning-of "what does the scanner see now" question, not deep historical backtesting.
 
 ## Tests
 

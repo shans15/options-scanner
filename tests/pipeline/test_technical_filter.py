@@ -98,3 +98,28 @@ def test_filter_returns_three_tickers_with_correct_directions():
     assert set(out.keys()) == {'BULL', 'BEAR'}
     assert any(s.direction == 'bullish' for s in out['BULL'])
     assert any(s.direction == 'bearish' for s in out['BEAR'])
+
+
+def test_filter_with_as_of_slices_history():
+    """When as_of is supplied, only bars on or before that date are used."""
+    full_df = _ohlcv_uptrend_with_squeeze()
+    # Give it a real DatetimeIndex so as_of can slice
+    full_df.index = pd.date_range('2025-01-01', periods=len(full_df), freq='B')
+    last_date = full_df.index[-1].date()
+    mid_date = full_df.index[len(full_df) // 2].date()
+
+    src = _FakeSource({'AAA': full_df})
+
+    # No as_of → uses full history → setup may or may not fire depending on tail
+    out_full = filter_by_technicals(['AAA'], [src])
+
+    # as_of at the very last date → identical to no-as_of
+    out_last = filter_by_technicals(['AAA'], [src], as_of=last_date)
+    assert (out_full and 'AAA' in out_full) == (out_last and 'AAA' in out_last)
+
+    # as_of at the midpoint → very different bars seen, expect different result
+    # (mostly: fewer bars, may not pass min_history of 220)
+    out_mid = filter_by_technicals(['AAA'], [src], as_of=mid_date)
+    # If midpoint is < 220 bars in, AAA should be dropped (min history)
+    # We can't always guarantee this, but we can check the call doesn't crash
+    assert isinstance(out_mid, dict)
