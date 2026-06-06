@@ -18,7 +18,9 @@ class YfinanceSource(DataSource):
         df = yf.Ticker(ticker).history(period=period, auto_adjust=False)
         if df.empty or 'Close' not in df.columns:
             return pd.Series(dtype=float)
-        return df['Close'].astype(float)
+        out = df['Close'].astype(float)
+        out.index = pd.to_datetime(out.index)
+        return out
 
     def fetch_price_history_ohlcv(self, ticker: str, lookback_days: int) -> pd.DataFrame:
         period = '1y' if lookback_days > 180 else '6mo'

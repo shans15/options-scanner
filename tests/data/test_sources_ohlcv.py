@@ -92,6 +92,35 @@ def test_yfinance_ohlcv_returns_datetime_index():
     assert isinstance(out.index, pd.DatetimeIndex), f"Expected DatetimeIndex, got {type(out.index)}"
 
 
+def test_yahooquery_price_history_returns_datetime_index():
+    """The close-only fetch_price_history must also return a DatetimeIndex
+    so downstream code can slice by date (used for --as-of)."""
+    fake_df = pd.DataFrame({
+        'close': [101.0, 102.0],
+    }, index=pd.Index([__import__('datetime').date(2026, 1, 2),
+                       __import__('datetime').date(2026, 1, 3)]))
+    with patch('data.sources.yahooquery_source.Ticker') as MockTicker:
+        instance = MagicMock()
+        instance.history.return_value = fake_df
+        MockTicker.return_value = instance
+        out = YahooQuerySource().fetch_price_history('AAPL', 365)
+    assert isinstance(out.index, pd.DatetimeIndex), f"Expected DatetimeIndex, got {type(out.index)}"
+
+
+def test_yfinance_price_history_returns_datetime_index():
+    fake_df = pd.DataFrame({
+        'Close': [101.0, 102.0],
+    }, index=pd.Index([__import__('datetime').date(2026, 1, 2),
+                       __import__('datetime').date(2026, 1, 3)]))
+    with patch('data.sources.yfinance_source.yf.Ticker') as MockTicker:
+        instance = MagicMock()
+        instance.history.return_value = fake_df
+        MockTicker.return_value = instance
+        from data.sources.yfinance_source import YfinanceSource
+        out = YfinanceSource().fetch_price_history('AAPL', 365)
+    assert isinstance(out.index, pd.DatetimeIndex), f"Expected DatetimeIndex, got {type(out.index)}"
+
+
 def test_stooq_ohlcv_preserves_datetime_index():
     fake_csv = (
         "Date,Open,High,Low,Close,Volume\n"

@@ -100,7 +100,7 @@ def run_scan(config: ScanConfig, sources_override: Optional[list[DataSource]] = 
                 skipped[ticker] = 'earnings_blackout'
                 continue
             history = fetch_with_fallback(sources, 'fetch_price_history', ticker, 365)
-            if config.as_of is not None and hasattr(history.index, 'date'):
+            if config.as_of is not None and len(history) > 0:
                 history = history[history.index.date <= config.as_of]
             spot = fetch_with_fallback(sources, 'fetch_spot', ticker)
             if config.as_of is not None and len(history) > 0:
