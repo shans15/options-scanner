@@ -34,6 +34,12 @@ def _candidates_to_df(candidates: list[dict]) -> pd.DataFrame:
             'setup_name': c.get('setup_name', ''),
             'setup_direction': c.get('setup_direction', ''),
             'setup_strength': c.get('setup_strength'),
+            'weekly_trend': c.get('weekly_trend', ''),
+            'streak': c.get('consecutive_close_streak'),
+            'pct_1w': c.get('pct_change_1w'),
+            'pct_2w': c.get('pct_change_2w'),
+            'pct_4w': c.get('pct_change_4w'),
+            'weekly_agree': c.get('weekly_ribbon_agreement'),
         })
     return pd.DataFrame(rows)
 

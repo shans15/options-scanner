@@ -15,6 +15,7 @@ from data.adapters import to_contract
 from domain.signals import compute_regime
 from domain.strategy import ALL_STRATEGIES, NakedPut, NakedCall, LongPut, LongCall
 from domain.technical_signals import TechnicalSetup
+from domain.market_context import compute_market_context
 from pipeline.technical_filter import filter_by_technicals
 
 from engine.pop_models import pop_delta, pop_black_scholes, pop_historical, pop_garch_mc, blend_pop
@@ -119,6 +120,8 @@ def run_scan(config: ScanConfig, sources_override: Optional[list[DataSource]] = 
         setups = setups_by_ticker.get(ticker, [])
         setup_dirs = {s.direction for s in setups}
 
+        context = compute_market_context(history)
+
         for strategy in ALL_STRATEGIES:
             if config.use_technical_filter:
                 if not _strategy_matches_setup(strategy, setup_dirs):
@@ -182,6 +185,12 @@ def run_scan(config: ScanConfig, sources_override: Optional[list[DataSource]] = 
                     setup_name=chosen.setup_name if chosen else None,
                     setup_direction=chosen.direction if chosen else None,
                     setup_strength=chosen.strength if chosen else None,
+                    weekly_trend=context.weekly_trend,
+                    consecutive_close_streak=context.consecutive_close_streak,
+                    pct_change_1w=context.pct_change_1w,
+                    pct_change_2w=context.pct_change_2w,
+                    pct_change_4w=context.pct_change_4w,
+                    weekly_ribbon_agreement=context.weekly_ribbon_agreement,
                 ))
 
     candidates.sort(key=lambda c: c.composite_score, reverse=True)

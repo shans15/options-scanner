@@ -33,6 +33,7 @@ def write_scan(result: ScanResult, output_dir: Path) -> tuple[Path, Path]:
                'pop_blended', 'pop_delta', 'pop_bs', 'pop_historical', 'pop_garch_mc',
                'ev', 'max_adverse_loss', 'margin_estimate', 'composite_score', 'label',
                'setup_name', 'setup_direction', 'setup_strength',
+               'weekly_trend', 'streak', 'pct_1w', 'pct_2w', 'pct_4w', 'weekly_agree',
                'reason_for', 'reason_against', 'failed_filters']
     with csv_path.open('w', newline='') as f:
         w = csv.writer(f)
@@ -49,6 +50,12 @@ def write_scan(result: ScanResult, output_dir: Path) -> tuple[Path, Path]:
                 c.setup_name or '',
                 c.setup_direction or '',
                 c.setup_strength if c.setup_strength is not None else '',
+                c.weekly_trend or '',
+                c.consecutive_close_streak if c.consecutive_close_streak is not None else '',
+                f"{c.pct_change_1w:.1%}" if c.pct_change_1w is not None else '',
+                f"{c.pct_change_2w:.1%}" if c.pct_change_2w is not None else '',
+                f"{c.pct_change_4w:.1%}" if c.pct_change_4w is not None else '',
+                c.weekly_ribbon_agreement if c.weekly_ribbon_agreement is not None else '',
                 c.reason_for, c.reason_against, ';'.join(c.filter_result.failed_filters),
             ])
 
@@ -68,6 +75,12 @@ def write_scan(result: ScanResult, output_dir: Path) -> tuple[Path, Path]:
                 'setup_name': c.setup_name,
                 'setup_direction': c.setup_direction,
                 'setup_strength': c.setup_strength,
+                'weekly_trend': c.weekly_trend,
+                'consecutive_close_streak': c.consecutive_close_streak,
+                'pct_change_1w': c.pct_change_1w,
+                'pct_change_2w': c.pct_change_2w,
+                'pct_change_4w': c.pct_change_4w,
+                'weekly_ribbon_agreement': c.weekly_ribbon_agreement,
                 'reason_for': c.reason_for, 'reason_against': c.reason_against,
                 'failed_filters': list(c.filter_result.failed_filters),
             }

@@ -176,6 +176,36 @@ def test_run_scan_with_as_of_uses_sliced_close_as_spot():
         )
 
 
+def test_run_scan_populates_market_context_on_candidates():
+    """Candidates produced under the technical filter must carry market context."""
+    bull_df = _bullish_ohlcv_history()
+    bull_df.index = pd.date_range('2025-01-01', periods=len(bull_df), freq='B')
+    chain = [
+        _make_raw(option_type='put', strike=98, mid=1.0, iv=0.22),
+        _make_raw(option_type='call', strike=102, mid=1.0, iv=0.22),
+    ]
+    src = _FakeSource(history=bull_df['close'], spot=100.0, chain=chain, ohlcv=bull_df)
+    src._history = bull_df['close']
+    # Make the close-only history use a DatetimeIndex too (matches new contract)
+    src._history.index = bull_df.index
+
+    with patch('pipeline.run_scan.build_universe_cached', return_value=['X']), \
+         patch('pipeline.run_scan.has_earnings_within', return_value=False):
+        result = run_scan(
+            ScanConfig(today=date(2026, 5, 30), use_technical_filter=True),
+            sources_override=[src],
+        )
+
+    if result.candidates:
+        c = result.candidates[0]
+        assert c.weekly_trend in ('up', 'down', 'flat')
+        assert isinstance(c.consecutive_close_streak, int)
+        assert isinstance(c.pct_change_1w, float)
+        assert isinstance(c.pct_change_2w, float)
+        assert isinstance(c.pct_change_4w, float)
+        assert isinstance(c.weekly_ribbon_agreement, bool)
+
+
 def test_run_scan_legacy_regime_gate_when_filter_off():
     """When use_technical_filter=False, ScanConfig falls back to regime-based gating.
     With a regime favoring 'sell', only NakedPut/NakedCall candidates should appear."""

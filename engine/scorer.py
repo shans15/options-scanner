@@ -34,6 +34,13 @@ class ScoredCandidate:
     setup_name: Optional[str] = None
     setup_direction: Optional[str] = None
     setup_strength: Optional[float] = None
+    # NEW — display-only context (not used in composite_score)
+    weekly_trend: Optional[str] = None
+    consecutive_close_streak: Optional[int] = None
+    pct_change_1w: Optional[float] = None
+    pct_change_2w: Optional[float] = None
+    pct_change_4w: Optional[float] = None
+    weekly_ribbon_agreement: Optional[bool] = None
 
 
 def _regime_alignment_score(strategy: Strategy, regime: Regime) -> float:
