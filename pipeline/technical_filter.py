@@ -32,13 +32,7 @@ def filter_by_technicals(
             log.info("technical_filter: dropping %s — fetch failed (%s)", ticker, e)
             continue
         if as_of is not None and not history.empty:
-            if hasattr(history.index, 'date'):
-                history = history[history.index.date <= as_of]
-            else:
-                log.warning(
-                    "technical_filter: %s history has non-DatetimeIndex; "
-                    "skipping as_of slice", ticker,
-                )
+            history = history[history.index.date <= as_of]
         setups = detect_setups(history)
         if setups:
             results[ticker] = setups

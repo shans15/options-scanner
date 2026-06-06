@@ -27,6 +27,7 @@ class YfinanceSource(DataSource):
             return pd.DataFrame(columns=['open', 'high', 'low', 'close', 'volume'])
         rename = {c: c.lower() for c in df.columns}
         df = df.rename(columns=rename)
+        df.index = pd.to_datetime(df.index)
         keep = ['open', 'high', 'low', 'close', 'volume']
         return df[[c for c in keep if c in df.columns]].astype(float).tail(lookback_days).dropna()
 
