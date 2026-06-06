@@ -11,6 +11,7 @@ from domain.technical_signals import (
 from domain.technical_signals import _detect_compression_breakout
 from domain.technical_signals import _detect_pullback_in_trend
 from domain.technical_signals import _detect_stage_2_breakout
+from domain.technical_signals import _detect_failed_breakdown_reversal
 
 
 def test_technical_setup_is_frozen_with_required_fields():
@@ -238,5 +239,56 @@ def test_stage_2_breakout_bearish_fires_on_stage_4_breakdown():
     df = _ohlcv_from_close(close.tolist())
 
     setup = _detect_stage_2_breakout(df)
+    assert setup is not None
+    assert setup.direction == 'bearish'
+
+
+def test_failed_breakdown_reversal_bullish_fires_on_reclaim_with_divergence():
+    # Fixture redesign: plan's volume concat had 246 entries vs 245 for close/high/low.
+    # Fix: use np.full(244, ...) + [1_800_000] so volume length matches the 245-bar series.
+    # Thresholds unchanged; only the array-length bug in the plan fixture is corrected.
+    base = np.linspace(120, 100, 240).tolist()
+    breakdown_lows = [99.0, 97.5, 95.0, 97.0, 100.5]
+    close = np.array(base + breakdown_lows)
+    high = np.array(base + [c + 1.0 for c in breakdown_lows])
+    low = np.array(base + [c - 0.5 for c in breakdown_lows])
+    low[-3] = 93.0
+    volume = np.concatenate([
+        np.full(244, 1_000_000),
+        np.array([1_800_000]),
+    ])
+    df = pd.DataFrame({
+        'open': pd.Series(close).shift(1).fillna(close[0]),
+        'high': high, 'low': low, 'close': close, 'volume': volume,
+    })
+
+    setup = _detect_failed_breakdown_reversal(df)
+    assert setup is not None
+    assert setup.direction == 'bullish'
+    assert setup.setup_name == 'failed_breakdown_reversal'
+
+
+def test_failed_breakdown_reversal_returns_none_on_continuous_decline():
+    close = np.linspace(120, 80, 250)
+    df = _ohlcv_from_close(close.tolist())
+    assert _detect_failed_breakdown_reversal(df) is None
+
+
+def test_failed_breakdown_reversal_bearish_fires_on_failed_breakout():
+    # Fixture redesign: same array-length bug as the bullish fixture — plan's volume
+    # concat produced 246 entries. Fixed to np.full(244, ...) + [1_800_000] = 245.
+    base = np.linspace(80, 100, 240).tolist()
+    breakout_highs = [101.0, 102.5, 105.0, 102.0, 99.0]
+    close = np.array(base + breakout_highs)
+    high = np.array(base + [c + 1.0 for c in breakout_highs])
+    high[-3] = 107.0
+    low = np.array(base + [c - 0.5 for c in breakout_highs])
+    volume = np.concatenate([np.full(244, 1_000_000), np.array([1_800_000])])
+    df = pd.DataFrame({
+        'open': pd.Series(close).shift(1).fillna(close[0]),
+        'high': high, 'low': low, 'close': close, 'volume': volume,
+    })
+
+    setup = _detect_failed_breakdown_reversal(df)
     assert setup is not None
     assert setup.direction == 'bearish'

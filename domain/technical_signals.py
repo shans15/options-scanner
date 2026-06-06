@@ -241,3 +241,85 @@ def _detect_stage_2_breakout(df: pd.DataFrame) -> Optional[TechnicalSetup]:
         )
 
     return None
+
+
+_REVERSAL_LOOKBACK = 25
+_REVERSAL_RECENT_BARS = 5
+_REVERSAL_VOL_MULT = 1.5
+_DIVERGENCE_WINDOW = 20
+
+
+def _has_bullish_divergence(low: pd.Series, po: pd.Series) -> bool:
+    window_low = low.iloc[-_DIVERGENCE_WINDOW:]
+    window_po = po.iloc[-_DIVERGENCE_WINDOW:]
+    if window_low.isna().any() or window_po.isna().any():
+        return False
+    first_low = window_low.iloc[: _DIVERGENCE_WINDOW // 2].min()
+    second_low = window_low.iloc[_DIVERGENCE_WINDOW // 2 :].min()
+    first_po_low = window_po.iloc[: _DIVERGENCE_WINDOW // 2].min()
+    second_po_low = window_po.iloc[_DIVERGENCE_WINDOW // 2 :].min()
+    return bool(second_low < first_low and second_po_low > first_po_low)
+
+
+def _has_bearish_divergence(high: pd.Series, po: pd.Series) -> bool:
+    window_high = high.iloc[-_DIVERGENCE_WINDOW:]
+    window_po = po.iloc[-_DIVERGENCE_WINDOW:]
+    if window_high.isna().any() or window_po.isna().any():
+        return False
+    first_high = window_high.iloc[: _DIVERGENCE_WINDOW // 2].max()
+    second_high = window_high.iloc[_DIVERGENCE_WINDOW // 2 :].max()
+    first_po_high = window_po.iloc[: _DIVERGENCE_WINDOW // 2].max()
+    second_po_high = window_po.iloc[_DIVERGENCE_WINDOW // 2 :].max()
+    return bool(second_high > first_high and second_po_high < first_po_high)
+
+
+def _detect_failed_breakdown_reversal(df: pd.DataFrame) -> Optional[TechnicalSetup]:
+    close = df['close']
+    high = df['high']
+    low = df['low']
+    volume = df['volume']
+    emas = _emas(close)
+    atr = _atr14(high, low, close)
+    po = _phase_oscillator(close, emas[21], atr)
+
+    last_close = close.iloc[-1]
+    last_vol = volume.iloc[-1]
+    avg_vol_prev = volume.iloc[-21:-1].mean()
+    if pd.isna(avg_vol_prev) or avg_vol_prev <= 0:
+        return None
+    if last_vol < _REVERSAL_VOL_MULT * avg_vol_prev:
+        return None
+
+    prior_window_low = low.iloc[-_REVERSAL_LOOKBACK:-_REVERSAL_RECENT_BARS]
+    recent_window_low = low.iloc[-_REVERSAL_RECENT_BARS:]
+    prior_min_low = prior_window_low.min()
+    recent_min_low = recent_window_low.min()
+
+    prior_window_high = high.iloc[-_REVERSAL_LOOKBACK:-_REVERSAL_RECENT_BARS]
+    recent_window_high = high.iloc[-_REVERSAL_RECENT_BARS:]
+    prior_max_high = prior_window_high.max()
+    recent_max_high = recent_window_high.max()
+
+    strength = float(min(1.0, last_vol / (_REVERSAL_VOL_MULT * avg_vol_prev)))
+
+    if (recent_min_low < prior_min_low
+        and last_close > prior_min_low
+        and _has_bullish_divergence(low, po)):
+        return TechnicalSetup(
+            setup_name='failed_breakdown_reversal',
+            direction='bullish',
+            strength=strength,
+            notes='Reclaimed prior 20d low with bullish PO divergence on high volume',
+        )
+
+    if (recent_max_high > prior_max_high
+        and last_close < prior_max_high
+        and _has_bearish_divergence(high, po)):
+        return TechnicalSetup(
+            setup_name='failed_breakdown_reversal',
+            direction='bearish',
+            strength=strength,
+            notes='Rejected prior 20d high with bearish PO divergence on high volume',
+        )
+
+    return None
