@@ -323,3 +323,39 @@ def _detect_failed_breakdown_reversal(df: pd.DataFrame) -> Optional[TechnicalSet
         )
 
     return None
+
+
+_MIN_HISTORY = 220
+_REQUIRED_COLS = ('open', 'high', 'low', 'close', 'volume')
+
+
+def detect_setups(history: pd.DataFrame) -> list[TechnicalSetup]:
+    """Run all detectors against a daily OHLCV history. Returns non-None setups.
+
+    Guarantees:
+    - len(history) < 220 → []
+    - All-NaN / flat history → []
+    - Never raises.
+    """
+    if history is None or len(history) < _MIN_HISTORY:
+        return []
+    if not all(col in history.columns for col in _REQUIRED_COLS):
+        return []
+    if history['close'].isna().all() or history['close'].dropna().nunique() <= 1:
+        return []
+
+    detectors = (
+        _detect_compression_breakout,
+        _detect_pullback_in_trend,
+        _detect_stage_2_breakout,
+        _detect_failed_breakdown_reversal,
+    )
+    out: list[TechnicalSetup] = []
+    for fn in detectors:
+        try:
+            setup = fn(history)
+        except Exception:
+            setup = None
+        if setup is not None:
+            out.append(setup)
+    return out

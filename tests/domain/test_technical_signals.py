@@ -12,6 +12,7 @@ from domain.technical_signals import _detect_compression_breakout
 from domain.technical_signals import _detect_pullback_in_trend
 from domain.technical_signals import _detect_stage_2_breakout
 from domain.technical_signals import _detect_failed_breakdown_reversal
+from domain.technical_signals import detect_setups
 
 
 def test_technical_setup_is_frozen_with_required_fields():
@@ -292,3 +293,46 @@ def test_failed_breakdown_reversal_bearish_fires_on_failed_breakout():
     setup = _detect_failed_breakdown_reversal(df)
     assert setup is not None
     assert setup.direction == 'bearish'
+
+
+def test_detect_setups_returns_empty_when_history_too_short():
+    close = pd.Series(np.linspace(100, 110, 100))  # only 100 bars
+    df = _ohlcv_from_close(close.tolist())
+    assert detect_setups(df) == []
+
+
+def test_detect_setups_returns_empty_for_flat_nan_history():
+    df = pd.DataFrame({
+        'open':   pd.Series([np.nan] * 250),
+        'high':   pd.Series([np.nan] * 250),
+        'low':    pd.Series([np.nan] * 250),
+        'close':  pd.Series([np.nan] * 250),
+        'volume': pd.Series([np.nan] * 250),
+    })
+    assert detect_setups(df) == []
+
+
+def test_detect_setups_returns_list_when_setup_matches():
+    # Reuse a fixture known to trigger compression breakout (see Task 3).
+    # Build a series that exercises the compression detector reliably.
+    np.random.seed(99)
+    volatile = 100 + np.cumsum(np.random.normal(0, 2.0, 100))
+    trend = np.linspace(volatile[-1], volatile[-1] + 20, 30)
+    flat = np.full(120, trend[-1]) + np.random.normal(0, 0.05, 120)
+    close = np.concatenate([volatile, trend, flat])
+    df = _ohlcv_from_close(close.tolist())
+    out = detect_setups(df)
+    assert len(out) >= 1
+    assert all(isinstance(s, TechnicalSetup) for s in out)
+
+
+def test_detect_setups_is_deterministic():
+    np.random.seed(99)
+    volatile = 100 + np.cumsum(np.random.normal(0, 2.0, 100))
+    trend = np.linspace(volatile[-1], volatile[-1] + 20, 30)
+    flat = np.full(120, trend[-1]) + np.random.normal(0, 0.05, 120)
+    close = np.concatenate([volatile, trend, flat])
+    df = _ohlcv_from_close(close.tolist())
+    first = detect_setups(df)
+    second = detect_setups(df)
+    assert first == second
