@@ -32,6 +32,7 @@ def write_scan(result: ScanResult, output_dir: Path) -> tuple[Path, Path]:
                'implied_volatility', 'delta', 'gamma', 'theta', 'vega',
                'pop_blended', 'pop_delta', 'pop_bs', 'pop_historical', 'pop_garch_mc',
                'ev', 'max_adverse_loss', 'margin_estimate', 'composite_score', 'label',
+               'setup_name', 'setup_direction', 'setup_strength',
                'reason_for', 'reason_against', 'failed_filters']
     with csv_path.open('w', newline='') as f:
         w = csv.writer(f)
@@ -45,6 +46,9 @@ def write_scan(result: ScanResult, output_dir: Path) -> tuple[Path, Path]:
                 con.implied_volatility, con.delta, con.gamma, con.theta, con.vega,
                 c.pop_blended, c.pop_delta, c.pop_bs, c.pop_historical, c.pop_garch_mc,
                 c.ev, c.max_adverse_loss, c.margin_estimate, c.composite_score, c.label,
+                c.setup_name or '',
+                c.setup_direction or '',
+                c.setup_strength if c.setup_strength is not None else '',
                 c.reason_for, c.reason_against, ';'.join(c.filter_result.failed_filters),
             ])
 
@@ -61,6 +65,9 @@ def write_scan(result: ScanResult, output_dir: Path) -> tuple[Path, Path]:
                 'ev': c.ev, 'max_adverse_loss': c.max_adverse_loss,
                 'margin_estimate': c.margin_estimate,
                 'composite_score': c.composite_score, 'label': c.label,
+                'setup_name': c.setup_name,
+                'setup_direction': c.setup_direction,
+                'setup_strength': c.setup_strength,
                 'reason_for': c.reason_for, 'reason_against': c.reason_against,
                 'failed_filters': list(c.filter_result.failed_filters),
             }

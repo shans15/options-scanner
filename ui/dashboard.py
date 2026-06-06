@@ -31,6 +31,9 @@ def _candidates_to_df(candidates: list[dict]) -> pd.DataFrame:
             'ev': c['ev'],
             'score': c['composite_score'],
             'label': c['label'],
+            'setup_name': c.get('setup_name', ''),
+            'setup_direction': c.get('setup_direction', ''),
+            'setup_strength': c.get('setup_strength'),
         })
     return pd.DataFrame(rows)
 
@@ -45,7 +48,14 @@ def render_dashboard() -> None:
         return
 
     st.caption(f"Last scan: {data['timestamp']}")
-    df = _candidates_to_df(data['candidates'])
+    candidates_data = data['candidates']
+
+    setup_options = sorted({c.get('setup_name', '') for c in candidates_data if c.get('setup_name')})
+    selected_setup = st.sidebar.selectbox('Filter by setup', ['(any)'] + setup_options)
+    if selected_setup != '(any)':
+        candidates_data = [c for c in candidates_data if c.get('setup_name') == selected_setup]
+
+    df = _candidates_to_df(candidates_data)
 
     if df.empty:
         st.info('No candidates in latest scan.')
@@ -71,13 +81,13 @@ def render_dashboard() -> None:
     with tab_watch: _show(df[df['label'] == 'WATCHLIST'])
 
     st.divider()
-    sel = st.selectbox('Inspect candidate', options=list(range(len(data['candidates']))),
-                       format_func=lambda i: f"{data['candidates'][i]['contract']['ticker']} "
-                                             f"{data['candidates'][i]['strategy']} "
-                                             f"{data['candidates'][i]['contract']['strike']} "
-                                             f"{data['candidates'][i]['contract']['expiration']}")
+    sel = st.selectbox('Inspect candidate', options=list(range(len(candidates_data))),
+                       format_func=lambda i: f"{candidates_data[i]['contract']['ticker']} "
+                                             f"{candidates_data[i]['strategy']} "
+                                             f"{candidates_data[i]['contract']['strike']} "
+                                             f"{candidates_data[i]['contract']['expiration']}")
     if sel is not None:
-        c = data['candidates'][sel]
+        c = candidates_data[sel]
         st.write(c)
 
     if st.button('Refresh from latest.json'):

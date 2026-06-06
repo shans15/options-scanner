@@ -56,3 +56,38 @@ def test_write_scan_json_roundtrips(tmp_path):
     data = json.loads(json_path.read_text())
     assert data['candidates'][0]['contract']['ticker'] == 'SPY'
     assert data['skipped'] == {}
+
+
+def test_exporter_includes_setup_columns_in_csv(tmp_path):
+    from datetime import datetime, date
+    from engine.scorer import ScoredCandidate
+    from engine.stress import StressResult
+    from engine.risk_filters import FilterResult
+    from domain.contract import Contract
+    from domain.strategy import LongCall
+    from pipeline.run_scan import ScanResult, ScanConfig
+    from ui.exporter import write_scan
+
+    contract = Contract(
+        ticker='AAPL', expiration=date(2026, 7, 18), strike=200.0, option_type='call',
+        bid=1.0, ask=1.2, mid=1.1, volume=500, open_interest=1000,
+        implied_volatility=0.22, delta=0.50, gamma=0.05, theta=-0.04, vega=0.10,
+        dte=21, spot_price=200.0,
+    )
+    candidate = ScoredCandidate(
+        contract=contract, strategy=LongCall(),
+        pop_blended=0.55, pop_delta=0.5, pop_bs=0.55, pop_historical=0.55, pop_garch_mc=0.55,
+        stress=StressResult(stress_1sd=-0.5, stress_2sd=-1.0, stress_expiry=-1.5),
+        ev=0.2, max_adverse_loss=1.0, margin_estimate=110.0,
+        filter_result=FilterResult(passed=True, failed_filters=[]),
+        composite_score=68.0, label='TRADE',
+        reason_for='test', reason_against='',
+        setup_name='compression_breakout', setup_direction='bullish', setup_strength=0.82,
+    )
+    result = ScanResult(timestamp=datetime.now(), config=ScanConfig(),
+                        candidates=[candidate], skipped={})
+    csv_path, _ = write_scan(result, tmp_path)
+
+    text = csv_path.read_text()
+    assert 'setup_name' in text
+    assert 'compression_breakout' in text
