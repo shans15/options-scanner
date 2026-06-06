@@ -32,6 +32,7 @@ def cmd_scan(args) -> int:
         require_options_chain=True,
     )
     config = ScanConfig(universe_filters=filters)
+    config.use_technical_filter = not args.no_technical_filter
     if args.fast:
         config.n_monte_carlo_paths = 1000  # tradeoff: faster, less precise GARCH-MC PoP
 
@@ -88,6 +89,8 @@ def main() -> int:
     s.add_argument('--tickers', type=str, default=None, help='Comma-separated override list')
     s.add_argument('--then-dashboard', action='store_true')
     s.add_argument('--fast', action='store_true', help='Use 1000 GARCH-MC paths instead of 10000 for faster scans')
+    s.add_argument('--no-technical-filter', action='store_true',
+                   help='Bypass Saty technical filter; use legacy RV/IV regime-only gating')
     s.set_defaults(func=cmd_scan)
 
     d = sub.add_parser('dashboard', help='Launch Streamlit dashboard')
