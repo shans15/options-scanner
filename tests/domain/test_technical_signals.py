@@ -9,6 +9,8 @@ from domain.technical_signals import (
     _emas, _atr14, _phase_oscillator, _po_bandwidth_percentile,
 )
 from domain.technical_signals import _detect_compression_breakout
+from domain.technical_signals import _detect_pullback_in_trend
+from domain.technical_signals import _detect_stage_2_breakout
 
 
 def test_technical_setup_is_frozen_with_required_fields():
@@ -127,9 +129,6 @@ def test_compression_breakout_bearish_fires_on_inverse_setup():
     assert setup.direction == 'bearish'
 
 
-from domain.technical_signals import _detect_pullback_in_trend
-
-
 def test_pullback_in_trend_bullish_fires_on_uptrend_pullback_to_21ema():
     # Build a 242-bar steady uptrend, then two bars that hold near the top while
     # the last bar's WICK dips to touch the 13-21 EMA zone.
@@ -172,5 +171,72 @@ def test_pullback_in_trend_bearish_fires_on_downtrend_rally_to_21ema():
         'volume': pd.Series([1_000_000] * (len(close) - 1) + [600_000]),
     })
     setup = _detect_pullback_in_trend(df)
+    assert setup is not None
+    assert setup.direction == 'bearish'
+
+
+def test_stage_2_breakout_bullish_fires_on_fresh_ema48_cross_with_prior_squeeze():
+    # Fixture deviation from plan: the plan's simple linspace fixture didn't produce
+    # sufficient contrast between the squeeze and background PO stdev (compression
+    # percentile stayed ~0.67, above the 0.25 cutoff), and close was already far above
+    # e48 so no fresh cross occurred. Redesigned with a volatile background within the
+    # 126-bar percentile window, followed by a tight squeeze and a fresh breakout that
+    # (a) crosses e48 from below within 5 bars, (b) goes to a new high (near_high=True),
+    # and (c) shows recent bbw_pct min < 0.25.
+    np.random.seed(42)
+    early = np.linspace(50, 80, 150)
+    vol_section = np.zeros(70)
+    vol_section[0] = 80
+    for i in range(1, 70):
+        vol_section[i] = vol_section[i - 1] + np.random.normal(0, 4.0)
+    vol_section = 80 + (vol_section - vol_section.mean()) * 0.7
+    vol_section = np.clip(vol_section, 60, 90)
+    plateau = vol_section[-1]
+    squeeze = np.full(40, plateau) + np.random.normal(0, 0.02, 40)
+    # Determine e48 level and prior high to anchor the breakout
+    temp_close = pd.Series(np.concatenate([early, vol_section, squeeze]))
+    e48_level = _emas(temp_close)[48].iloc[-1]
+    prior_high = (temp_close * 1.003).max()
+    breakout = np.linspace(e48_level * 0.99, prior_high * 1.02, 6)
+    close = np.concatenate([early, vol_section, squeeze, breakout])
+    df = _ohlcv_from_close(close.tolist())
+
+    setup = _detect_stage_2_breakout(df)
+    assert setup is not None
+    assert setup.direction == 'bullish'
+    assert setup.setup_name == 'stage_2_breakout'
+
+
+def test_stage_2_breakout_returns_none_when_far_from_52w_high():
+    close = np.concatenate([np.linspace(80, 200, 100), np.linspace(200, 110, 150)])
+    df = _ohlcv_from_close(close.tolist())
+    assert _detect_stage_2_breakout(df) is None
+
+
+def test_stage_2_breakout_bearish_fires_on_stage_4_breakdown():
+    # Fixture deviation from plan: same reasoning as the bullish case — the plan's
+    # linspace fixture didn't create enough PO-stdev contrast for the compression check,
+    # and close was already far below e48 so no fresh cross occurred. Redesigned with
+    # a volatile background, tight squeeze, and a fresh breakdown that crosses e48 from
+    # above within 5 bars and hits a new 52w low (near_low=True).
+    np.random.seed(17)
+    early = np.linspace(120, 90, 150)
+    vol_section = np.zeros(70)
+    vol_section[0] = 90
+    for i in range(1, 70):
+        vol_section[i] = vol_section[i - 1] + np.random.normal(-0.1, 4.0)
+    vol_section = 90 + (vol_section - vol_section.mean()) * 0.7
+    vol_section = np.clip(vol_section, 70, 110)
+    plateau = vol_section[-1]
+    squeeze = np.full(40, plateau) + np.random.normal(0, 0.02, 40)
+    # Determine e48 level and prior low to anchor the breakdown
+    temp_close = pd.Series(np.concatenate([early, vol_section, squeeze]))
+    e48_level = _emas(temp_close)[48].iloc[-1]
+    prior_low = (temp_close * 0.997).min()
+    breakdown = np.linspace(e48_level * 1.005, prior_low * 0.98, 6)
+    close = np.concatenate([early, vol_section, squeeze, breakdown])
+    df = _ohlcv_from_close(close.tolist())
+
+    setup = _detect_stage_2_breakout(df)
     assert setup is not None
     assert setup.direction == 'bearish'

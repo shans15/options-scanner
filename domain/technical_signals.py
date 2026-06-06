@@ -1,6 +1,7 @@
 from __future__ import annotations
 from dataclasses import dataclass
 from typing import Literal, Optional
+import numpy as np
 import pandas as pd
 
 
@@ -147,4 +148,96 @@ def _detect_pullback_in_trend(df: pd.DataFrame) -> Optional[TechnicalSetup]:
             strength=strength,
             notes=f'Ribbon stacked bearish, high tagged 21-13 EMA, PO={last_po:.1f}',
         )
+    return None
+
+
+_FRESH_CROSS_BARS = 5
+_NEAR_52W_PCT = 0.10
+_PRIOR_COMPRESSION_LOOKBACK = 20
+_PRIOR_COMPRESSION_PCT = 0.25
+_EMA200_SLOPE_LOOKBACK = 30
+
+
+def _crossed_above_within(series: pd.Series, reference: pd.Series, bars: int) -> bool:
+    window_s = series.iloc[-(bars + 1):]
+    window_r = reference.iloc[-(bars + 1):]
+    diff = window_s.values - window_r.values
+    return bool((diff[:-1] <= 0).any() and diff[-1] > 0)
+
+
+def _crossed_below_within(series: pd.Series, reference: pd.Series, bars: int) -> bool:
+    window_s = series.iloc[-(bars + 1):]
+    window_r = reference.iloc[-(bars + 1):]
+    diff = window_s.values - window_r.values
+    return bool((diff[:-1] >= 0).any() and diff[-1] < 0)
+
+
+def _crossed_zero_above(series: pd.Series, bars: int) -> bool:
+    window = series.iloc[-(bars + 1):]
+    return bool((window.iloc[:-1] <= 0).any() and window.iloc[-1] > 0)
+
+
+def _crossed_zero_below(series: pd.Series, bars: int) -> bool:
+    window = series.iloc[-(bars + 1):]
+    return bool((window.iloc[:-1] >= 0).any() and window.iloc[-1] < 0)
+
+
+def _detect_stage_2_breakout(df: pd.DataFrame) -> Optional[TechnicalSetup]:
+    close = df['close']
+    high = df['high']
+    low = df['low']
+    emas = _emas(close)
+    atr = _atr14(high, low, close)
+    po = _phase_oscillator(close, emas[21], atr)
+    bbw_pct = _po_bandwidth_percentile(po)
+
+    e48 = emas[48]
+    e200 = emas[200]
+    last_close = close.iloc[-1]
+    last_atr = atr.iloc[-1]
+
+    if pd.isna(last_atr) or last_atr <= 0:
+        return None
+    if pd.isna(e200.iloc[-1]) or pd.isna(e200.iloc[-_EMA200_SLOPE_LOOKBACK - 1]):
+        return None
+
+    ema200_rising = e200.iloc[-1] > e200.iloc[-_EMA200_SLOPE_LOOKBACK - 1]
+    ema200_falling = e200.iloc[-1] < e200.iloc[-_EMA200_SLOPE_LOOKBACK - 1]
+
+    recent_compression = bbw_pct.iloc[-_PRIOR_COMPRESSION_LOOKBACK:].min()
+    if pd.isna(recent_compression) or recent_compression >= _PRIOR_COMPRESSION_PCT:
+        return None
+
+    # Bullish branch
+    high_52w = high.iloc[-252:].max() if len(high) >= 252 else high.max()
+    near_high = last_close >= (1 - _NEAR_52W_PCT) * high_52w
+
+    if (ema200_rising
+            and _crossed_above_within(close, e48, _FRESH_CROSS_BARS)
+            and _crossed_zero_above(po, _FRESH_CROSS_BARS)
+            and near_high):
+        strength = float(np.clip((last_close - e48.iloc[-1]) / last_atr, 0.0, 2.0) / 2.0)
+        return TechnicalSetup(
+            setup_name='stage_2_breakout',
+            direction='bullish',
+            strength=strength,
+            notes='EMA200 rising, fresh EMA48 + PO zero cross, near 52w high',
+        )
+
+    # Bearish branch (Stage 4 breakdown)
+    low_52w = low.iloc[-252:].min() if len(low) >= 252 else low.min()
+    near_low = last_close <= (1 + _NEAR_52W_PCT) * low_52w
+
+    if (ema200_falling
+            and _crossed_below_within(close, e48, _FRESH_CROSS_BARS)
+            and _crossed_zero_below(po, _FRESH_CROSS_BARS)
+            and near_low):
+        strength = float(np.clip((e48.iloc[-1] - last_close) / last_atr, 0.0, 2.0) / 2.0)
+        return TechnicalSetup(
+            setup_name='stage_2_breakout',
+            direction='bearish',
+            strength=strength,
+            notes='EMA200 falling, fresh EMA48 + PO zero cross, near 52w low',
+        )
+
     return None
