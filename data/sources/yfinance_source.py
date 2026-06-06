@@ -28,7 +28,7 @@ class YfinanceSource(DataSource):
         rename = {c: c.lower() for c in df.columns}
         df = df.rename(columns=rename)
         keep = ['open', 'high', 'low', 'close', 'volume']
-        return df[[c for c in keep if c in df.columns]].astype(float).dropna()
+        return df[[c for c in keep if c in df.columns]].astype(float).tail(lookback_days).dropna()
 
     def fetch_option_chain(self, ticker: str) -> list[RawContract]:
         tk = yf.Ticker(ticker)

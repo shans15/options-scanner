@@ -30,7 +30,7 @@ class YahooQuerySource(DataSource):
         cols = {c.lower(): c for c in df.columns}
         keep = ['open', 'high', 'low', 'close', 'volume']
         out = pd.DataFrame({k: df[cols[k]].astype(float) for k in keep if k in cols})
-        return out.dropna()
+        return out.tail(lookback_days).dropna()
 
     def fetch_option_chain(self, ticker: str) -> list[RawContract]:
         t = Ticker(ticker)

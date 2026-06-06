@@ -26,9 +26,12 @@ class StooqSource(DataSource):
             raise RuntimeError(f"stooq returned empty for {ticker}")
         rename = {c: c.lower() for c in df.columns}
         df = df.rename(columns=rename)
+        if 'date' in df.columns:
+            df['date'] = pd.to_datetime(df['date'])
+            df = df.set_index('date')
         keep = ['open', 'high', 'low', 'close', 'volume']
         out = df[[c for c in keep if c in df.columns]].astype(float).tail(lookback_days)
-        return out.reset_index(drop=True).dropna()
+        return out.dropna()
 
     def fetch_option_chain(self, ticker: str) -> list[RawContract]:
         return []
