@@ -1,7 +1,6 @@
 from __future__ import annotations
 from dataclasses import dataclass
-from typing import Literal, Optional
-import numpy as np
+from typing import Literal
 import pandas as pd
 
 

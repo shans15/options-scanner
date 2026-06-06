@@ -1,8 +1,13 @@
+from dataclasses import FrozenInstanceError
+
 import numpy as np
 import pandas as pd
 import pytest
 
 from domain.technical_signals import TechnicalSetup
+from domain.technical_signals import (
+    _emas, _atr14, _phase_oscillator, _po_bandwidth_percentile,
+)
 
 
 def test_technical_setup_is_frozen_with_required_fields():
@@ -15,13 +20,8 @@ def test_technical_setup_is_frozen_with_required_fields():
     assert s.setup_name == 'compression_breakout'
     assert s.direction == 'bullish'
     assert 0.0 <= s.strength <= 1.0
-    with pytest.raises((AttributeError, Exception)):
+    with pytest.raises(FrozenInstanceError):
         s.strength = 0.5  # frozen → cannot mutate
-
-
-from domain.technical_signals import (
-    _emas, _atr14, _phase_oscillator, _po_bandwidth_percentile,
-)
 
 
 def _synth_ohlcv(close_series: pd.Series) -> pd.DataFrame:
