@@ -45,7 +45,7 @@ def test_run_scan_skips_tickers_with_earnings():
 
     with patch('pipeline.run_scan.build_universe_cached', return_value=['X']), \
          patch('pipeline.run_scan.has_earnings_within', return_value=True):
-        result = run_scan(ScanConfig(today=date(2026, 5, 30)), sources_override=[src])
+        result = run_scan(ScanConfig(today=date(2026, 5, 30), use_technical_filter=False), sources_override=[src])
 
     assert result.skipped == {'X': 'earnings_blackout'}
     assert result.candidates == []
@@ -60,7 +60,7 @@ def test_run_scan_records_fetch_failure_per_ticker():
 
     with patch('pipeline.run_scan.build_universe_cached', return_value=['X']), \
          patch('pipeline.run_scan.has_earnings_within', return_value=False):
-        result = run_scan(ScanConfig(today=date(2026, 5, 30)), sources_override=[_Broken()])
+        result = run_scan(ScanConfig(today=date(2026, 5, 30), use_technical_filter=False), sources_override=[_Broken()])
 
     assert 'X' in result.skipped
     assert 'fetch_failed' in result.skipped['X']
