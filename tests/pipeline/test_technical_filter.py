@@ -66,3 +66,35 @@ def test_filter_handles_fetch_failure_gracefully():
     out = filter_by_technicals(['AAA', 'CCC'], [src])
     assert 'AAA' in out
     assert 'CCC' not in out
+
+
+def _ohlcv_downtrend_with_squeeze(seed: int = 99) -> pd.DataFrame:
+    # Volatile phase → 30-bar downtrend dropping 30 pts → 80-bar flat squeeze.
+    # At the end the EMA ribbon is stacked bearish (e8 < e13 < e21 < e48) and
+    # PO bandwidth is in the bottom 20th percentile, reliably triggering at least
+    # compression_breakout + pullback_in_trend with direction='bearish'.
+    np.random.seed(seed)
+    volatile = 100 + np.cumsum(np.random.normal(0, 2.0, 100))
+    trend = np.linspace(volatile[-1], volatile[-1] - 30, 80)
+    flat = np.full(80, trend[-1]) + np.random.normal(0, 0.05, 80)
+    close = np.concatenate([volatile, trend, flat])
+    s = pd.Series(close)
+    return pd.DataFrame({
+        'open':   s.shift(1).fillna(s.iloc[0]),
+        'high':   s * 1.003,
+        'low':    s * 0.997,
+        'close':  s,
+        'volume': pd.Series(1_000_000, index=s.index),
+    })
+
+
+def test_filter_returns_three_tickers_with_correct_directions():
+    src = _FakeSource({
+        'BULL': _ohlcv_uptrend_with_squeeze(),
+        'BEAR': _ohlcv_downtrend_with_squeeze(),
+        'FLAT': _ohlcv_flat(),
+    })
+    out = filter_by_technicals(['BULL', 'BEAR', 'FLAT'], [src])
+    assert set(out.keys()) == {'BULL', 'BEAR'}
+    assert any(s.direction == 'bullish' for s in out['BULL'])
+    assert any(s.direction == 'bearish' for s in out['BEAR'])

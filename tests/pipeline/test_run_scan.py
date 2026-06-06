@@ -28,10 +28,10 @@ def _make_raw(option_type='put', strike=100.0, dte=21, iv=0.20, mid=2.0):
 
 
 def test_run_scan_returns_scan_result_with_candidates():
-    history = pd.Series(np.exp(np.cumsum(np.random.RandomState(0).normal(0, 0.01, 365)))) * 100
+    bull_df = _bullish_ohlcv_history()
     chain = [_make_raw(option_type='put', strike=98, mid=1.0),
              _make_raw(option_type='call', strike=102, mid=1.0)]
-    src = _FakeSource(history, spot=100.0, chain=chain)
+    src = _FakeSource(history=bull_df['close'], spot=100.0, chain=chain, ohlcv=bull_df)
 
     with patch('pipeline.run_scan.build_universe_cached', return_value=['X']), \
          patch('pipeline.run_scan.has_earnings_within', return_value=False):
@@ -40,6 +40,7 @@ def test_run_scan_returns_scan_result_with_candidates():
     assert isinstance(result, ScanResult)
     assert result.skipped == {} or 'X' not in result.skipped
     assert isinstance(result.candidates, list)
+    assert len(result.candidates) > 0
 
 
 def test_run_scan_skips_tickers_with_earnings():
@@ -121,7 +122,7 @@ def test_run_scan_with_technical_filter_only_fires_aligned_strategies():
     assert 'naked_call' not in strategy_names
     if strategy_names:
         assert strategy_names.issubset({'long_call', 'naked_put'})
-    _valid_bullish_setups = {'compression_breakout', 'pullback_in_trend', 'stage2_breakout', 'failed_breakdown_reversal'}
+    _valid_bullish_setups = {'compression_breakout', 'pullback_in_trend', 'stage_2_breakout', 'failed_breakdown_reversal'}
     for c in result.candidates:
         assert c.setup_name in _valid_bullish_setups
         assert c.setup_direction == 'bullish'
@@ -140,3 +141,34 @@ def test_run_scan_with_no_signal_ticker_produces_no_candidates_when_filter_on():
         )
 
     assert result.candidates == []
+
+
+def test_run_scan_legacy_regime_gate_when_filter_off():
+    """When use_technical_filter=False, ScanConfig falls back to regime-based gating.
+    With a regime favoring 'sell', only NakedPut/NakedCall candidates should appear."""
+    # Tiny-noise random walk gives RV ~0.014% annualised (vs IV 30%),
+    # so rv_iv_ratio << 0.8 → regime.favored == ['sell'].
+    # Requires >=3 ATM contracts (within ±5% of spot=100) so _atm_iv returns a
+    # valid non-zero value — otherwise compute_regime falls back to 'sell'+'buy'.
+    np.random.seed(0)
+    history = pd.Series(100.0 + np.cumsum(np.random.normal(0, 0.001, 365)))
+    chain = [
+        _make_raw(option_type='put',  strike=99,  mid=1.0, iv=0.30),
+        _make_raw(option_type='put',  strike=100, mid=1.0, iv=0.30),
+        _make_raw(option_type='call', strike=100, mid=1.0, iv=0.30),
+        _make_raw(option_type='call', strike=101, mid=1.0, iv=0.30),
+    ]
+    src = _FakeSource(history=history, spot=100.0, chain=chain)
+
+    with patch('pipeline.run_scan.build_universe_cached', return_value=['X']), \
+         patch('pipeline.run_scan.has_earnings_within', return_value=False):
+        result = run_scan(
+            ScanConfig(today=date(2026, 5, 30), use_technical_filter=False),
+            sources_override=[src],
+        )
+
+    # rv_iv_ratio ~0.0005 < 0.8 → regime favors 'sell' only.
+    # Therefore LongPut/LongCall ('buy' direction) should NOT appear.
+    strategy_names = {c.strategy.name for c in result.candidates}
+    assert 'long_put' not in strategy_names
+    assert 'long_call' not in strategy_names
