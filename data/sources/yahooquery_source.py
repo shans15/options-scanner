@@ -22,6 +22,16 @@ class YahooQuerySource(DataSource):
             df = df.xs(ticker, level='symbol', drop_level=True)
         return df['close'].astype(float)
 
+    def fetch_price_history_ohlcv(self, ticker: str, lookback_days: int) -> pd.DataFrame:
+        period = '1y' if lookback_days > 180 else '6mo'
+        df = Ticker(ticker).history(period=period)
+        if isinstance(df.index, pd.MultiIndex):
+            df = df.xs(ticker, level='symbol', drop_level=True)
+        cols = {c.lower(): c for c in df.columns}
+        keep = ['open', 'high', 'low', 'close', 'volume']
+        out = pd.DataFrame({k: df[cols[k]].astype(float) for k in keep if k in cols})
+        return out.dropna()
+
     def fetch_option_chain(self, ticker: str) -> list[RawContract]:
         t = Ticker(ticker)
         spot = self.fetch_spot(ticker)

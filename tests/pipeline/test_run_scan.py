@@ -13,6 +13,7 @@ class _FakeSource(DataSource):
     def fetch_spot(self, ticker): return self._spot
     def fetch_price_history(self, ticker, lookback_days): return self._history
     def fetch_option_chain(self, ticker): return self._chain
+    def fetch_price_history_ohlcv(self, ticker, lookback_days): return pd.DataFrame()
 
 
 def _make_raw(option_type='put', strike=100.0, dte=21, iv=0.20, mid=2.0):
@@ -55,6 +56,7 @@ def test_run_scan_records_fetch_failure_per_ticker():
         def fetch_spot(self, t): raise RuntimeError('no')
         def fetch_price_history(self, t, lb): raise RuntimeError('no')
         def fetch_option_chain(self, t): raise RuntimeError('no')
+        def fetch_price_history_ohlcv(self, t, lb): raise RuntimeError('no')
 
     with patch('pipeline.run_scan.build_universe_cached', return_value=['X']), \
          patch('pipeline.run_scan.has_earnings_within', return_value=False):

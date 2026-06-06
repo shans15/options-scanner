@@ -20,5 +20,15 @@ class StooqSource(DataSource):
             raise RuntimeError(f"stooq returned no Close column for {ticker}")
         return df['Close'].astype(float).tail(lookback_days).reset_index(drop=True)
 
+    def fetch_price_history_ohlcv(self, ticker: str, lookback_days: int) -> pd.DataFrame:
+        df = pd.read_csv(self._url(ticker))
+        if df.empty:
+            raise RuntimeError(f"stooq returned empty for {ticker}")
+        rename = {c: c.lower() for c in df.columns}
+        df = df.rename(columns=rename)
+        keep = ['open', 'high', 'low', 'close', 'volume']
+        out = df[[c for c in keep if c in df.columns]].astype(float).tail(lookback_days)
+        return out.reset_index(drop=True).dropna()
+
     def fetch_option_chain(self, ticker: str) -> list[RawContract]:
         return []

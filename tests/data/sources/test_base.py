@@ -31,5 +31,6 @@ def test_minimal_concrete_source_can_be_instantiated():
         def fetch_spot(self, ticker): return 100.0
         def fetch_price_history(self, ticker, lookback_days): return pd.Series([1, 2, 3])
         def fetch_option_chain(self, ticker): return []
+        def fetch_price_history_ohlcv(self, ticker, lookback_days): return pd.DataFrame()
     src = Minimal()
     assert src.fetch_spot('X') == 100.0

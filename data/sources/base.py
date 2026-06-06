@@ -30,3 +30,9 @@ class DataSource(ABC):
 
     @abstractmethod
     def fetch_option_chain(self, ticker: str) -> list[RawContract]: ...
+
+    @abstractmethod
+    def fetch_price_history_ohlcv(self, ticker: str, lookback_days: int) -> pd.DataFrame:
+        """Return DataFrame with lowercase columns: open, high, low, close, volume.
+        Index is the date (ascending). Length up to lookback_days; may be less
+        if the ticker has shorter history."""

@@ -20,6 +20,16 @@ class YfinanceSource(DataSource):
             return pd.Series(dtype=float)
         return df['Close'].astype(float)
 
+    def fetch_price_history_ohlcv(self, ticker: str, lookback_days: int) -> pd.DataFrame:
+        period = '1y' if lookback_days > 180 else '6mo'
+        df = yf.Ticker(ticker).history(period=period, auto_adjust=False)
+        if df.empty:
+            return pd.DataFrame(columns=['open', 'high', 'low', 'close', 'volume'])
+        rename = {c: c.lower() for c in df.columns}
+        df = df.rename(columns=rename)
+        keep = ['open', 'high', 'low', 'close', 'volume']
+        return df[[c for c in keep if c in df.columns]].astype(float).dropna()
+
     def fetch_option_chain(self, ticker: str) -> list[RawContract]:
         tk = yf.Ticker(ticker)
         try:

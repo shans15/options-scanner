@@ -19,6 +19,7 @@ class _FakeSource(DataSource):
         return pd.Series([vol] * lookback_days)
     def fetch_option_chain(self, ticker):
         return self._chains.get(ticker, [])
+    def fetch_price_history_ohlcv(self, ticker, lookback_days): return pd.DataFrame()
 
 
 def test_fetch_sp500_constituents_returns_list_of_strings():

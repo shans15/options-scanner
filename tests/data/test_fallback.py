@@ -9,6 +9,7 @@ class _Fail(DataSource):
     def fetch_spot(self, ticker): raise RuntimeError(self.msg)
     def fetch_price_history(self, ticker, lookback_days): raise RuntimeError(self.msg)
     def fetch_option_chain(self, ticker): raise RuntimeError(self.msg)
+    def fetch_price_history_ohlcv(self, ticker, lookback_days): raise RuntimeError(self.msg)
 
 
 class _OK(DataSource):
@@ -16,6 +17,7 @@ class _OK(DataSource):
     def fetch_spot(self, ticker): return self.value
     def fetch_price_history(self, ticker, lookback_days): return pd.Series([1.0, 2.0])
     def fetch_option_chain(self, ticker): return ['raw']
+    def fetch_price_history_ohlcv(self, ticker, lookback_days): return pd.DataFrame()
 
 
 def test_first_success_wins():
@@ -40,5 +42,6 @@ def test_passes_through_args_and_kwargs():
         def fetch_price_history(self, ticker, lookback_days):
             captured.update({'ticker': ticker, 'lb': lookback_days}); return pd.Series([1])
         def fetch_option_chain(self, ticker): return []
+        def fetch_price_history_ohlcv(self, ticker, lookback_days): return pd.DataFrame()
     fetch_with_fallback([_Capture()], 'fetch_price_history', 'SPY', 365)
     assert captured == {'ticker': 'SPY', 'lb': 365}
