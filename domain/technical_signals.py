@@ -96,3 +96,55 @@ def _detect_compression_breakout(df: pd.DataFrame) -> Optional[TechnicalSetup]:
             notes=f'PO squeeze pct={last_bbw:.2f}, ribbon stacked bearish',
         )
     return None
+
+
+_PO_LAUNCH_BAND = 23.6
+_PULLBACK_VOL_MULT = 1.1
+
+
+def _detect_pullback_in_trend(df: pd.DataFrame) -> Optional[TechnicalSetup]:
+    close = df['close']
+    low = df['low']
+    volume = df['volume']
+    emas = _emas(close)
+    atr = _atr14(df['high'], low, close)
+    po = _phase_oscillator(close, emas[21], atr)
+
+    e8, e13, e21, e48 = emas[8].iloc[-1], emas[13].iloc[-1], emas[21].iloc[-1], emas[48].iloc[-1]
+    e200 = emas[200].iloc[-1]
+    last_low = low.iloc[-1]
+    last_close = close.iloc[-1]
+    last_po = po.iloc[-1]
+    last_vol = volume.iloc[-1]
+    avg_vol_prev = volume.iloc[-21:-1].mean()
+
+    if pd.isna(last_po) or pd.isna(avg_vol_prev) or avg_vol_prev <= 0:
+        return None
+    if not (-_PO_LAUNCH_BAND <= last_po <= _PO_LAUNCH_BAND):
+        return None
+    if last_vol >= _PULLBACK_VOL_MULT * avg_vol_prev:
+        return None
+
+    strength = float(1.0 - abs(last_po) / _PO_LAUNCH_BAND)
+    strength = max(0.0, min(1.0, strength))
+
+    bullish_stack = e8 > e13 > e21 > e48 and last_close > e200
+    bearish_stack = e8 < e13 < e21 < e48 and last_close < e200
+    bullish_touch = e21 * 0.99 <= last_low <= e13 * 1.01
+    bearish_touch = e13 * 0.99 <= df['high'].iloc[-1] <= e21 * 1.01
+
+    if bullish_stack and bullish_touch:
+        return TechnicalSetup(
+            setup_name='pullback_in_trend',
+            direction='bullish',
+            strength=strength,
+            notes=f'Ribbon stacked bullish, low tagged 13-21 EMA, PO={last_po:.1f}',
+        )
+    if bearish_stack and bearish_touch:
+        return TechnicalSetup(
+            setup_name='pullback_in_trend',
+            direction='bearish',
+            strength=strength,
+            notes=f'Ribbon stacked bearish, high tagged 21-13 EMA, PO={last_po:.1f}',
+        )
+    return None

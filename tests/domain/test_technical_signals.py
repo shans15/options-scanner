@@ -125,3 +125,52 @@ def test_compression_breakout_bearish_fires_on_inverse_setup():
     setup = _detect_compression_breakout(df)
     assert setup is not None
     assert setup.direction == 'bearish'
+
+
+from domain.technical_signals import _detect_pullback_in_trend
+
+
+def test_pullback_in_trend_bullish_fires_on_uptrend_pullback_to_21ema():
+    # Build a 242-bar steady uptrend, then two bars that hold near the top while
+    # the last bar's WICK dips to touch the 13-21 EMA zone.
+    # Fixture deviation from plan: the pullback is in the intrabar wick (low = close * 0.985),
+    # NOT a down-close, so the close stays above e200 and the low still hits [e21*0.99, e13*1.01].
+    # A 3% close pullback would land the low below the EMA zone on a linear ramp.
+    base = np.linspace(80, 130, 240)
+    close = np.concatenate([base, [base[-1], base[-1]]])  # hold at top for last 2 bars
+    df = pd.DataFrame({
+        'open':   pd.Series(close).shift(1).fillna(close[0]),
+        'high':   pd.Series(close) * 1.003,
+        'low':    pd.Series(close) * 0.985,   # 1.5% wick dips into the 13-21 EMA zone
+        'close':  pd.Series(close),
+        'volume': pd.Series([1_000_000] * (len(close) - 1) + [600_000]),  # last bar low vol
+    })
+
+    setup = _detect_pullback_in_trend(df)
+    assert setup is not None
+    assert setup.direction == 'bullish'
+    assert setup.setup_name == 'pullback_in_trend'
+
+
+def test_pullback_in_trend_returns_none_on_flat_market():
+    close = pd.Series(np.full(250, 100.0) + np.random.RandomState(3).normal(0, 0.5, 250))
+    df = _ohlcv_from_close(close.tolist())
+    assert _detect_pullback_in_trend(df) is None
+
+
+def test_pullback_in_trend_bearish_fires_on_downtrend_rally_to_21ema():
+    # Mirror of bullish: 240-bar downtrend stacks ribbon bearishly, then two bars
+    # hold at the bottom while the last bar's HIGH wick rallies to touch [e13*0.99, e21*1.01].
+    # Fixture uses high = close * 1.015; the close stays below e200 so bearish_stack holds.
+    base = np.linspace(130, 80, 240)
+    close = np.concatenate([base, [base[-1], base[-1]]])  # hold at bottom for last 2 bars
+    df = pd.DataFrame({
+        'open':   pd.Series(close).shift(1).fillna(close[0]),
+        'high':   pd.Series(close) * 1.015,   # 1.5% wick rallies into the 21-13 EMA zone
+        'low':    pd.Series(close) * 0.997,
+        'close':  pd.Series(close),
+        'volume': pd.Series([1_000_000] * (len(close) - 1) + [600_000]),
+    })
+    setup = _detect_pullback_in_trend(df)
+    assert setup is not None
+    assert setup.direction == 'bearish'
