@@ -72,6 +72,16 @@ def cmd_dashboard(_args) -> int:
     return subprocess.call([sys.executable, '-m', 'streamlit', 'run', 'ui/dashboard.py'])
 
 
+def cmd_watchlist(args) -> int:
+    from ui.watchlist import render_watchlist
+    scan_path = Path(args.scan) if args.scan else Path('output/scans/latest.json')
+    if not scan_path.exists():
+        print(f"Scan file not found: {scan_path}", file=sys.stderr)
+        return 2
+    print(render_watchlist(scan_path))
+    return 0
+
+
 def cmd_universe(args) -> int:
     if args.action == 'rebuild':
         from datetime import date as _date
@@ -109,6 +119,11 @@ def main() -> int:
 
     d = sub.add_parser('dashboard', help='Launch Streamlit dashboard')
     d.set_defaults(func=cmd_dashboard)
+
+    w = sub.add_parser('watchlist', help='Print a focused long-only report from a scan')
+    w.add_argument('--scan', type=str, default=None,
+                   help='Path to scan JSON (defaults to output/scans/latest.json)')
+    w.set_defaults(func=cmd_watchlist)
 
     u = sub.add_parser('universe', help='Manage universe cache')
     u.add_argument('action', choices=['rebuild'])

@@ -93,6 +93,12 @@ python -m main scan --then-dashboard
 # Dashboard only (reads latest.json)
 python -m main dashboard
 
+# Print a focused long-only morning report from the latest scan
+python -m main watchlist
+
+# Read a specific scan file
+python -m main watchlist --scan output/scans/scan_20260606_0531.json
+
 # Force universe cache rebuild
 python -m main universe rebuild
 ```
