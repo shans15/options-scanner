@@ -97,7 +97,17 @@ print(f"\nMerged rows after dropna: {len(merged):,}")
 from domain.crypto.features import build_features
 
 features = build_features(merged, settlement_period_bars=4)  # Hyperliquid: 1h = 4 bars at 15m
+
+# Step 1: NaN audit
 print(f"Feature columns ({len(features.columns)}): {list(features.columns)}")
+print("\nNaN audit per feature column:")
+nan_counts = features.isna().sum().sort_values(ascending=False)
+for col, n in nan_counts.items():
+    pct = n / len(features) * 100
+    if n > 0:
+        print(f"  {col:<32} {n:>6,} NaN ({pct:.1f}%)")
+print(f"\n  Rows where ANY feature is NaN: {features.isna().any(axis=1).sum():,} ({features.isna().any(axis=1).mean()*100:.1f}%)")
+print(f"  Rows where ALL features are non-NaN: {(~features.isna().any(axis=1)).sum():,}")
 
 # %% Build target — symmetric ~50/50 split
 # Previous version used > +10 bps which created a 35/65 imbalance, causing the
@@ -105,11 +115,39 @@ print(f"Feature columns ({len(features.columns)}): {list(features.columns)}")
 future_log_return = np.log(merged["close"].shift(-4) / merged["close"])
 target = (future_log_return > 0).astype(int)  # sign of next 4-bar return — true direction
 
-# Drop rows where target is undefined or any feature is NaN
-valid = ~target.isna() & ~features.isna().any(axis=1)
+# Step 2: Split features into required vs optional
+# LightGBM handles NaN natively (use_missing=True by default since 3.0).
+# Only drop rows where REQUIRED features are NaN; optional columns keep NaN.
+REQUIRED_FEATURE_COLS = [
+    'ret_1', 'ret_4', 'ret_24',
+    'rv_24', 'rv_96', 'rv_24_pct_rank_7d',
+    'vol_zscore_24',
+    'fund_current', 'fund_delta_1h', 'fund_delta_24h',
+    'fund_pct_rank_7d', 'fund_zscore_7d', 'fund_x_price_div',
+    'hour_sin', 'hour_cos', 'dow_sin', 'dow_cos',
+    'bars_since_funding_settlement',
+    'session_asia', 'session_eu', 'session_us', 'session_overnight',
+    'intrabar_range', 'body_pct', 'upper_shadow_pct',
+    'vol_zscore_96',
+    'fund_x_vol', 'fund_x_ret', 'vol_x_ret',
+]
+# Optional: only present when data source was available
+optional_cols = [c for c in features.columns if c not in REQUIRED_FEATURE_COLS]
+print(f"\n  Required features: {len(REQUIRED_FEATURE_COLS)}")
+print(f"  Optional features: {len(optional_cols)}  ({optional_cols})")
+
+# Drop rows where target is undefined OR any REQUIRED feature is NaN
+# Optional features keep NaN; LightGBM handles them natively
+required_present = features[[c for c in REQUIRED_FEATURE_COLS if c in features.columns]]
+valid = ~target.isna() & ~required_present.isna().any(axis=1)
 features = features[valid]
 target = target[valid]
 print(f"\nValid samples: {len(features):,}  (base rate: {target.mean():.3f})")
+
+# Step 3: Confirm LightGBM NaN handling
+import lightgbm as lgb
+print(f"\nLightGBM version: {lgb.__version__}  (NaN handled natively via use_missing=True)")
+print(f"  Optional-feature NaN in training set: {features[optional_cols].isna().sum().sum():,} total cells" if optional_cols else "  No optional features present.")
 
 # %% Hold out final 20% as untouched test set
 holdout_start = int(len(features) * 0.8)
