@@ -9,7 +9,7 @@ import requests
 
 _BINANCE_FAPI = "https://fapi.binance.com"
 _BINANCE_API = "https://api.binance.com"
-_CACHE_DIR = Path(__file__).resolve().parents[3] / "cache" / "crypto"
+_CACHE_DIR = Path(__file__).resolve().parents[2] / "cache" / "crypto"
 
 logger = logging.getLogger(__name__)
 
