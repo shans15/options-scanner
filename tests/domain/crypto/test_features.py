@@ -177,8 +177,12 @@ def test_bars_since_settlement_custom_period_modulus():
 # ---------------------------------------------------------------------------
 
 def test_all_expected_columns_present():
-    """build_features must return exactly the documented feature set."""
-    expected = {
+    """build_features must return at least the documented base feature set.
+
+    Optional columns (btc_dom_current, btc_dom_delta_24h, hv_30d) are only
+    present when the corresponding source columns are passed in merged.
+    """
+    base_expected = {
         "ret_1", "ret_4", "ret_24",
         "rv_24", "rv_96",
         "rv_24_pct_rank_7d",
@@ -190,8 +194,118 @@ def test_all_expected_columns_present():
         "hour_sin", "hour_cos",
         "dow_sin", "dow_cos",
         "bars_since_funding_settlement",
+        # New base features (Path B)
+        "session_asia", "session_eu", "session_us", "session_overnight",
+        "intrabar_range", "body_pct", "upper_shadow_pct",
+        "vol_zscore_96",
+        "fund_x_vol", "fund_x_ret", "vol_x_ret",
     }
     merged = _make_merged(n=200)
     feat = build_features(merged)
 
-    assert set(feat.columns) == expected
+    assert base_expected.issubset(set(feat.columns)), (
+        f"Missing columns: {base_expected - set(feat.columns)}"
+    )
+    # Without optional source columns, dominance/HV features must NOT be present
+    assert "btc_dom_current" not in feat.columns
+    assert "btc_dom_delta_24h" not in feat.columns
+    assert "hv_30d" not in feat.columns
+
+
+def test_optional_btc_dominance_features_present_when_column_provided():
+    """btc_dom_current and btc_dom_delta_24h appear iff btc_dominance is in merged."""
+    merged = _make_merged(n=800)
+    merged["btc_dominance"] = 45.0  # constant
+
+    feat = build_features(merged)
+    assert "btc_dom_current" in feat.columns
+    assert "btc_dom_delta_24h" in feat.columns
+    # btc_dom_current must equal the input column
+    pd.testing.assert_series_equal(
+        feat["btc_dom_current"].rename("btc_dom_current"),
+        merged["btc_dominance"].rename("btc_dom_current"),
+        check_exact=True,
+    )
+
+
+def test_optional_hv_30d_feature_present_when_column_provided():
+    """hv_30d appears iff hv_30d is in merged."""
+    merged = _make_merged(n=200)
+    merged["hv_30d"] = 0.75
+
+    feat = build_features(merged)
+    assert "hv_30d" in feat.columns
+    pd.testing.assert_series_equal(
+        feat["hv_30d"].rename("hv_30d"),
+        merged["hv_30d"].rename("hv_30d"),
+        check_exact=True,
+    )
+
+
+def test_session_indicators_mutually_exclusive_and_exhaustive():
+    """Session indicator columns must sum to 1 for every row (exactly one active)."""
+    merged = _make_merged(n=800)
+    feat = build_features(merged)
+
+    session_sum = (
+        feat["session_asia"]
+        + feat["session_eu"]
+        + feat["session_us"]
+        + feat["session_overnight"]
+    )
+    assert (session_sum == 1).all(), (
+        f"Session indicators not mutually exclusive/exhaustive at rows: "
+        f"{list(session_sum[session_sum != 1].index[:5])}"
+    )
+
+
+def test_intrabar_features_non_negative():
+    """intrabar_range, body_pct, upper_shadow_pct must all be >= 0."""
+    merged = _make_merged(n=400)
+    feat = build_features(merged)
+
+    for col in ("intrabar_range", "body_pct", "upper_shadow_pct"):
+        assert (feat[col] >= 0).all(), f"{col} has negative values"
+
+
+def test_no_temporal_leakage_in_features():
+    """Compute features on a longer series and a truncated version.
+
+    For each row in the common range, the feature values must be IDENTICAL.
+    This catches any rolling/cumulative operation that accidentally uses future
+    data (e.g., a rolling operation with center=True, or a percentile computed
+    on the full history).
+    """
+    np.random.seed(42)
+    n_full = 500
+    n_truncated = 300
+
+    idx_full = pd.date_range("2025-01-01", periods=n_full, freq="15min", tz="UTC")
+    close_full = 100.0 + np.cumsum(np.random.normal(0, 0.5, n_full))
+    merged_full = pd.DataFrame(
+        {
+            "open": close_full * (1 + np.random.normal(0, 0.0005, n_full)),
+            "high": close_full * (1 + np.abs(np.random.normal(0, 0.001, n_full))),
+            "low": close_full * (1 - np.abs(np.random.normal(0, 0.001, n_full))),
+            "close": close_full,
+            "volume": np.random.uniform(50, 200, n_full),
+            "funding_rate": np.random.normal(0, 0.0001, n_full),
+            "mark_price": close_full,
+        },
+        index=idx_full,
+    )
+    merged_truncated = merged_full.iloc[:n_truncated].copy()
+
+    feat_full = build_features(merged_full, settlement_period_bars=4)
+    feat_truncated = build_features(merged_truncated, settlement_period_bars=4)
+
+    # The first n_truncated rows of feat_full must EXACTLY match feat_truncated
+    common = feat_full.iloc[:n_truncated]
+    pd.testing.assert_frame_equal(
+        common,
+        feat_truncated,
+        check_exact=False,
+        atol=1e-12,
+        rtol=1e-12,
+        obj="No-leakage check: features at time T must not depend on data after T",
+    )

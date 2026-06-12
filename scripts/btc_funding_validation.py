@@ -1,21 +1,41 @@
 # %%
-"""BTC funding-rate edge validation (Phase 1).
+"""BTC funding-rate edge validation (Phase 1 v2).
 
-OHLCV:    Coinbase BTC-USD spot 15m (US-accessible, full year of history)
-Funding:  Hyperliquid BTC perp hourly funding (US-accessible DEX)
+OHLCV:      Coinbase BTC-USD spot 15m (US-accessible, full year of history)
+Funding:    Hyperliquid BTC perp hourly funding (US-accessible DEX)
+Optional:   CoinGecko BTC dominance history (daily, forward-filled)
+Optional:   Deribit BTC realized volatility (daily, forward-filled)
 
-Target:   P(BTC log-return > +10 bps in next 4 bars of 15-min data)
+Target:   sign(future_log_return over next 4 bars) — symmetric ~50/50 split
 
-Note: spot price from Coinbase and funding from Hyperliquid perp don't share
-an exchange. This is intentional — spot OHLCV is cleaner (no basis noise)
-and funding signal is whichever is most liquid (Hyperliquid). The validation
-is about whether funding-derived features predict spot direction.
+Changes vs Phase 1 v1
+---------------------
+Path A:
+  - Symmetric target: (future_log_return > 0) instead of > +10 bps
+    → avoids majority-class collapse (~50/50 split, true direction signal)
+  - class_weight='balanced' in LightGBM
+    → forces the model to learn the minority class rather than always predict 0
+  - Proper metrics: AUC, F1, precision, recall (not just accuracy)
+  - Fixed verdict logic: lift over majority baseline + AUC thresholds
+    (previous logic incorrectly flagged no-edge as lookahead)
+
+Path B:
+  - CoinGeckoSource: BTC dominance history (graceful fallback)
+  - DeribitSource: BTC 30-day realized volatility (graceful fallback)
+  - 14 new features: session indicators, intra-bar, vol z-score,
+    BTC dominance, Deribit HV, cross-products
 """
 
-# %% Fetch
+# %% Fetch all data
 from datetime import datetime, timezone, timedelta
+
+import numpy as np
+import pandas as pd
+
 from data.sources.coinbase_source import CoinbaseSource
 from data.sources.hyperliquid_source import HyperliquidSource
+from data.sources.coingecko_source import CoinGeckoSource
+from data.sources.deribit_source import DeribitSource
 
 end = datetime.now(timezone.utc).replace(minute=0, second=0, microsecond=0)
 start = end - timedelta(days=365)
@@ -24,6 +44,8 @@ end_ms = int(end.timestamp() * 1000)
 
 cb = CoinbaseSource()
 hl = HyperliquidSource()
+cg = CoinGeckoSource()
+dr = DeribitSource()
 
 print(f"Fetching BTC-USD 15m OHLCV from Coinbase: {start.date()} to {end.date()} …")
 ohlcv = cb.fetch_ohlcv("BTC-USD", "15m", start_ms, end_ms)
@@ -33,14 +55,43 @@ print(f"Fetching BTC perp hourly funding from Hyperliquid …")
 funding = hl.fetch_perp_funding("BTC", start_ms, end_ms)
 print(f"  Funding rows: {len(funding):,}")
 
-# %% Merge + feature build
-import pandas as pd
+# Optional: BTC dominance (CoinGecko)
+try:
+    print("Fetching BTC dominance history from CoinGecko …")
+    btc_dom = cg.fetch_btc_dominance_history(days=365)
+    print(f"  BTC dominance rows: {len(btc_dom)}")
+except Exception as e:
+    print(f"  WARN: BTC dominance fetch failed ({e}), skipping that feature group")
+    btc_dom = pd.DataFrame(columns=["btc_dominance"])
 
+# Optional: Deribit realized volatility
+try:
+    print("Fetching BTC realized volatility from Deribit …")
+    hv = dr.fetch_historical_volatility("BTC")
+    print(f"  Deribit HV rows: {len(hv)}")
+except Exception as e:
+    print(f"  WARN: Deribit HV fetch failed ({e}), skipping that feature")
+    hv = pd.DataFrame(columns=["hv_30d"])
+
+# %% Merge all into single 15m grid
 merged = ohlcv.copy()
-# Forward-fill funding rate into the 15m price grid
+# Forward-fill funding rate into the 15m price grid.
+# Hyperliquid's funding endpoint doesn't return mark_price (all NaN), so we
+# fill it with the close as a proxy and drop only rows with missing
+# OHLCV/funding_rate (the features we actually use).
 merged["funding_rate"] = funding["funding_rate"].reindex(merged.index, method="ffill")
-merged["mark_price"] = funding["mark_price"].reindex(merged.index, method="ffill")
-merged = merged.dropna()
+merged["mark_price"] = merged["close"]  # proxy; not used in features
+
+# Optional: BTC dominance (daily → forward-fill to 15m grid)
+if not btc_dom.empty and "btc_dominance" in btc_dom.columns:
+    merged["btc_dominance"] = btc_dom["btc_dominance"].reindex(merged.index, method="ffill")
+
+# Optional: Deribit HV (daily → forward-fill to 15m grid)
+if not hv.empty and "hv_30d" in hv.columns:
+    merged["hv_30d"] = hv["hv_30d"].reindex(merged.index, method="ffill")
+
+required_cols = ["open", "high", "low", "close", "volume", "funding_rate"]
+merged = merged.dropna(subset=required_cols)
 print(f"\nMerged rows after dropna: {len(merged):,}")
 
 from domain.crypto.features import build_features
@@ -48,11 +99,11 @@ from domain.crypto.features import build_features
 features = build_features(merged, settlement_period_bars=4)  # Hyperliquid: 1h = 4 bars at 15m
 print(f"Feature columns ({len(features.columns)}): {list(features.columns)}")
 
-# %% Build target
-import numpy as np
-
+# %% Build target — symmetric ~50/50 split
+# Previous version used > +10 bps which created a 35/65 imbalance, causing the
+# model to learn "always predict 0" and achieve 65% accuracy with zero lift.
 future_log_return = np.log(merged["close"].shift(-4) / merged["close"])
-target = (future_log_return > 0.001).astype(int)  # > +10 bps in next 4 bars
+target = (future_log_return > 0).astype(int)  # sign of next 4-bar return — true direction
 
 # Drop rows where target is undefined or any feature is NaN
 valid = ~target.isna() & ~features.isna().any(axis=1)
@@ -70,6 +121,7 @@ print(f"\nTrain pool: {len(X_train_pool):,}  Holdout: {len(X_holdout):,}")
 
 # %% Walk-forward CV on the training pool
 import lightgbm as lgb
+from sklearn.metrics import roc_auc_score, f1_score, precision_score, recall_score, confusion_matrix
 
 from engine.ml.walkforward import walk_forward_splits
 
@@ -92,6 +144,7 @@ for i, (train_idx, val_idx, test_idx) in enumerate(splits):
         feature_fraction=0.9,
         bagging_fraction=0.8,
         bagging_freq=5,
+        class_weight="balanced",   # forces model to learn minority class
         verbose=-1,
     )
     model.fit(
@@ -101,12 +154,31 @@ for i, (train_idx, val_idx, test_idx) in enumerate(splits):
     )
     proba = model.predict_proba(X_te)[:, 1]
     pred = (proba > 0.5).astype(int)
+
     acc = (pred == y_te).mean()
-    fold_results.append({"fold": i, "acc": acc, "n_test": len(y_te), "base_rate": y_te.mean()})
-    print(f"Fold {i}: acc={acc:.3f}  base_rate={y_te.mean():.3f}  n={len(y_te)}")
+    auc = roc_auc_score(y_te, proba)
+    f1 = f1_score(y_te, pred, zero_division=0)
+    prec = precision_score(y_te, pred, zero_division=0)
+    rec = recall_score(y_te, pred, zero_division=0)
+    base_rate = float(y_te.mean())
+    majority_baseline = max(base_rate, 1 - base_rate)
+    lift = acc - majority_baseline
+
+    fold_results.append({
+        "fold": i, "acc": acc, "auc": auc, "f1": f1,
+        "precision": prec, "recall": rec, "lift": lift,
+        "n_test": len(y_te), "base_rate": base_rate,
+    })
+    print(
+        f"Fold {i}: acc={acc:.3f}  auc={auc:.3f}  f1={f1:.3f}  "
+        f"prec={prec:.3f}  rec={rec:.3f}  lift={lift:+.3f}  "
+        f"base_rate={base_rate:.3f}  n={len(y_te)}"
+    )
 
 mean_cv_acc = sum(r["acc"] for r in fold_results) / len(fold_results)
-print(f"\nMean CV accuracy: {mean_cv_acc:.3f}")
+mean_cv_auc = sum(r["auc"] for r in fold_results) / len(fold_results)
+mean_cv_lift = sum(r["lift"] for r in fold_results) / len(fold_results)
+print(f"\nMean CV accuracy: {mean_cv_acc:.3f}  AUC: {mean_cv_auc:.3f}  Lift: {mean_cv_lift:+.3f}")
 
 # %% Final fit on all training pool and evaluate on untouched holdout
 best_iter = getattr(model, "best_iteration_", None)
@@ -119,17 +191,34 @@ final_model = lgb.LGBMClassifier(
     feature_fraction=0.9,
     bagging_fraction=0.8,
     bagging_freq=5,
+    class_weight="balanced",
     verbose=-1,
 )
 final_model.fit(X_train_pool, y_train_pool)
 proba_holdout = final_model.predict_proba(X_holdout)[:, 1]
 pred_holdout = (proba_holdout > 0.5).astype(int)
-oos_acc = (pred_holdout == y_holdout).mean()
 
-print(f"\nFinal OOS accuracy (untouched holdout): {oos_acc:.3f}")
-print(f"Base rate on holdout:                   {y_holdout.mean():.3f}")
-naive_acc = max(float(y_holdout.mean()), 1.0 - float(y_holdout.mean()))
-print(f"Lift over base rate:                    {oos_acc - naive_acc:+.3f}")
+oos_acc = (pred_holdout == y_holdout).mean()
+auc_holdout = roc_auc_score(y_holdout, proba_holdout)
+f1_holdout = f1_score(y_holdout, pred_holdout, zero_division=0)
+prec_holdout = precision_score(y_holdout, pred_holdout, zero_division=0)
+rec_holdout = recall_score(y_holdout, pred_holdout, zero_division=0)
+cm = confusion_matrix(y_holdout, pred_holdout)
+
+majority_baseline = max(float(y_holdout.mean()), 1.0 - float(y_holdout.mean()))
+lift = oos_acc - majority_baseline
+
+print(f"\nFinal OOS metrics (untouched holdout):")
+print(f"  Accuracy:          {oos_acc:.3f}")
+print(f"  AUC:               {auc_holdout:.3f}")
+print(f"  F1:                {f1_holdout:.3f}")
+print(f"  Precision:         {prec_holdout:.3f}")
+print(f"  Recall:            {rec_holdout:.3f}")
+print(f"  Majority baseline: {majority_baseline:.3f}")
+print(f"  Lift over majority:{lift:+.3f}")
+print(f"  Confusion matrix:")
+print(f"    TN={cm[0,0]}  FP={cm[0,1]}")
+print(f"    FN={cm[1,0]}  TP={cm[1,1]}")
 
 # %% Feature importance
 imp = pd.Series(
@@ -152,7 +241,7 @@ trade_returns = (
     holdout_realized.values * positions
     - (fee_bps / 10_000) * positions
 )
-n_trades = positions.sum()
+n_trades = int(positions.sum())
 total_return = float(trade_returns.sum())
 std = float(trade_returns.std())
 bars_per_year = 24 * 4 * 252
@@ -160,17 +249,26 @@ sharpe_proxy = (
     float(trade_returns.mean()) / std * (bars_per_year ** 0.5) if std > 0 else 0.0
 )
 print(
-    f"\nSimulated trading: {n_trades} trades, "
+    f"\nSimulated trading (threshold={threshold}): {n_trades} trades, "
     f"total log-return {total_return:.4f}, "
     f"Sharpe proxy {sharpe_proxy:.2f}"
 )
 
-# %% Verdict
+# %% Verdict — fixed logic: lift over majority baseline + AUC
+# Previous logic: "if OOS >= 60% → lookahead" was wrong for imbalanced targets.
+# A model that always predicts majority can get 65% accuracy with zero skill.
+# Correct logic uses lift over majority baseline and AUC (rank-based, not threshold-based).
 print("\n" + "=" * 60)
-if oos_acc >= 0.60:
-    print("WARNING  OOS accuracy >= 60% — likely lookahead bias, audit features.")
-elif oos_acc >= 0.53:
-    print("PASS  Edge exists. Build Phase 2 infrastructure.")
+if auc_holdout < 0.52:
+    verdict = "FAIL: No edge over random. Features need work."
+elif lift < 0.02:
+    verdict = f"FAIL: No lift over majority-class baseline (lift={lift:+.2%}, AUC={auc_holdout:.3f})."
+elif auc_holdout >= 0.65:
+    verdict = f"WARNING: AUC={auc_holdout:.3f} >= 0.65 — audit for lookahead bias."
+elif lift >= 0.05 and auc_holdout >= 0.55:
+    verdict = f"PASS: Real edge detected (lift={lift:+.2%}, AUC={auc_holdout:.3f}). Build Phase 2 infrastructure."
 else:
-    print("FAIL  No clear edge. More feature engineering needed before Phase 2.")
+    verdict = f"MARGINAL: lift={lift:+.2%}, AUC={auc_holdout:.3f}. More features needed."
+
+print(verdict)
 print("=" * 60)
