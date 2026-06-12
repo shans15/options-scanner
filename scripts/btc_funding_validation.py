@@ -1,46 +1,36 @@
 # %%
-"""BTC funding-rate edge validation.
+"""BTC funding-rate edge validation (Phase 1).
 
-Goal: prove or disprove that funding-rate features predict short-horizon BTC direction.
-Target: P(BTC log-return > +10 bps in next 4 bars of 15-min data).
+OHLCV:    Coinbase BTC-USD spot 15m (US-accessible, full year of history)
+Funding:  Hyperliquid BTC perp hourly funding (US-accessible DEX)
 
-Decision rule:
-  OOS accuracy >= 53%: edge exists, proceed to Phase 2.
-  OOS accuracy < 53%:  no edge, more feature work needed before building infra.
-  OOS accuracy >= 60%: very likely lookahead bias, audit features.
+Target:   P(BTC log-return > +10 bps in next 4 bars of 15-min data)
 
-Data source: Hyperliquid (US-accessible DEX perp exchange, public REST API).
-Binance global API is geo-blocked from US (HTTP 451); Binance.US has no perp futures.
-Hyperliquid funding settles HOURLY (every 4 bars at 15m cadence), vs Binance's 8h.
-settlement_period_bars=4 is passed to build_features accordingly.
-
-Run with:
-    python -m scripts.btc_funding_validation
+Note: spot price from Coinbase and funding from Hyperliquid perp don't share
+an exchange. This is intentional — spot OHLCV is cleaner (no basis noise)
+and funding signal is whichever is most liquid (Hyperliquid). The validation
+is about whether funding-derived features predict spot direction.
 """
 
-# %% Fetch data
+# %% Fetch
 from datetime import datetime, timezone, timedelta
-
+from data.sources.coinbase_source import CoinbaseSource
 from data.sources.hyperliquid_source import HyperliquidSource
 
-src = HyperliquidSource()
 end = datetime.now(timezone.utc).replace(minute=0, second=0, microsecond=0)
 start = end - timedelta(days=365)
+start_ms = int(start.timestamp() * 1000)
+end_ms = int(end.timestamp() * 1000)
 
-print(f"Fetching BTC 15m OHLCV from Hyperliquid: {start.date()} to {end.date()} …")
-ohlcv = src.fetch_ohlcv(
-    "BTC", "15m",
-    int(start.timestamp() * 1000),
-    int(end.timestamp() * 1000),
-)
+cb = CoinbaseSource()
+hl = HyperliquidSource()
+
+print(f"Fetching BTC-USD 15m OHLCV from Coinbase: {start.date()} to {end.date()} …")
+ohlcv = cb.fetch_ohlcv("BTC-USD", "15m", start_ms, end_ms)
 print(f"  OHLCV rows: {len(ohlcv):,}")
 
-print("Fetching BTC perpetual funding rates (hourly) from Hyperliquid …")
-funding = src.fetch_perp_funding(
-    "BTC",
-    int(start.timestamp() * 1000),
-    int(end.timestamp() * 1000),
-)
+print(f"Fetching BTC perp hourly funding from Hyperliquid …")
+funding = hl.fetch_perp_funding("BTC", start_ms, end_ms)
 print(f"  Funding rows: {len(funding):,}")
 
 # %% Merge + feature build
