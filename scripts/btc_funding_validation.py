@@ -9,6 +9,11 @@ Decision rule:
   OOS accuracy < 53%:  no edge, more feature work needed before building infra.
   OOS accuracy >= 60%: very likely lookahead bias, audit features.
 
+Data source: Hyperliquid (US-accessible DEX perp exchange, public REST API).
+Binance global API is geo-blocked from US (HTTP 451); Binance.US has no perp futures.
+Hyperliquid funding settles HOURLY (every 4 bars at 15m cadence), vs Binance's 8h.
+settlement_period_bars=4 is passed to build_features accordingly.
+
 Run with:
     python -m scripts.btc_funding_validation
 """
@@ -16,23 +21,23 @@ Run with:
 # %% Fetch data
 from datetime import datetime, timezone, timedelta
 
-from data.sources.binance_source import BinanceSource
+from data.sources.hyperliquid_source import HyperliquidSource
 
-src = BinanceSource()
+src = HyperliquidSource()
 end = datetime.now(timezone.utc).replace(minute=0, second=0, microsecond=0)
 start = end - timedelta(days=365)
 
-print(f"Fetching BTC 15m OHLCV from {start.date()} to {end.date()} …")
+print(f"Fetching BTC 15m OHLCV from Hyperliquid: {start.date()} to {end.date()} …")
 ohlcv = src.fetch_ohlcv(
-    "BTCUSDT", "15m",
+    "BTC", "15m",
     int(start.timestamp() * 1000),
     int(end.timestamp() * 1000),
 )
 print(f"  OHLCV rows: {len(ohlcv):,}")
 
-print("Fetching BTC perpetual funding rates …")
+print("Fetching BTC perpetual funding rates (hourly) from Hyperliquid …")
 funding = src.fetch_perp_funding(
-    "BTCUSDT",
+    "BTC",
     int(start.timestamp() * 1000),
     int(end.timestamp() * 1000),
 )
@@ -50,7 +55,7 @@ print(f"\nMerged rows after dropna: {len(merged):,}")
 
 from domain.crypto.features import build_features
 
-features = build_features(merged)
+features = build_features(merged, settlement_period_bars=4)  # Hyperliquid: 1h = 4 bars at 15m
 print(f"Feature columns ({len(features.columns)}): {list(features.columns)}")
 
 # %% Build target

@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 
 
-def build_features(merged: pd.DataFrame) -> pd.DataFrame:
+def build_features(merged: pd.DataFrame, settlement_period_bars: int = 32) -> pd.DataFrame:
     """Build ML features from a merged price+funding DataFrame.
 
     Parameters
@@ -12,6 +12,9 @@ def build_features(merged: pd.DataFrame) -> pd.DataFrame:
     merged : pd.DataFrame
         Columns: ['open', 'high', 'low', 'close', 'volume', 'funding_rate',
         'mark_price']. Index: UTC datetime at 15-minute intervals, ascending.
+    settlement_period_bars : int, default 32
+        Number of 15-minute bars per funding settlement cycle.
+        32 = 8h (Binance cadence), 4 = 1h (Hyperliquid cadence).
 
     Returns
     -------
@@ -39,7 +42,8 @@ def build_features(merged: pd.DataFrame) -> pd.DataFrame:
     CONTEXT
         hour_sin, hour_cos             sin/cos encoding of hour of day (UTC)
         dow_sin, dow_cos               sin/cos encoding of day of week
-        bars_since_funding_settlement  0–31 (funding settles every 32 bars = 8h)
+        bars_since_funding_settlement  0–(settlement_period_bars-1), position within
+                                       the current funding cycle (no lookahead)
     """
     close = merged["close"]
     volume = merged["volume"]
@@ -97,11 +101,12 @@ def build_features(merged: pd.DataFrame) -> pd.DataFrame:
     dow_sin = np.sin(2 * np.pi * dow / 7)
     dow_cos = np.cos(2 * np.pi * dow / 7)
 
-    # bars_since_funding_settlement: funding settles every 8h = 32 bars at 15m
-    # We encode position within the current 32-bar cycle.
-    # Use the integer bar position mod 32 so there is no lookahead.
+    # bars_since_funding_settlement: position within the current funding cycle.
+    # settlement_period_bars=32 → 8h Binance cadence (0–31)
+    # settlement_period_bars=4  → 1h Hyperliquid cadence (0–3)
+    # Use integer bar position mod settlement_period_bars — no lookahead.
     bar_number = pd.RangeIndex(len(merged))
-    bars_since_settlement = bar_number % 32
+    bars_since_settlement = bar_number % settlement_period_bars
 
     # ------------------------------------------------------------------
     # Assemble

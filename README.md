@@ -48,7 +48,8 @@ Each candidate in the output is tagged with the setup that qualified it (`setup_
 options-scanner/
 ├── data/           # I/O — yahooquery + yfinance + stooq fallback chain
 │   └── sources/
-│       └── binance_source.py   # Public Binance API: OHLCV + perpetual funding rates
+│       ├── binance_source.py      # Binance API (US-geo-blocked; kept for reference)
+│       └── hyperliquid_source.py  # Hyperliquid DEX: OHLCV + hourly perp funding rates
 ├── domain/         # Pure logic — Contract, Strategy, Regime, Greeks, TechnicalSetup + detectors
 │   └── crypto/
 │       └── features.py         # Funding-rate feature engineering (no lookahead)
@@ -67,19 +68,25 @@ The technical filter (`domain/technical_signals.py` + `pipeline/technical_filter
 
 ## Crypto prediction module (Phase 1 — validation only)
 
-Phase 1 validates whether funding-rate features predict short-horizon BTC direction.
-If the edge exists (OOS accuracy >= 53%), Phase 2 builds the production pipeline.
+Validates whether perpetual-futures funding-rate features predict short-horizon
+BTC direction. Uses Hyperliquid public API (US-accessible decentralized perp
+exchange) for OHLCV + hourly funding rates.
 
-Run the validation:
+Binance global API is geo-blocked from the US (HTTP 451) and Binance.US has no
+perp futures. Hyperliquid is a DEX perp exchange with a public REST API, no
+authentication required, and hourly funding settlement (more granular than
+Binance's 8h cadence — 4 bars at 15m vs 32 bars).
+
+If the edge exists (OOS accuracy >= 53%), Phase 2 builds the production pipeline.
 
 ```bash
 python -m scripts.btc_funding_validation
 ```
 
-This fetches 12 months of BTC 15m OHLCV + funding from Binance (cached to
-`cache/crypto/`), engineers funding-derived features, runs 6-fold walk-forward
-cross-validation, and reports out-of-sample accuracy on an untouched 20%
-holdout.
+This fetches 12 months of BTC 15m OHLCV + hourly funding from Hyperliquid
+(cached to `cache/crypto/`), engineers funding-derived features, runs 6-fold
+walk-forward cross-validation, and reports out-of-sample accuracy on an
+untouched 20% holdout.
 
 ## Setup
 

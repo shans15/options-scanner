@@ -143,13 +143,33 @@ def test_cyclical_encoding_bounds():
 # ---------------------------------------------------------------------------
 
 def test_bars_since_settlement_range():
-    """bars_since_funding_settlement must be in [0, 31]."""
+    """bars_since_funding_settlement must be in [0, 31] with default period (32)."""
     merged = _make_merged(n=200)
     feat = build_features(merged)
 
     col = feat["bars_since_funding_settlement"]
     assert col.min() >= 0
     assert col.max() <= 31
+
+
+def test_bars_since_settlement_hyperliquid_period():
+    """settlement_period_bars=4 (Hyperliquid 1h) must keep values in [0, 3]."""
+    merged = _make_merged(n=200)
+    feat = build_features(merged, settlement_period_bars=4)
+
+    col = feat["bars_since_funding_settlement"]
+    assert col.min() >= 0
+    assert col.max() <= 3
+
+
+def test_bars_since_settlement_custom_period_modulus():
+    """bars_since_funding_settlement values must cycle 0..period-1 exactly."""
+    merged = _make_merged(n=20)
+    period = 5
+    feat = build_features(merged, settlement_period_bars=period)
+
+    expected = list(range(period)) * (20 // period)
+    assert list(feat["bars_since_funding_settlement"]) == expected
 
 
 # ---------------------------------------------------------------------------
