@@ -47,15 +47,39 @@ Each candidate in the output is tagged with the setup that qualified it (`setup_
 ```
 options-scanner/
 ├── data/           # I/O — yahooquery + yfinance + stooq fallback chain
+│   └── sources/
+│       └── binance_source.py   # Public Binance API: OHLCV + perpetual funding rates
 ├── domain/         # Pure logic — Contract, Strategy, Regime, Greeks, TechnicalSetup + detectors
+│   └── crypto/
+│       └── features.py         # Funding-rate feature engineering (no lookahead)
 ├── engine/         # PoP models, stress, risk filters, scorer
+│   └── ml/
+│       └── walkforward.py      # Expanding-window walk-forward CV splits
 ├── pipeline/       # Universe builder, earnings blackout, technical_filter, run_scan
+├── scripts/
+│   └── btc_funding_validation.py  # Phase 1 edge-validation script
 ├── ui/             # Streamlit dashboard, CSV/JSON exporter
 ├── tests/
 └── main.py         # CLI: scan / dashboard / universe
 ```
 
 The technical filter (`domain/technical_signals.py` + `pipeline/technical_filter.py`) is the new front-of-pipeline stage. Everything downstream — option chain pull, PoP, stress, scoring — only runs on tickers that produced a setup.
+
+## Crypto prediction module (Phase 1 — validation only)
+
+Phase 1 validates whether funding-rate features predict short-horizon BTC direction.
+If the edge exists (OOS accuracy >= 53%), Phase 2 builds the production pipeline.
+
+Run the validation:
+
+```bash
+python -m scripts.btc_funding_validation
+```
+
+This fetches 12 months of BTC 15m OHLCV + funding from Binance (cached to
+`cache/crypto/`), engineers funding-derived features, runs 6-fold walk-forward
+cross-validation, and reports out-of-sample accuracy on an untouched 20%
+holdout.
 
 ## Setup
 
