@@ -138,39 +138,6 @@ def test_cyclical_encoding_bounds():
         assert feat[col].between(-1.0, 1.0).all(), f"{col} out of [-1, 1]"
 
 
-# ---------------------------------------------------------------------------
-# test_bars_since_settlement_range
-# ---------------------------------------------------------------------------
-
-def test_bars_since_settlement_range():
-    """bars_since_funding_settlement must be in [0, 31] with default period (32)."""
-    merged = _make_merged(n=200)
-    feat = build_features(merged)
-
-    col = feat["bars_since_funding_settlement"]
-    assert col.min() >= 0
-    assert col.max() <= 31
-
-
-def test_bars_since_settlement_hyperliquid_period():
-    """settlement_period_bars=4 (Hyperliquid 1h) must keep values in [0, 3]."""
-    merged = _make_merged(n=200)
-    feat = build_features(merged, settlement_period_bars=4)
-
-    col = feat["bars_since_funding_settlement"]
-    assert col.min() >= 0
-    assert col.max() <= 3
-
-
-def test_bars_since_settlement_custom_period_modulus():
-    """bars_since_funding_settlement values must cycle 0..period-1 exactly."""
-    merged = _make_merged(n=20)
-    period = 5
-    feat = build_features(merged, settlement_period_bars=period)
-
-    expected = list(range(period)) * (20 // period)
-    assert list(feat["bars_since_funding_settlement"]) == expected
-
 
 # ---------------------------------------------------------------------------
 # test_all_expected_columns_present
@@ -179,8 +146,9 @@ def test_bars_since_settlement_custom_period_modulus():
 def test_all_expected_columns_present():
     """build_features must return at least the documented base feature set.
 
-    Optional columns (btc_dom_current, btc_dom_delta_24h, hv_30d) are only
-    present when the corresponding source columns are passed in merged.
+    Pruned features (session_*, btc_dom_*, hv_30d, bars_since_funding_settlement,
+    consec_down_bars, gap_pct, body_pct, intrabar_range, fund_x_dom,
+    crypto_breadth_24) must NOT be present.
     """
     base_expected = {
         "ret_1", "ret_4", "ret_24",
@@ -193,12 +161,14 @@ def test_all_expected_columns_present():
         "fund_x_price_div",
         "hour_sin", "hour_cos",
         "dow_sin", "dow_cos",
-        "bars_since_funding_settlement",
-        # New base features (Path B)
-        "session_asia", "session_eu", "session_us", "session_overnight",
-        "intrabar_range", "body_pct", "upper_shadow_pct",
+        "upper_shadow_pct",
         "vol_zscore_96",
         "fund_x_vol", "fund_x_ret", "vol_x_ret",
+        # Price action (pruned)
+        "close_to_high_20", "close_to_low_20", "range_pct_20",
+        "consec_up_bars", "range_expansion",
+        # Volume
+        "vol_ratio_4_24", "cvd_proxy_24", "vol_breakout", "up_vol_pct_24",
     }
     merged = _make_merged(n=200)
     feat = build_features(merged)
@@ -206,66 +176,33 @@ def test_all_expected_columns_present():
     assert base_expected.issubset(set(feat.columns)), (
         f"Missing columns: {base_expected - set(feat.columns)}"
     )
-    # Without optional source columns, dominance/HV features must NOT be present
+
+    # Pruned features must NOT appear
+    pruned = {
+        "session_asia", "session_eu", "session_us", "session_overnight",
+        "btc_dom_current", "btc_dom_delta_24h",
+        "hv_30d",
+        "consec_down_bars", "gap_pct",
+        "body_pct", "intrabar_range",
+        "fund_x_dom",
+        "crypto_breadth_24",
+    }
+    present_pruned = pruned & set(feat.columns)
+    assert not present_pruned, f"Pruned features still present: {present_pruned}"
+
+    # Without optional source columns, macro/dominance/HV features must NOT be present
     assert "btc_dom_current" not in feat.columns
-    assert "btc_dom_delta_24h" not in feat.columns
     assert "hv_30d" not in feat.columns
-
-
-def test_optional_btc_dominance_features_present_when_column_provided():
-    """btc_dom_current and btc_dom_delta_24h appear iff btc_dominance is in merged."""
-    merged = _make_merged(n=800)
-    merged["btc_dominance"] = 45.0  # constant
-
-    feat = build_features(merged)
-    assert "btc_dom_current" in feat.columns
-    assert "btc_dom_delta_24h" in feat.columns
-    # btc_dom_current must equal the input column
-    pd.testing.assert_series_equal(
-        feat["btc_dom_current"].rename("btc_dom_current"),
-        merged["btc_dominance"].rename("btc_dom_current"),
-        check_exact=True,
-    )
-
-
-def test_optional_hv_30d_feature_present_when_column_provided():
-    """hv_30d appears iff hv_30d is in merged."""
-    merged = _make_merged(n=200)
-    merged["hv_30d"] = 0.75
-
-    feat = build_features(merged)
-    assert "hv_30d" in feat.columns
-    pd.testing.assert_series_equal(
-        feat["hv_30d"].rename("hv_30d"),
-        merged["hv_30d"].rename("hv_30d"),
-        check_exact=True,
-    )
-
-
-def test_session_indicators_mutually_exclusive_and_exhaustive():
-    """Session indicator columns must sum to 1 for every row (exactly one active)."""
-    merged = _make_merged(n=800)
-    feat = build_features(merged)
-
-    session_sum = (
-        feat["session_asia"]
-        + feat["session_eu"]
-        + feat["session_us"]
-        + feat["session_overnight"]
-    )
-    assert (session_sum == 1).all(), (
-        f"Session indicators not mutually exclusive/exhaustive at rows: "
-        f"{list(session_sum[session_sum != 1].index[:5])}"
-    )
+    assert "dxy_ret_24" not in feat.columns
+    assert "vix_current" not in feat.columns
 
 
 def test_intrabar_features_non_negative():
-    """intrabar_range, body_pct, upper_shadow_pct must all be >= 0."""
+    """upper_shadow_pct must be >= 0."""
     merged = _make_merged(n=400)
     feat = build_features(merged)
 
-    for col in ("intrabar_range", "body_pct", "upper_shadow_pct"):
-        assert (feat[col] >= 0).all(), f"{col} has negative values"
+    assert (feat["upper_shadow_pct"] >= 0).all(), "upper_shadow_pct has negative values"
 
 
 def test_no_temporal_leakage_in_features():
@@ -276,8 +213,8 @@ def test_no_temporal_leakage_in_features():
     data (e.g., a rolling operation with center=True, or a percentile computed
     on the full history).
 
-    Includes all optional source columns: btc_dominance, hv_30d, eth_close,
-    eth_volume, sol_close, sol_volume.
+    Includes all optional source columns: eth_close, eth_volume, sol_close,
+    sol_volume, dxy_close, vix_close.
     """
     np.random.seed(42)
     n_full = 500
@@ -287,6 +224,8 @@ def test_no_temporal_leakage_in_features():
     close_full = 100.0 + np.cumsum(np.random.normal(0, 0.5, n_full))
     eth_close_full = 2000.0 + np.cumsum(np.random.normal(0, 5.0, n_full))
     sol_close_full = 100.0 + np.cumsum(np.random.normal(0, 1.0, n_full))
+    dxy_full = 100.0 + np.cumsum(np.random.normal(0, 0.1, n_full))
+    vix_full = 20.0 + np.cumsum(np.random.normal(0, 0.2, n_full))
     merged_full = pd.DataFrame(
         {
             "open": close_full * (1 + np.random.normal(0, 0.0005, n_full)),
@@ -297,12 +236,12 @@ def test_no_temporal_leakage_in_features():
             "funding_rate": np.random.normal(0, 0.0001, n_full),
             "mark_price": close_full,
             # Optional source columns
-            "btc_dominance": np.full(n_full, 45.0),
-            "hv_30d": np.full(n_full, 0.75),
             "eth_close": eth_close_full,
             "eth_volume": np.random.uniform(100, 500, n_full),
             "sol_close": sol_close_full,
             "sol_volume": np.random.uniform(50, 300, n_full),
+            "dxy_close": dxy_full,
+            "vix_close": vix_full,
         },
         index=idx_full,
     )
@@ -373,7 +312,7 @@ def test_cross_asset_features_skipped_when_columns_absent():
 
     cross_asset_cols = [
         "eth_ret_24", "sol_ret_24", "eth_btc_ratio", "eth_btc_ratio_delta_24",
-        "correl_btc_eth_96", "btc_eth_div", "crypto_breadth_24", "eth_vol_zscore_24",
+        "correl_btc_eth_96", "btc_eth_div", "eth_vol_zscore_24",
         "vol_x_breadth",
     ]
     for col in cross_asset_cols:
@@ -393,7 +332,7 @@ def test_cross_asset_features_present_when_columns_provided():
 
     cross_asset_cols = [
         "eth_ret_24", "sol_ret_24", "eth_btc_ratio", "eth_btc_ratio_delta_24",
-        "correl_btc_eth_96", "btc_eth_div", "crypto_breadth_24", "eth_vol_zscore_24",
+        "correl_btc_eth_96", "btc_eth_div", "eth_vol_zscore_24",
         "vol_x_breadth",
     ]
     for col in cross_asset_cols:
@@ -432,4 +371,93 @@ def test_correl_btc_eth_96_is_one_for_identical_series():
     assert len(corr) > 0, "Expected some non-NaN correlation values"
     assert (corr.round(10) == 1.0).all(), (
         f"Expected correlation = 1.0 for identical series, got min={corr.min():.6f}"
+    )
+
+
+# ---------------------------------------------------------------------------
+# Macro feature tests (Path 3)
+# ---------------------------------------------------------------------------
+
+def test_macro_features_absent_without_columns():
+    """Macro features must not appear when dxy_close/vix_close are not in merged."""
+    merged = _make_merged(n=200)
+    feat = build_features(merged)
+
+    macro_cols = [
+        "dxy_ret_24", "dxy_vs_btc_24",
+        "vix_current", "vix_zscore_30d",
+        "correl_btc_vix_96", "correl_btc_dxy_96",
+    ]
+    for col in macro_cols:
+        assert col not in feat.columns, f"'{col}' should not be present without macro columns"
+
+
+def test_macro_features_present_when_dxy_provided():
+    """dxy_ret_24 and dxy_vs_btc_24 appear when dxy_close is in merged."""
+    rng = np.random.default_rng(5)
+    merged = _make_merged(n=200)
+    merged["dxy_close"] = 100.0 + np.cumsum(rng.normal(0, 0.1, 200))
+
+    feat = build_features(merged)
+
+    assert "dxy_ret_24" in feat.columns, "dxy_ret_24 should be present when dxy_close is in merged"
+    assert "dxy_vs_btc_24" in feat.columns, "dxy_vs_btc_24 should be present when dxy_close is in merged"
+
+
+def test_macro_features_present_when_vix_provided():
+    """vix_current and vix_zscore_30d appear when vix_close is in merged."""
+    rng = np.random.default_rng(6)
+    merged = _make_merged(n=200)
+    merged["vix_close"] = 20.0 + np.abs(rng.normal(0, 2, 200))
+
+    feat = build_features(merged)
+
+    assert "vix_current" in feat.columns, "vix_current should be present when vix_close is in merged"
+    assert "vix_zscore_30d" in feat.columns, "vix_zscore_30d should be present when vix_close is in merged"
+
+
+def test_correlation_macro_features_present_when_both_provided():
+    """correl_btc_vix_96 and correl_btc_dxy_96 appear only when both dxy_close
+    AND vix_close are in merged."""
+    rng = np.random.default_rng(7)
+    n = 200
+    merged = _make_merged(n=n)
+    merged["dxy_close"] = 100.0 + np.cumsum(rng.normal(0, 0.1, n))
+    merged["vix_close"] = 20.0 + np.abs(rng.normal(0, 2, n))
+
+    feat = build_features(merged)
+
+    assert "correl_btc_vix_96" in feat.columns
+    assert "correl_btc_dxy_96" in feat.columns
+
+
+def test_dxy_vs_btc_24_sign():
+    """dxy_vs_btc_24 = dxy_ret_24 * -ret_24. When DXY rises and BTC falls,
+    the product should be positive (bearish macro alignment)."""
+    n = 300
+    idx = pd.date_range("2024-01-01", periods=n, freq="15min", tz="UTC")
+    # Monotonically rising DXY and falling BTC prices
+    dxy = np.linspace(100, 110, n)
+    btc = np.linspace(50000, 40000, n)
+    merged = pd.DataFrame(
+        {
+            "open": btc,
+            "high": btc + 50,
+            "low": btc - 50,
+            "close": btc,
+            "volume": np.ones(n) * 100,
+            "funding_rate": np.zeros(n),
+            "mark_price": btc,
+            "dxy_close": dxy,
+        },
+        index=idx,
+    )
+
+    feat = build_features(merged)
+
+    # After warm-up (24 bars), dxy_vs_btc_24 should be positive
+    signal = feat["dxy_vs_btc_24"].dropna()
+    assert len(signal) > 0
+    assert (signal > 0).all(), (
+        f"Expected dxy_vs_btc_24 > 0 when DXY up and BTC down, got min={signal.min():.6f}"
     )
