@@ -6,7 +6,7 @@ import pandas as pd
 import pytest
 import responses as resp_lib
 
-from data.sources.kalshi_source import KalshiSource, _KALSHI_API
+from data.sources.kalshi_source import KalshiSource, _KALSHI_API, _KALSHI_PUBLIC_API
 
 
 # ---------------------------------------------------------------------------
@@ -69,7 +69,7 @@ def test_list_btc_markets_parses_response(tmp_path):
     }
     resp_lib.add(resp_lib.GET, _markets_url(), json=payload, status=200)
 
-    src = KalshiSource(cache_dir=tmp_path)
+    src = KalshiSource(cache_dir=tmp_path, signer=None)
     markets = src.list_btc_markets(status="open")
 
     assert len(markets) == 2
@@ -100,7 +100,7 @@ def test_list_btc_markets_paginates(tmp_path):
         status=200,
     )
 
-    src = KalshiSource(cache_dir=tmp_path)
+    src = KalshiSource(cache_dir=tmp_path, signer=None)
     markets = src.list_btc_markets(status="open")
 
     assert len(resp_lib.calls) == 2
@@ -123,7 +123,7 @@ def test_get_market_orderbook_returns_yes_no_sides(tmp_path):
     }
     resp_lib.add(resp_lib.GET, _orderbook_url(ticker), json=orderbook_payload, status=200)
 
-    src = KalshiSource(cache_dir=tmp_path)
+    src = KalshiSource(cache_dir=tmp_path, signer=None)
     ob = src.get_market_orderbook(ticker)
 
     assert "yes" in ob
@@ -153,7 +153,7 @@ def test_get_market_history_returns_datetime_indexed_df(tmp_path):
     start_ms = t0_s * 1000
     end_ms = t1_s * 1000 + 1000
 
-    src = KalshiSource(cache_dir=tmp_path)
+    src = KalshiSource(cache_dir=tmp_path, signer=None)
     df = src.get_market_history(ticker, start_ms, end_ms)
 
     assert isinstance(df.index, pd.DatetimeIndex)
@@ -182,7 +182,7 @@ def test_get_settled_markets_filters_by_date_range(tmp_path):
         status=200,
     )
 
-    src = KalshiSource(cache_dir=tmp_path)
+    src = KalshiSource(cache_dir=tmp_path, signer=None)
     markets = src.get_settled_markets(t0_ms, t1_ms)
 
     # Verify the request included the right params
@@ -207,7 +207,7 @@ def test_caches_to_parquet(tmp_path):
     }
     resp_lib.add(resp_lib.GET, _markets_url(), json=payload, status=200)
 
-    src = KalshiSource(cache_dir=tmp_path)
+    src = KalshiSource(cache_dir=tmp_path, signer=None)
     markets1 = src.list_btc_markets(status="open")
 
     # Parquet file must exist

@@ -3,36 +3,74 @@ from __future__ import annotations
 import logging
 import time
 from pathlib import Path
+from urllib.parse import urlencode
 
 import pandas as pd
 import requests
 
-_KALSHI_API = "https://api.elections.kalshi.com/trade-api/v2"
+# Authenticated trading API — required for BTC hourly markets
+_KALSHI_API = "https://trading-api.kalshi.com/trade-api/v2"
+# Public elections API — political markets, no auth required
+_KALSHI_PUBLIC_API = "https://api.elections.kalshi.com/trade-api/v2"
+
 _CACHE_DIR = Path(__file__).resolve().parents[2] / "cache" / "kalshi"
 
 logger = logging.getLogger(__name__)
 
 
 class KalshiSource:
-    """Public Kalshi REST API client for prediction-market data.
-    No authentication required for market discovery, orderbooks, and history."""
+    """Kalshi REST API client for prediction-market data.
+
+    Uses the authenticated trading-api endpoint (trading-api.kalshi.com) which
+    supports BTC hourly markets.  When KALSHI_ACCESS_KEY_ID and
+    KALSHI_PRIVATE_KEY_PATH are present in the environment a KalshiSigner is
+    auto-constructed; otherwise only public (political) markets will work.
+    """
 
     _PAGE_LIMIT = 200  # Kalshi max per page
 
-    def __init__(self, cache_dir: Path | None = None) -> None:
+    def __init__(self, cache_dir: Path | None = None, signer=None) -> None:
         self._cache_dir = cache_dir or _CACHE_DIR
         self._cache_dir.mkdir(parents=True, exist_ok=True)
+
+        if signer is None:
+            try:
+                from data.sources.kalshi_auth import KalshiAuthError, KalshiSigner
+
+                signer = KalshiSigner()
+            except Exception:
+                # KalshiAuthError or ImportError — run unauthenticated
+                signer = None
+                logger.warning(
+                    "Kalshi auth not configured; only public endpoints will work."
+                )
+        self._signer = signer
 
     # ------------------------------------------------------------------
     # Internal helpers
     # ------------------------------------------------------------------
 
-    def _get(self, endpoint: str, params: dict | None = None) -> dict:
-        """GET with one retry on transient error. Returns parsed JSON dict."""
-        url = f"{_KALSHI_API}/{endpoint}"
+    def _request(self, method: str, path: str, params: dict | None = None) -> dict:
+        """Signed (if signer available) HTTP request with one retry.
+
+        path: bare path segment such as 'markets' or 'markets/{ticker}/orderbook'.
+              It is joined to the base URL with a '/'.
+        """
+        url = f"{_KALSHI_API}/{path}"
+        headers: dict[str, str] = {"Accept": "application/json"}
+
+        if self._signer:
+            # Build the full path (with leading /) including query string for signing
+            api_path = f"/trade-api/v2/{path}"
+            if params:
+                api_path = f"{api_path}?{urlencode(params)}"
+            headers.update(self._signer.sign_headers(method, api_path))
+
         for attempt in range(2):
             try:
-                resp = requests.get(url, params=params or {}, timeout=15)
+                resp = requests.request(
+                    method, url, params=params, headers=headers, timeout=15
+                )
                 resp.raise_for_status()
                 return resp.json()
             except (requests.RequestException, ValueError) as exc:
@@ -42,6 +80,10 @@ class KalshiSource:
                 else:
                     raise
         return {}
+
+    def _get(self, endpoint: str, params: dict | None = None) -> dict:
+        """Convenience wrapper around _request for GET calls."""
+        return self._request("GET", endpoint, params)
 
     def _cache_path(self, name: str) -> Path:
         return self._cache_dir / f"{name}.parquet"
@@ -100,7 +142,9 @@ class KalshiSource:
         if markets:
             df = pd.DataFrame(markets)
             df.to_parquet(cache_file)
-            logger.info("Cached %d BTC markets (status=%s) to %s", len(markets), status, cache_file)
+            logger.info(
+                "Cached %d BTC markets (status=%s) to %s", len(markets), status, cache_file
+            )
 
         return markets
 
@@ -160,7 +204,9 @@ class KalshiSource:
         df = df[~df.index.duplicated(keep="first")]
 
         df.to_parquet(cache_file)
-        logger.info("Cached market history for %s to %s (%d rows)", ticker, cache_file, len(df))
+        logger.info(
+            "Cached market history for %s to %s (%d rows)", ticker, cache_file, len(df)
+        )
         return df
 
     def get_settled_markets(self, start_ms: int, end_ms: int) -> list[dict]:
