@@ -275,6 +275,9 @@ def test_no_temporal_leakage_in_features():
     This catches any rolling/cumulative operation that accidentally uses future
     data (e.g., a rolling operation with center=True, or a percentile computed
     on the full history).
+
+    Includes all optional source columns: btc_dominance, hv_30d, eth_close,
+    eth_volume, sol_close, sol_volume.
     """
     np.random.seed(42)
     n_full = 500
@@ -282,6 +285,8 @@ def test_no_temporal_leakage_in_features():
 
     idx_full = pd.date_range("2025-01-01", periods=n_full, freq="15min", tz="UTC")
     close_full = 100.0 + np.cumsum(np.random.normal(0, 0.5, n_full))
+    eth_close_full = 2000.0 + np.cumsum(np.random.normal(0, 5.0, n_full))
+    sol_close_full = 100.0 + np.cumsum(np.random.normal(0, 1.0, n_full))
     merged_full = pd.DataFrame(
         {
             "open": close_full * (1 + np.random.normal(0, 0.0005, n_full)),
@@ -291,6 +296,13 @@ def test_no_temporal_leakage_in_features():
             "volume": np.random.uniform(50, 200, n_full),
             "funding_rate": np.random.normal(0, 0.0001, n_full),
             "mark_price": close_full,
+            # Optional source columns
+            "btc_dominance": np.full(n_full, 45.0),
+            "hv_30d": np.full(n_full, 0.75),
+            "eth_close": eth_close_full,
+            "eth_volume": np.random.uniform(100, 500, n_full),
+            "sol_close": sol_close_full,
+            "sol_volume": np.random.uniform(50, 300, n_full),
         },
         index=idx_full,
     )
@@ -308,4 +320,116 @@ def test_no_temporal_leakage_in_features():
         atol=1e-12,
         rtol=1e-12,
         obj="No-leakage check: features at time T must not depend on data after T",
+    )
+
+
+# ---------------------------------------------------------------------------
+# New feature tests
+# ---------------------------------------------------------------------------
+
+def test_close_to_high_20_in_unit_range():
+    """close_to_high_20 should be in (0, 1] — close is never above its recent 20-bar high."""
+    merged = _make_merged(n=200)
+    feat = build_features(merged)
+
+    col = feat["close_to_high_20"].dropna()
+    assert (col > 0).all(), "close_to_high_20 should be > 0"
+    assert (col <= 1.0 + 1e-9).all(), f"close_to_high_20 should be <= 1, max={col.max()}"
+
+
+def test_consec_up_bars_capped_at_10():
+    """15 consecutive up bars should yield consec_up_bars == 10 (cap enforced)."""
+    rng = np.random.default_rng(0)
+    n = 30
+    idx = pd.date_range("2024-01-01", periods=n, freq="15min", tz="UTC")
+    # All bars are clearly up: close > open for all of them
+    open_prices = np.ones(n) * 100.0
+    close_prices = np.ones(n) * 101.0
+    merged = pd.DataFrame(
+        {
+            "open": open_prices,
+            "high": close_prices + 1,
+            "low": open_prices - 1,
+            "close": close_prices,
+            "volume": rng.uniform(10, 200, n),
+            "funding_rate": rng.uniform(-0.001, 0.001, n),
+            "mark_price": close_prices,
+        },
+        index=idx,
+    )
+    feat = build_features(merged)
+    # By bar index 15 (0-based), we've had 15 consecutive up bars before it,
+    # but capped at 10.
+    assert feat["consec_up_bars"].iloc[-1] == 10, (
+        f"Expected 10 (capped), got {feat['consec_up_bars'].iloc[-1]}"
+    )
+
+
+def test_cross_asset_features_skipped_when_columns_absent():
+    """If merged lacks eth_close/sol_close, cross-asset features must not appear."""
+    merged = _make_merged(n=200)
+    # No eth_close, no sol_close
+    feat = build_features(merged)
+
+    cross_asset_cols = [
+        "eth_ret_24", "sol_ret_24", "eth_btc_ratio", "eth_btc_ratio_delta_24",
+        "correl_btc_eth_96", "btc_eth_div", "crypto_breadth_24", "eth_vol_zscore_24",
+        "vol_x_breadth",
+    ]
+    for col in cross_asset_cols:
+        assert col not in feat.columns, f"'{col}' should not be present without eth/sol data"
+
+
+def test_cross_asset_features_present_when_columns_provided():
+    """If merged has eth_close + sol_close, cross-asset features ARE present."""
+    rng = np.random.default_rng(7)
+    merged = _make_merged(n=200)
+    merged["eth_close"] = 2000.0 + np.cumsum(rng.normal(0, 5, 200))
+    merged["eth_volume"] = rng.uniform(100, 500, 200)
+    merged["sol_close"] = 100.0 + np.cumsum(rng.normal(0, 1, 200))
+    merged["sol_volume"] = rng.uniform(50, 300, 200)
+
+    feat = build_features(merged)
+
+    cross_asset_cols = [
+        "eth_ret_24", "sol_ret_24", "eth_btc_ratio", "eth_btc_ratio_delta_24",
+        "correl_btc_eth_96", "btc_eth_div", "crypto_breadth_24", "eth_vol_zscore_24",
+        "vol_x_breadth",
+    ]
+    for col in cross_asset_cols:
+        assert col in feat.columns, f"'{col}' should be present when eth/sol data is available"
+
+
+def test_eth_btc_ratio_correct():
+    """eth_btc_ratio must equal eth_close / btc_close exactly."""
+    merged = _make_merged(n=200)
+    merged["eth_close"] = 2000.0
+    merged["sol_close"] = 100.0
+
+    feat = build_features(merged)
+    expected = merged["eth_close"] / merged["close"]
+    pd.testing.assert_series_equal(
+        feat["eth_btc_ratio"].rename("eth_btc_ratio"),
+        expected.rename("eth_btc_ratio"),
+        check_exact=False,
+        atol=1e-12,
+    )
+
+
+def test_correl_btc_eth_96_is_one_for_identical_series():
+    """If ETH returns == BTC returns, rolling 96-bar correlation should be 1.0."""
+    rng = np.random.default_rng(99)
+    n = 200
+    merged = _make_merged(n=n, seed=99)
+    # Make ETH exactly equal to BTC (same close prices → same log returns)
+    merged["eth_close"] = merged["close"].values.copy()
+    merged["sol_close"] = merged["close"].values.copy()
+
+    feat = build_features(merged)
+
+    # After the 96-bar warm-up, correlation should be 1.0
+    corr = feat["correl_btc_eth_96"].dropna()
+    assert len(corr) > 0, "Expected some non-NaN correlation values"
+    assert (corr.round(10) == 1.0).all(), (
+        f"Expected correlation = 1.0 for identical series, got min={corr.min():.6f}"
     )

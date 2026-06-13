@@ -15,6 +15,10 @@ def build_features(merged: pd.DataFrame, settlement_period_bars: int = 32) -> pd
         Optional columns (auto-detected, skipped if absent):
             'btc_dominance'   — BTC dominance % (daily, forward-filled to 15m)
             'hv_30d'          — Deribit 30-day realized volatility (daily, ffill)
+            'eth_close'       — ETH-USD close price (15m, forward-filled)
+            'eth_volume'      — ETH-USD volume (15m, forward-filled)
+            'sol_close'       — SOL-USD close price (15m, forward-filled)
+            'sol_volume'      — SOL-USD volume (15m, forward-filled)
         Index: UTC datetime at 15-minute intervals, ascending.
     settlement_period_bars : int, default 32
         Number of 15-minute bars per funding settlement cycle.
@@ -74,6 +78,35 @@ def build_features(merged: pd.DataFrame, settlement_period_bars: int = 32) -> pd
         fund_x_vol                     fund_zscore_7d * rv_24_pct_rank_7d
         fund_x_ret                     fund_delta_24h * ret_24
         vol_x_ret                      rv_24 * ret_24
+
+    PRICE ACTION (7) — new
+        close_to_high_20               close / rolling 20-bar max(high) — distance from recent high
+        close_to_low_20                close / rolling 20-bar min(low)  — distance from recent low
+        range_pct_20                   (max(high[-20:]) - min(low[-20:])) / close — 20-bar range
+        consec_up_bars                 consecutive prior bars where close > open (capped at 10)
+        consec_down_bars               consecutive prior bars where close < open (capped at 10)
+        gap_pct                        (open - prior_close) / prior_close
+        range_expansion                current bar range / 20-bar avg range
+
+    VOLUME (4) — new
+        vol_ratio_4_24                 mean(volume[-4:]) / mean(volume[-24:])
+        cvd_proxy_24                   sum(volume * sign(close-open)) / sum(volume) over 24 bars
+        vol_breakout                   current volume / 96-bar avg, clipped to [0, 5]
+        up_vol_pct_24                  fraction of last 24 bars' volume on green candles
+
+    CROSS-ASSET (8) — new, only when eth_close/sol_close present
+        eth_ret_24                     ETH 24-bar log return
+        sol_ret_24                     SOL 24-bar log return
+        eth_btc_ratio                  ETH price / BTC price
+        eth_btc_ratio_delta_24         24h change in ETH/BTC ratio
+        correl_btc_eth_96              rolling 96-bar correlation of BTC/ETH log returns
+        btc_eth_div                    ret_24(BTC) - ret_24(ETH) divergence
+        crypto_breadth_24              fraction of (BTC, ETH, SOL) with positive 24-bar return
+        eth_vol_zscore_24              ETH volume z-score over 24 bars
+
+    CROSS-PRODUCTS (2) — new
+        fund_x_dom                     fund_zscore_7d * btc_dom_current (only when btc_dom present)
+        vol_x_breadth                  rv_24_pct_rank_7d * crypto_breadth_24 (only when cross-asset present)
     """
     close = merged["close"]
     open_ = merged["open"]
@@ -228,5 +261,129 @@ def build_features(merged: pd.DataFrame, settlement_period_bars: int = 32) -> pd
     # ------------------------------------------------------------------
     if "hv_30d" in merged.columns:
         features["hv_30d"] = merged["hv_30d"]
+
+    # ------------------------------------------------------------------
+    # PRICE ACTION (new)
+    # ------------------------------------------------------------------
+    # close / 20-bar rolling max(high): 0-to-1 ratio (1 = at recent high)
+    high_20 = high.rolling(20).max()
+    features["close_to_high_20"] = close / high_20
+
+    # close / 20-bar rolling min(low): ≥1 (1 = at recent low)
+    low_20 = low.rolling(20).min()
+    features["close_to_low_20"] = close / low_20
+
+    # 20-bar range as % of close
+    features["range_pct_20"] = (high_20 - low_20) / close
+
+    # Consecutive bars where close > open (capped at 10), strictly backward-looking.
+    # We compute this as: for each bar T, count how many consecutive bars ending at T-1
+    # had close > open. The current bar T is NOT included (no lookahead).
+    is_up = (close > open_).astype(int).values
+    consec_up = np.zeros(len(is_up), dtype=float)
+    consec_down_arr = np.zeros(len(is_up), dtype=float)
+    run_up = 0
+    run_down = 0
+    for i in range(len(is_up)):
+        # consec at position i reflects the run of bars ending at i-1
+        consec_up[i] = min(run_up, 10)
+        consec_down_arr[i] = min(run_down, 10)
+        if is_up[i] == 1:
+            run_up += 1
+            run_down = 0
+        elif is_up[i] == 0:
+            run_down += 1
+            run_up = 0
+        else:
+            run_up = 0
+            run_down = 0
+    features["consec_up_bars"] = pd.Series(consec_up, index=merged.index)
+    features["consec_down_bars"] = pd.Series(consec_down_arr, index=merged.index)
+
+    # Gap: (open - prior close) / prior close
+    features["gap_pct"] = (open_ - close.shift(1)) / close.shift(1)
+
+    # Range expansion: current bar range vs 20-bar average range
+    bar_range = high - low
+    avg_range_20 = bar_range.shift(1).rolling(20).mean()  # shift(1): exclude current bar
+    features["range_expansion"] = bar_range / avg_range_20.replace(0, np.nan)
+
+    # ------------------------------------------------------------------
+    # VOLUME (new)
+    # ------------------------------------------------------------------
+    # Short-term vs medium-term volume ratio
+    vol_mean_4 = volume.rolling(4).mean()
+    features["vol_ratio_4_24"] = vol_mean_4 / vol_mean_24.replace(0, np.nan)
+
+    # CVD proxy: sum(vol * sign(close - open)) / sum(vol) over 24 bars
+    signed_vol = volume * np.sign(close - open_)
+    cvd_num = signed_vol.rolling(24).sum()
+    cvd_den = volume.rolling(24).sum()
+    features["cvd_proxy_24"] = cvd_num / cvd_den.replace(0, np.nan)
+
+    # Vol breakout: current volume vs 96-bar mean, clipped to [0, 5]
+    features["vol_breakout"] = (volume / vol_mean_96.replace(0, np.nan)).clip(lower=0, upper=5)
+
+    # Fraction of last 24 bars' volume on green candles
+    green_vol = (volume * (close > open_).astype(float)).rolling(24).sum()
+    total_vol_24 = volume.rolling(24).sum()
+    features["up_vol_pct_24"] = green_vol / total_vol_24.replace(0, np.nan)
+
+    # ------------------------------------------------------------------
+    # CROSS-ASSET (new) — only when eth_close and sol_close are present
+    # ------------------------------------------------------------------
+    _has_eth = "eth_close" in merged.columns
+    _has_sol = "sol_close" in merged.columns
+    _has_cross = _has_eth and _has_sol
+
+    if _has_cross:
+        eth_close = merged["eth_close"]
+        sol_close = merged["sol_close"]
+
+        log_eth = np.log(eth_close)
+        log_sol = np.log(sol_close)
+        log_btc = log_close  # already computed above
+
+        eth_ret_24 = log_eth.diff(24)
+        sol_ret_24 = log_sol.diff(24)
+        btc_ret_24 = ret_24  # same as log_btc.diff(24)
+
+        features["eth_ret_24"] = eth_ret_24
+        features["sol_ret_24"] = sol_ret_24
+
+        # ETH/BTC price ratio
+        eth_btc_ratio = eth_close / close
+        features["eth_btc_ratio"] = eth_btc_ratio
+        features["eth_btc_ratio_delta_24"] = eth_btc_ratio.diff(24)
+
+        # Rolling correlation of 1-bar log returns over 96 bars
+        btc_ret_1bar = log_btc.diff(1)
+        eth_ret_1bar = log_eth.diff(1)
+        features["correl_btc_eth_96"] = btc_ret_1bar.rolling(96).corr(eth_ret_1bar)
+
+        # BTC-ETH return divergence
+        features["btc_eth_div"] = btc_ret_24 - eth_ret_24
+
+        # Crypto breadth: fraction of (BTC, ETH, SOL) with positive 24-bar return
+        btc_pos = (btc_ret_24 > 0).astype(float)
+        eth_pos = (eth_ret_24 > 0).astype(float)
+        sol_pos = (sol_ret_24 > 0).astype(float)
+        features["crypto_breadth_24"] = (btc_pos + eth_pos + sol_pos) / 3.0
+
+        # ETH volume z-score over 24 bars
+        if "eth_volume" in merged.columns:
+            eth_vol = merged["eth_volume"]
+            eth_vol_mean_24 = eth_vol.rolling(24).mean()
+            eth_vol_std_24 = eth_vol.rolling(24).std()
+            features["eth_vol_zscore_24"] = (eth_vol - eth_vol_mean_24) / eth_vol_std_24.replace(0, np.nan)
+
+        # Cross-products involving cross-asset
+        features["vol_x_breadth"] = rv_24_pct_rank_7d * features["crypto_breadth_24"]
+
+    # ------------------------------------------------------------------
+    # Optional cross-product: funding × dominance
+    # ------------------------------------------------------------------
+    if "btc_dom_current" in features.columns:
+        features["fund_x_dom"] = fund_zscore_7d * features["btc_dom_current"]
 
     return features

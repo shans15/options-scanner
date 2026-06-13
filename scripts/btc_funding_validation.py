@@ -55,6 +55,23 @@ print(f"Fetching BTC perp hourly funding from Hyperliquid …")
 funding = hl.fetch_perp_funding("BTC", start_ms, end_ms)
 print(f"  Funding rows: {len(funding):,}")
 
+# Cross-asset: ETH-USD and SOL-USD OHLCV (graceful degradation on rate-limit)
+try:
+    print(f"Fetching ETH-USD 15m OHLCV …")
+    ohlcv_eth = cb.fetch_ohlcv("ETH-USD", "15m", start_ms, end_ms)
+    print(f"  ETH rows: {len(ohlcv_eth):,}")
+except Exception as e:
+    print(f"  WARN: ETH-USD fetch failed ({e}), skipping cross-asset ETH features")
+    ohlcv_eth = None
+
+try:
+    print(f"Fetching SOL-USD 15m OHLCV …")
+    ohlcv_sol = cb.fetch_ohlcv("SOL-USD", "15m", start_ms, end_ms)
+    print(f"  SOL rows: {len(ohlcv_sol):,}")
+except Exception as e:
+    print(f"  WARN: SOL-USD fetch failed ({e}), skipping cross-asset SOL features")
+    ohlcv_sol = None
+
 # Optional: BTC dominance (CoinGecko)
 try:
     print("Fetching BTC dominance history from CoinGecko …")
@@ -89,6 +106,15 @@ if not btc_dom.empty and "btc_dominance" in btc_dom.columns:
 # Optional: Deribit HV (daily → forward-fill to 15m grid)
 if not hv.empty and "hv_30d" in hv.columns:
     merged["hv_30d"] = hv["hv_30d"].reindex(merged.index, method="ffill")
+
+# Optional: ETH and SOL cross-asset columns
+if ohlcv_eth is not None and not ohlcv_eth.empty:
+    merged["eth_close"] = ohlcv_eth["close"].reindex(merged.index, method="ffill")
+    merged["eth_volume"] = ohlcv_eth["volume"].reindex(merged.index, method="ffill")
+
+if ohlcv_sol is not None and not ohlcv_sol.empty:
+    merged["sol_close"] = ohlcv_sol["close"].reindex(merged.index, method="ffill")
+    merged["sol_volume"] = ohlcv_sol["volume"].reindex(merged.index, method="ffill")
 
 required_cols = ["open", "high", "low", "close", "volume", "funding_rate"]
 merged = merged.dropna(subset=required_cols)
@@ -264,6 +290,39 @@ imp = pd.Series(
 ).sort_values(ascending=False)
 print("\nTop 10 features by gain:")
 print(imp.head(10))
+
+# %% SHAP feature importance
+import shap
+
+# Use up to 1000 holdout rows for SHAP (TreeExplainer is fast but we cap for safety)
+shap_sample = X_holdout.sample(n=min(1000, len(X_holdout)), random_state=42)
+explainer = shap.TreeExplainer(final_model)
+shap_values = explainer.shap_values(shap_sample)
+
+# For binary classification, shap_values is sometimes a list [neg_class, pos_class].
+# We want the positive-class contributions.
+if isinstance(shap_values, list):
+    shap_arr = shap_values[1]
+else:
+    shap_arr = shap_values
+
+mean_abs_shap = pd.Series(
+    np.abs(shap_arr).mean(axis=0),
+    index=shap_sample.columns,
+).sort_values(ascending=False)
+
+print("\n--- SHAP feature importance (mean |SHAP| on holdout) ---")
+print(mean_abs_shap.to_string())
+
+# Recommend bottom-quartile cuts
+cut_threshold = mean_abs_shap.quantile(0.25)
+recommended_drops = mean_abs_shap[mean_abs_shap <= cut_threshold].index.tolist()
+print(f"\nRecommended drops (bottom quartile, mean|SHAP| <= {cut_threshold:.5f}):")
+for col in recommended_drops:
+    print(f"  - {col}: {mean_abs_shap[col]:.5f}")
+keep_features = mean_abs_shap.index[: len(mean_abs_shap) - len(recommended_drops)].tolist() if recommended_drops else mean_abs_shap.index.tolist()
+print(f"\nKeep these {len(keep_features)} features for the next iteration:")
+print(", ".join(keep_features))
 
 # %% Simulated trading P&L (educational, not production)
 fee_bps = 7.5
