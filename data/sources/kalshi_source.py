@@ -18,6 +18,10 @@ _KALSHI_PUBLIC_API = _KALSHI_API
 
 _CACHE_DIR = Path(__file__).resolve().parents[2] / "cache" / "kalshi"
 
+# Rate limiting: Kalshi's documented public limit is 10 req/sec.
+# We target ≤5 req/sec (0.21s interval) to leave a safety margin.
+_MIN_REQUEST_INTERVAL_S = 0.21
+
 logger = logging.getLogger(__name__)
 
 
@@ -35,6 +39,7 @@ class KalshiSource:
     def __init__(self, cache_dir: Path | None = None, signer=None) -> None:
         self._cache_dir = cache_dir or _CACHE_DIR
         self._cache_dir.mkdir(parents=True, exist_ok=True)
+        self._last_request_time: float = 0.0
 
         if signer is None:
             try:
@@ -54,11 +59,20 @@ class KalshiSource:
     # ------------------------------------------------------------------
 
     def _request(self, method: str, path: str, params: dict | None = None) -> dict:
-        """Signed (if signer available) HTTP request with one retry.
+        """Signed (if signer available) HTTP request with rate limiting and 429 backoff.
 
         path: bare path segment such as 'markets' or 'markets/{ticker}/orderbook'.
               It is joined to the base URL with a '/'.
+
+        Rate limit: enforces ≤5 req/sec by sleeping if needed.
+        429 handling: exponential backoff — retries up to 3 times (1s, 2s, 4s).
         """
+        # Enforce rate limit before building/sending the request
+        elapsed = time.time() - self._last_request_time
+        if elapsed < _MIN_REQUEST_INTERVAL_S:
+            time.sleep(_MIN_REQUEST_INTERVAL_S - elapsed)
+        self._last_request_time = time.time()
+
         url = f"{_KALSHI_API}/{path}"
         headers: dict[str, str] = {"Accept": "application/json"}
 
@@ -69,17 +83,35 @@ class KalshiSource:
                 api_path = f"{api_path}?{urlencode(params)}"
             headers.update(self._signer.sign_headers(method, api_path))
 
-        for attempt in range(2):
+        for attempt in range(3):
             try:
                 resp = requests.request(
                     method, url, params=params, headers=headers, timeout=15
                 )
+                if resp.status_code == 429:
+                    wait = 2 ** attempt  # 1s, 2s, 4s
+                    logger.warning("Kalshi 429 (rate limit), backing off %ds", wait)
+                    time.sleep(wait)
+                    # Refresh last_request_time so rate limiter accounts for the sleep
+                    self._last_request_time = time.time()
+                    continue
+                # 4xx errors (except 429 handled above) are client errors — don't retry.
+                # Return empty dict for 404 (no history / market not found) so callers
+                # can treat it as an empty result rather than a fatal exception.
+                if 400 <= resp.status_code < 500:
+                    if resp.status_code == 404:
+                        logger.debug("Kalshi 404 for %s %s — returning empty", method, path)
+                        return {}
+                    resp.raise_for_status()  # other 4xx: raise immediately
                 resp.raise_for_status()
                 return resp.json()
             except (requests.RequestException, ValueError) as exc:
-                if attempt == 0:
-                    logger.warning("Kalshi request failed (%s), retrying once…", exc)
-                    time.sleep(1)
+                if attempt < 2:
+                    logger.warning(
+                        "Kalshi request failed (attempt %d/3): %s — retrying…",
+                        attempt + 1, exc,
+                    )
+                    time.sleep(2 ** attempt)
                 else:
                     raise
         return {}
