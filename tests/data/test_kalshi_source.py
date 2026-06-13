@@ -43,8 +43,10 @@ def _orderbook_url(ticker: str) -> str:
     return f"{_KALSHI_API}/markets/{ticker}/orderbook"
 
 
-def _history_url(ticker: str) -> str:
-    return f"{_KALSHI_API}/markets/{ticker}/history"
+def _candlesticks_url(ticker: str) -> str:
+    """URL for the candlesticks endpoint (the replacement for the old /history path)."""
+    series_ticker = ticker.split("-")[0]
+    return f"{_KALSHI_API}/series/{series_ticker}/markets/{ticker}/candlesticks"
 
 
 # ---------------------------------------------------------------------------
@@ -138,17 +140,40 @@ def test_get_market_orderbook_returns_yes_no_sides(tmp_path):
 
 @resp_lib.activate
 def test_get_market_history_returns_datetime_indexed_df(tmp_path):
-    """get_market_history must return a DataFrame indexed by UTC datetime."""
+    """get_market_history must return a DataFrame indexed by UTC datetime.
+
+    Kalshi v2 API uses the /series/{series}/markets/{ticker}/candlesticks endpoint
+    (the old /markets/{ticker}/history path does not exist).
+    """
     ticker = "KXBTC-26JUN1316-T62500"
     t0_s = int(datetime(2026, 6, 13, 12, 0, tzinfo=timezone.utc).timestamp())
-    t1_s = t0_s + 3600
-    history_payload = {
-        "history": [
-            {"ts": t0_s, "yes_bid": 8, "yes_ask": 10, "no_bid": 90, "no_ask": 92, "volume": 100},
-            {"ts": t1_s, "yes_bid": 9, "yes_ask": 11, "no_bid": 89, "no_ask": 91, "volume": 120},
+    t1_s = t0_s + 60  # one minute later
+    # Candlestick response format — prices are dollar strings, ts is end_period_ts in seconds
+    candlesticks_payload = {
+        "candlesticks": [
+            {
+                "end_period_ts": t0_s,
+                "yes_bid": {"close_dollars": "0.08", "open_dollars": "0.07",
+                            "high_dollars": "0.09", "low_dollars": "0.07"},
+                "yes_ask": {"close_dollars": "0.10", "open_dollars": "0.09",
+                            "high_dollars": "0.11", "low_dollars": "0.09"},
+                "volume_fp": "100",
+                "open_interest_fp": "500",
+                "price": {},
+            },
+            {
+                "end_period_ts": t1_s,
+                "yes_bid": {"close_dollars": "0.09", "open_dollars": "0.08",
+                            "high_dollars": "0.10", "low_dollars": "0.08"},
+                "yes_ask": {"close_dollars": "0.11", "open_dollars": "0.10",
+                            "high_dollars": "0.12", "low_dollars": "0.10"},
+                "volume_fp": "120",
+                "open_interest_fp": "520",
+                "price": {},
+            },
         ]
     }
-    resp_lib.add(resp_lib.GET, _history_url(ticker), json=history_payload, status=200)
+    resp_lib.add(resp_lib.GET, _candlesticks_url(ticker), json=candlesticks_payload, status=200)
 
     start_ms = t0_s * 1000
     end_ms = t1_s * 1000 + 1000
@@ -162,6 +187,9 @@ def test_get_market_history_returns_datetime_indexed_df(tmp_path):
     assert list(df.columns) == ["yes_bid", "yes_ask", "no_bid", "no_ask", "volume"]
     assert len(df) == 2
     assert df.index.is_monotonic_increasing
+    # Values should be in probability space (0-1), not cent-prices
+    assert df["yes_bid"].iloc[0] == pytest.approx(0.08)
+    assert df["yes_ask"].iloc[0] == pytest.approx(0.10)
 
 
 # ---------------------------------------------------------------------------

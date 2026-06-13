@@ -70,6 +70,16 @@ _HISTORY_WINDOW_MS = 30 * 60 * 1000  # 30 min in ms
 _Q = {0.25: 0.25, 0.5: 0.5, 0.75: 0.75}
 
 
+def _safe_float(value) -> Optional[float]:
+    """Convert a value to float, returning None on failure."""
+    if value is None:
+        return None
+    try:
+        return float(value)
+    except (TypeError, ValueError):
+        return None
+
+
 # ---------------------------------------------------------------------------
 # Wilson confidence interval
 # ---------------------------------------------------------------------------
@@ -337,19 +347,25 @@ def _fetch_market_implied_prob(
     if df.empty:
         return None
 
-    # Use the last available yes_ask as the market-implied probability.
-    # yes_ask is in the range 0-100 (cents) or 0-1 (fraction) depending on
-    # what the history endpoint returned; get_market_history normalises to float.
-    last_yes_ask = df["yes_ask"].dropna()
-    if last_yes_ask.empty:
+    # Use the mid of yes_bid and yes_ask from the last candlestick before close.
+    # get_market_history (via candlesticks endpoint) normalises prices to [0, 1] float.
+    # If bid is 0 and ask > 0, use ask as a conservative estimate (market is illiquid).
+    last = df.iloc[-1]
+    bid = float(last["yes_bid"]) if not pd.isna(last["yes_bid"]) else 0.0
+    ask = float(last["yes_ask"]) if not pd.isna(last["yes_ask"]) else 0.0
+
+    if ask <= 0.0:
+        return None  # no quote at all — skip
+
+    # If spread is too wide (bid=0, ask=1), the market is effectively unquoted — skip
+    if bid == 0.0 and ask >= 0.99:
         return None
 
-    prob = float(last_yes_ask.iloc[-1])
-    # Normalise cents → fraction if needed
-    if prob > 1.0:
-        prob = prob / 100.0
+    prob = (bid + ask) / 2.0 if bid > 0.0 else ask
     if prob <= 0.0 or prob >= 1.0:
         return None
+    # Note: extreme prob filtering (< 0.05 or > 0.95) is done in the main loop
+    # after this function returns, so callers can log the skip reason separately.
     return prob
 
 
@@ -414,6 +430,13 @@ def run_backtest(
             market_prob = m.market_implied_prob
             if market_prob <= 0 or market_prob >= 1:
                 continue
+
+        # Skip markets where the market consensus is already extreme (< 5% or > 95%).
+        # These are deep OTM markets where our vol-model is miscalibrated and the
+        # "edge" signal is just model error, not genuine mispricing.
+        if market_prob < 0.05 or market_prob > 0.95:
+            n_skipped += 1
+            continue
 
         # ------------------------------------------------------------------
         # Historical OHLCV slice at market close
@@ -592,7 +615,48 @@ def main() -> int:
     print(f"  {len(markets)} settled markets, {len(resolved)} with resolution")
 
     if not resolved:
-        print("No resolved markets in range. Nothing to backtest.")
+        print("No resolved liquid markets in range. Nothing to backtest.")
+        return 0
+
+    # ------------------------------------------------------------------
+    # Fetch OHLCV early for moneyness-based pre-filter
+    # ------------------------------------------------------------------
+    print("Fetching historical BTC 1h OHLCV for moneyness pre-filter …")
+    try:
+        cb = CoinbaseSource()
+        warmup_ms = int((start_dt - timedelta(days=31)).timestamp() * 1000)
+        ohlcv_1h = cb.fetch_ohlcv("BTC-USD", "1h", warmup_ms, end_ms)
+    except Exception as exc:
+        print(f"ERROR: Coinbase fetch failed: {exc}", file=sys.stderr)
+        traceback.print_exc(file=sys.stderr)
+        return 1
+    print(f"  OHLCV rows: {len(ohlcv_1h)}")
+
+    # Pre-filter: keep only markets where strike is within ±15% of spot at close.
+    # This targets near-the-money markets where probability estimates are meaningful
+    # and Kalshi prices reflect genuine information (not artefact listings).
+    def _moneyness_ok(m: KalshiMarket) -> bool:
+        """True if this market's strike is within ±5% of spot at close.
+
+        Within 5% of spot, BTC hourly markets should have meaningful price
+        discovery (probability 10%–90%) and our vol-model fair estimates are
+        calibrated to be informative.
+        """
+        slice_df = _slice_ohlcv_at(ohlcv_1h, m.close_time, 2)
+        if slice_df.empty:
+            return True  # can't filter, let it through
+        spot = float(slice_df["close"].iloc[-1])
+        if spot <= 0:
+            return True
+        moneyness = abs(m.strike / spot - 1.0)
+        return moneyness <= 0.05
+
+    n_before = len(resolved)
+    resolved = [m for m in resolved if _moneyness_ok(m)]
+    print(f"  {n_before} → {len(resolved)} after moneyness filter (strike within ±5% of spot)")
+
+    if not resolved:
+        print("No near-money markets in range. Nothing to backtest.")
         return 0
 
     # ------------------------------------------------------------------
@@ -602,21 +666,6 @@ def main() -> int:
         print(f"  Sampling {max_markets} from {len(resolved)} markets (stratified by day) …")
         resolved = _stratified_sample(resolved, max_markets)
         print(f"  Sampled {len(resolved)} markets")
-
-    # ------------------------------------------------------------------
-    # Fetch historical BTC hourly data for the full range + 30d warmup
-    # ------------------------------------------------------------------
-    print("Fetching historical BTC 1h OHLCV …")
-    try:
-        cb = CoinbaseSource()
-        warmup_ms = int((start_dt - timedelta(days=31)).timestamp() * 1000)
-        ohlcv_1h = cb.fetch_ohlcv("BTC-USD", "1h", warmup_ms, end_ms)
-    except Exception as exc:
-        print(f"ERROR: Coinbase fetch failed: {exc}", file=sys.stderr)
-        traceback.print_exc(file=sys.stderr)
-        return 1
-
-    print(f"  OHLCV rows: {len(ohlcv_1h)}")
 
     # ------------------------------------------------------------------
     # Run backtest (with real market history per market)

@@ -382,6 +382,9 @@ def test_backtest_main_with_mocked_sources(tmp_path):
             "close_time": "2026-03-10T16:00:00Z",
             "expiration_time": "2026-03-10T16:00:00Z",
             "result": "yes" if i % 2 == 0 else "no",
+            # Pre-close bid/ask for liquidity filter (5%–95%)
+            "previous_yes_bid_dollars": "0.38",
+            "previous_yes_ask_dollars": "0.42",
         }
         for i in range(1, 6)
     ]

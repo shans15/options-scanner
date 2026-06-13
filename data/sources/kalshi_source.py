@@ -193,10 +193,15 @@ class KalshiSource:
         return data.get("orderbook", data)
 
     def get_market_history(self, ticker: str, start_ms: int, end_ms: int) -> pd.DataFrame:
-        """Get price history for a market.
+        """Get 1-minute candlestick price history for a market.
+
+        Uses the /series/{series}/markets/{ticker}/candlesticks endpoint (the old
+        /markets/{ticker}/history path does not exist on the current API version).
 
         Returns DataFrame indexed by UTC datetime with columns
         ['yes_bid', 'yes_ask', 'no_bid', 'no_ask', 'volume'].
+
+        yes_bid and yes_ask are in [0, 1] probability space (dollars / 1.00).
 
         Cached to Parquet under cache/kalshi/.
         """
@@ -208,31 +213,35 @@ class KalshiSource:
 
         start_s = start_ms // 1000
         end_s = end_ms // 1000
-        params = {"start_ts": start_s, "end_ts": end_s}
-        data = self._get(f"markets/{ticker}/history", params)
+        # Series ticker is the first segment of the market ticker (e.g. KXBTC)
+        series_ticker = ticker.split("-")[0]
+        params = {"start_ts": start_s, "end_ts": end_s, "period_interval": 1}
+        data = self._get(f"series/{series_ticker}/markets/{ticker}/candlesticks", params)
 
-        history = data.get("history", [])
-        if not history:
+        candlesticks = data.get("candlesticks", [])
+        if not candlesticks:
             return pd.DataFrame(columns=["yes_bid", "yes_ask", "no_bid", "no_ask", "volume"])
 
         rows = []
-        for entry in history:
+        for c in candlesticks:
+            ts_s = c.get("end_period_ts")
+            yes_bid_raw = c.get("yes_bid", {})
+            yes_ask_raw = c.get("yes_ask", {})
+            # close_dollars is a string like "0.4500"; convert to float probability
+            yes_bid = float(yes_bid_raw.get("close_dollars", 0) or 0)
+            yes_ask = float(yes_ask_raw.get("close_dollars", 0) or 0)
+            volume = float(c.get("volume_fp", 0) or 0)
             rows.append({
-                "ts": entry.get("ts") or entry.get("timestamp"),
-                "yes_bid": entry.get("yes_bid", float("nan")),
-                "yes_ask": entry.get("yes_ask", float("nan")),
-                "no_bid": entry.get("no_bid", float("nan")),
-                "no_ask": entry.get("no_ask", float("nan")),
-                "volume": entry.get("volume", 0),
+                "ts_s": ts_s,
+                "yes_bid": yes_bid,
+                "yes_ask": yes_ask,
+                "no_bid": 1.0 - yes_ask,
+                "no_ask": 1.0 - yes_bid,
+                "volume": volume,
             })
 
         df = pd.DataFrame(rows)
-        # ts may be seconds or milliseconds — normalise to ms
-        ts_col = df["ts"].astype("int64")
-        # If max value < 1e12, it's in seconds
-        if ts_col.max() < 1_000_000_000_000:
-            ts_col = ts_col * 1000
-        df["datetime"] = pd.to_datetime(ts_col, unit="ms", utc=True)
+        df["datetime"] = pd.to_datetime(df["ts_s"].astype("int64"), unit="s", utc=True)
         df = df.set_index("datetime")[["yes_bid", "yes_ask", "no_bid", "no_ask", "volume"]]
         df = df.astype(float)
         df = df.sort_index()
@@ -240,7 +249,7 @@ class KalshiSource:
 
         df.to_parquet(cache_file)
         logger.info(
-            "Cached market history for %s to %s (%d rows)", ticker, cache_file, len(df)
+            "Cached market candlesticks for %s to %s (%d rows)", ticker, cache_file, len(df)
         )
         return df
 
