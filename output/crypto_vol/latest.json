@@ -1,0 +1,19 @@
+{
+  "generated_at": "2026-06-13",
+  "model_path": "/Users/sarthakhans/options-scanner/cache/models/btc_vol_model.pkl",
+  "trained_date": "2026-06-13",
+  "cv_auc": 0.7457124581167233,
+  "current_bar": "2026-06-13 01:00:00+00:00",
+  "btc_spot": 63620.55,
+  "probability": 0.041129265327487056,
+  "signal": {
+    "direction": "contraction",
+    "strength": "strong",
+    "suggested_action": "Iron condor \u2014 v2 placeholder (defined-risk short-vol; requires level-3 options approval)",
+    "notes": "Strong contraction signal. An iron condor profits in a low-vol, range-bound environment. Requires understanding of spread mechanics and margin. Deferred to v2."
+  },
+  "trades": {
+    "BTC": [],
+    "ETH": []
+  }
+}
