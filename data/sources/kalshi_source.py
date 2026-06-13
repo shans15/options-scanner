@@ -8,10 +8,13 @@ from urllib.parse import urlencode
 import pandas as pd
 import requests
 
-# Authenticated trading API — required for BTC hourly markets
-_KALSHI_API = "https://trading-api.kalshi.com/trade-api/v2"
-# Public elections API — political markets, no auth required
-_KALSHI_PUBLIC_API = "https://api.elections.kalshi.com/trade-api/v2"
+# Kalshi unified everything to api.elections.kalshi.com in 2026; the old
+# trading-api.kalshi.com now returns a redirect notice. The same host serves
+# political markets unauthenticated AND financial markets (BTC, etc.) when
+# requests are signed.
+_KALSHI_API = "https://api.elections.kalshi.com/trade-api/v2"
+# Alias kept for backwards compatibility with tests.
+_KALSHI_PUBLIC_API = _KALSHI_API
 
 _CACHE_DIR = Path(__file__).resolve().parents[2] / "cache" / "kalshi"
 
@@ -116,7 +119,7 @@ class KalshiSource:
 
         while True:
             params: dict = {
-                "event_ticker": "KXBTC",
+                "series_ticker": "KXBTC",
                 "status": status,
                 "limit": self._PAGE_LIMIT,
             }
@@ -230,7 +233,7 @@ class KalshiSource:
 
         while True:
             params: dict = {
-                "event_ticker": "KXBTC",
+                "series_ticker": "KXBTC",
                 "status": "settled",
                 "min_close_ts": start_s,
                 "max_close_ts": end_s,
