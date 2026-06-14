@@ -95,3 +95,58 @@ def test_score_iv_percentile_low_iv_high_score():
 
 def test_score_iv_percentile_high_iv_low_score():
     assert score_iv_percentile(0.60) <= 4.0
+
+
+from domain.aplus.features import (
+    score_days_to_earnings, score_days_to_macro_event,
+    score_skip_window, score_spx_alignment, score_sector_rotation,
+    score_dxy_trend_pass_through,
+)
+
+
+def test_score_days_to_earnings_within_blackout_zero():
+    assert score_days_to_earnings(3) == 0.0
+
+
+def test_score_days_to_earnings_in_window_high():
+    assert score_days_to_earnings(10) == 10.0
+
+
+def test_score_days_to_earnings_far_neutral():
+    assert score_days_to_earnings(60) == 6.0
+
+
+def test_score_days_to_macro_event_within_2_days_zero():
+    assert score_days_to_macro_event(1) == 0.0
+
+
+def test_score_days_to_macro_event_5_days_out_high():
+    assert score_days_to_macro_event(10) == 10.0
+
+
+def test_score_skip_window_combines_blockers():
+    # If both earnings and macro are clear, returns 10
+    assert score_skip_window(days_earnings=15, days_macro=10) == 10.0
+    # If either is blocking (≤2), returns 0
+    assert score_skip_window(days_earnings=1, days_macro=10) == 0.0
+
+
+def test_score_spx_alignment_pass_through():
+    # Test that we just pass through the precomputed market_context value
+    assert score_spx_alignment(8.0) == 8.0
+
+
+def test_score_sector_rotation_top_sector_bullish_high():
+    score = score_sector_rotation(rank=1, total_sectors=11, setup_direction='bullish')
+    assert score >= 9.0
+
+
+def test_score_sector_rotation_bottom_sector_bullish_low():
+    score = score_sector_rotation(rank=11, total_sectors=11, setup_direction='bullish')
+    assert score <= 1.0
+
+
+def test_score_sector_rotation_top_sector_bearish_low():
+    # If the sector is leading and the setup is bearish, that's bad
+    score = score_sector_rotation(rank=1, total_sectors=11, setup_direction='bearish')
+    assert score <= 1.0
