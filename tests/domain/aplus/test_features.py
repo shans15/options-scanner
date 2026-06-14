@@ -150,3 +150,62 @@ def test_score_sector_rotation_top_sector_bearish_low():
     # If the sector is leading and the setup is bearish, that's bad
     score = score_sector_rotation(rank=1, total_sectors=11, setup_direction='bearish')
     assert score <= 1.0
+
+
+from domain.aplus.features import (
+    score_bid_ask_spread, score_open_interest, score_volume_oi_ratio,
+    extract_features,
+)
+from domain.aplus.types import MarketContext
+
+
+def test_score_bid_ask_spread_tight_high():
+    # Spread 1% of mid → high
+    assert score_bid_ask_spread(bid=0.99, ask=1.01) == 10.0
+
+
+def test_score_bid_ask_spread_wide_low():
+    # Spread 30% of mid → low
+    assert score_bid_ask_spread(bid=0.85, ask=1.15) == 0.0
+
+
+def test_score_open_interest_high_oi_max():
+    assert score_open_interest(2000) == 10.0
+
+
+def test_score_open_interest_low_oi_zero():
+    assert score_open_interest(50) == 0.0
+
+
+def test_score_volume_oi_ratio_active_high():
+    assert score_volume_oi_ratio(volume=1000, open_interest=2000) == 10.0
+
+
+def test_score_volume_oi_ratio_dormant_low():
+    assert score_volume_oi_ratio(volume=10, open_interest=2000) == 3.0
+
+
+def test_extract_features_returns_feature_scores_with_20_keys():
+    candidate = {
+        'contract': {
+            'ticker': 'XLF', 'strike': 52.0, 'bid': 0.47, 'ask': 0.53,
+            'volume': 500, 'open_interest': 1500, 'implied_volatility': 0.17,
+            'spot_price': 53.34, 'delta': 0.30,
+        },
+        'setup_name': 'compression_breakout',
+        'setup_direction': 'bullish',
+        'setup_strength': 0.87,
+        'weekly_ribbon_agreement': True,
+        'pct_change_4w': 0.05,
+        'vix_regime': 'neutral',
+        'vix_pct_vs_7d': -0.05,
+    }
+    mc = MarketContext(
+        spx_trend_score=9.0, sector_rotation_rank={'XLF': 2}, dxy_trend_score=6.0,
+        yield_10y_score=8.0, vvix_score=8.5, days_to_macro_event=8,
+    )
+    fs = extract_features(candidate, mc, days_to_earnings=15)
+    assert len(fs.values) == 20
+    assert fs.values['tech_setup_type'] == 10.0
+    assert fs.values['vol_vix_regime'] == 7.0
+    assert fs.values['liq_open_interest'] == 10.0
