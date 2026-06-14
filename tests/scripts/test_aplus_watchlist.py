@@ -51,5 +51,7 @@ def test_render_watchlist_with_strong_candidate_produces_output(tmp_path):
     assert (out_dir / 'latest.json').exists()
     out_data = json.loads((out_dir / 'latest.json').read_text())
     assert 'graded_candidates' in out_data
-    # Should have at least the XLF candidate graded
-    assert len(result) >= 0
+    assert out_data['account_size'] == 1000.0
+    # Every graded candidate must be A+ or A (filtered)
+    for c in out_data['graded_candidates']:
+        assert c['grade'] in ('A+', 'A'), f"Found {c['grade']} in output — should be filtered"

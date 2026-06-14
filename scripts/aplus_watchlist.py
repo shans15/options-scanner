@@ -51,7 +51,7 @@ def render_watchlist(
         fs = extract_features(cand, mc, days_to_earnings=days_to_earn)
         cs = score_categories(fs)
         grade = assign_grade(cs)
-        if grade in ('B', 'F'):
+        if grade not in ('A+', 'A'):
             continue
         structure, rationale = select_structure(fs)
         composite = cs.composite()
