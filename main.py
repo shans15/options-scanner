@@ -96,6 +96,16 @@ def cmd_universe(args) -> int:
     return 1
 
 
+def cmd_aplus_watchlist(args) -> int:
+    from scripts.aplus_watchlist import render_watchlist
+    scan_path = Path(args.scan) if args.scan else Path('output/scans/latest.json')
+    if not scan_path.exists():
+        print(f"Scan file not found: {scan_path}", file=sys.stderr)
+        return 2
+    render_watchlist(scan_path, Path(args.out), account_size=args.account_size)
+    return 0
+
+
 def main() -> int:
     p = argparse.ArgumentParser(prog='options-scanner')
     sub = p.add_subparsers(dest='cmd', required=True)
@@ -124,6 +134,15 @@ def main() -> int:
     u = sub.add_parser('universe', help='Manage universe cache')
     u.add_argument('action', choices=['rebuild'])
     u.set_defaults(func=cmd_universe)
+
+    a = sub.add_parser('aplus_watchlist', help='Generate A+ confluence-graded watchlist')
+    a.add_argument('--scan', type=str, default=None,
+                   help='Path to scan JSON (defaults to output/scans/latest.json)')
+    a.add_argument('--out', type=str, default='output/aplus',
+                   help='Output directory for latest.json')
+    a.add_argument('--account-size', type=float, default=1000.0,
+                   help='Account size for sizing recommendations (default $1000)')
+    a.set_defaults(func=cmd_aplus_watchlist)
 
     args = p.parse_args()
     return args.func(args)
