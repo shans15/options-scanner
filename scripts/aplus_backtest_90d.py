@@ -51,17 +51,22 @@ _SECTOR_ETFS = [
     "XLP", "XLY", "XLB", "XLU", "XLRE", "XLC",
 ]
 
-# Neutral-ish liquidity fixtures for missing option chain data.
-# bid=0.97 ask=1.03 → 3% spread → liq_bid_ask_spread ≈ 10
-# oi=500              → liq_open_interest ≈ 4.4
-# volume=100          → volume/oi=0.2 → liq_volume_oi_ratio ≈ 7
-# implied_volatility=0.30 → liq_iv_percentile ≈ 7.5
-_LIQ_FIXTURE: dict = {
-    "bid": 0.97,
-    "ask": 1.03,
-    "open_interest": 500,
-    "volume": 100,
-    "implied_volatility": 0.30,
+# Liquidity fixtures. Historical option chains are unavailable for expired
+# contracts, so we inject a representative fixture and run two passes:
+#  - "neutral" produces a realistic mid-tier liquidity (~6 avg). This is the
+#    grade you'd see if your filled contract happened to have mediocre liquidity.
+#  - "good" assumes the filled contract had healthy liquidity (~8.75 avg).
+#    Use this to isolate whether the OTHER four categories (technical, vol/vix,
+#    catalyst, macro/breadth) produce edge when liquidity is not the blocker.
+_LIQ_FIXTURES: dict[str, dict] = {
+    "neutral": {
+        "bid": 0.97, "ask": 1.03, "open_interest": 500, "volume": 100,
+        "implied_volatility": 0.30,
+    },
+    "good": {
+        "bid": 0.99, "ask": 1.01, "open_interest": 2000, "volume": 1000,
+        "implied_volatility": 0.20,
+    },
 }
 
 # ---------------------------------------------------------------------------
@@ -236,7 +241,7 @@ def compute_vix_pct_vs_7d(
 # Grade a single CSV row
 # ---------------------------------------------------------------------------
 
-def grade_row(row: dict, helpers: dict) -> dict:
+def grade_row(row: dict, helpers: dict, liq_profile: str = "neutral") -> dict:
     """Return the row augmented with composite_score, grade, and category scores."""
     as_of = pd.Timestamp(row["as_of"])
     direction = str(row.get("direction", "bullish"))
@@ -263,7 +268,7 @@ def grade_row(row: dict, helpers: dict) -> dict:
         "contract": {
             "ticker": ticker,
             "spot_price": spot,
-            **_LIQ_FIXTURE,
+            **_LIQ_FIXTURES[liq_profile],
         },
     }
 
@@ -472,6 +477,14 @@ def main() -> int:
         default=_DEFAULT_OUTPUT_DIR,
         help=f"Output directory (default {_DEFAULT_OUTPUT_DIR})",
     )
+    parser.add_argument(
+        "--liq",
+        choices=["neutral", "good"],
+        default="neutral",
+        help="Liquidity fixture profile. 'neutral' = mid-tier liquidity (~6 avg); "
+             "'good' = healthy liquidity (~8.75 avg) — use to test whether the "
+             "other four categories produce edge when liquidity is not the blocker.",
+    )
     args = parser.parse_args()
 
     # Resolve input CSV
@@ -519,7 +532,7 @@ def main() -> int:
         if i % 100 == 0 and i > 0:
             print(f"  {i}/{len(rows)} graded …")
         try:
-            graded.append(grade_row(row, helpers))
+            graded.append(grade_row(row, helpers, liq_profile=args.liq))
         except Exception as exc:
             errors += 1
             if errors <= 5:
