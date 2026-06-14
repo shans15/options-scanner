@@ -41,6 +41,10 @@ class ScoredCandidate:
     pct_change_2w: Optional[float] = None
     pct_change_4w: Optional[float] = None
     weekly_ribbon_agreement: Optional[bool] = None
+    # VIX-regime context tag (equity-only, display-only, not used in composite_score)
+    vix_now: Optional[float] = None
+    vix_regime: Optional[str] = None
+    vix_pct_vs_7d: Optional[float] = None
 
 
 def _regime_alignment_score(strategy: Strategy, regime: Regime) -> float:

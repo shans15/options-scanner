@@ -34,6 +34,7 @@ def write_scan(result: ScanResult, output_dir: Path) -> tuple[Path, Path]:
                'ev', 'max_adverse_loss', 'margin_estimate', 'composite_score', 'label',
                'setup_name', 'setup_direction', 'setup_strength',
                'weekly_trend', 'streak', 'pct_1w', 'pct_2w', 'pct_4w', 'weekly_agree',
+               'vix_now', 'vix_regime', 'vix_pct_vs_7d',
                'reason_for', 'reason_against', 'failed_filters']
     with csv_path.open('w', newline='') as f:
         w = csv.writer(f)
@@ -56,6 +57,9 @@ def write_scan(result: ScanResult, output_dir: Path) -> tuple[Path, Path]:
                 f"{c.pct_change_2w:.1%}" if c.pct_change_2w is not None else '',
                 f"{c.pct_change_4w:.1%}" if c.pct_change_4w is not None else '',
                 c.weekly_ribbon_agreement if c.weekly_ribbon_agreement is not None else '',
+                c.vix_now if c.vix_now is not None else '',
+                c.vix_regime or '',
+                f"{c.vix_pct_vs_7d:.4f}" if c.vix_pct_vs_7d is not None else '',
                 c.reason_for, c.reason_against, ';'.join(c.filter_result.failed_filters),
             ])
 
@@ -81,6 +85,9 @@ def write_scan(result: ScanResult, output_dir: Path) -> tuple[Path, Path]:
                 'pct_change_2w': c.pct_change_2w,
                 'pct_change_4w': c.pct_change_4w,
                 'weekly_ribbon_agreement': c.weekly_ribbon_agreement,
+                'vix_now': c.vix_now,
+                'vix_regime': c.vix_regime,
+                'vix_pct_vs_7d': c.vix_pct_vs_7d,
                 'reason_for': c.reason_for, 'reason_against': c.reason_against,
                 'failed_filters': list(c.filter_result.failed_filters),
             }

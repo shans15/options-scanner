@@ -75,3 +75,36 @@ def test_scored_candidate_supports_optional_setup_fields():
     assert 'setup_name' in fields_present
     assert 'setup_direction' in fields_present
     assert 'setup_strength' in fields_present
+
+
+def test_scored_candidate_has_vix_regime_fields():
+    from engine.scorer import ScoredCandidate
+    fields_present = ScoredCandidate.__dataclass_fields__
+    assert 'vix_now' in fields_present
+    assert 'vix_regime' in fields_present
+    assert 'vix_pct_vs_7d' in fields_present
+    # All three should default to None (positional defaults preserved)
+    sc = ScoredCandidate(
+        contract=_make_contract(), strategy=NakedPut(),
+        pop_blended=0.80, pop_delta=0.78, pop_bs=0.79, pop_historical=0.81, pop_garch_mc=0.80,
+        stress=StressResult(-1, -3, -2), ev=0.5, max_adverse_loss=3.0, margin_estimate=200.0,
+        filter_result=FilterResult(passed=True), composite_score=85.0, label='TRADE',
+        reason_for='r', reason_against='',
+    )
+    assert sc.vix_now is None
+    assert sc.vix_regime is None
+    assert sc.vix_pct_vs_7d is None
+
+
+def test_scored_candidate_accepts_vix_fields_when_provided():
+    sc = ScoredCandidate(
+        contract=_make_contract(), strategy=NakedPut(),
+        pop_blended=0.80, pop_delta=0.78, pop_bs=0.79, pop_historical=0.81, pop_garch_mc=0.80,
+        stress=StressResult(-1, -3, -2), ev=0.5, max_adverse_loss=3.0, margin_estimate=200.0,
+        filter_result=FilterResult(passed=True), composite_score=85.0, label='TRADE',
+        reason_for='r', reason_against='',
+        vix_now=22.5, vix_regime='expansion', vix_pct_vs_7d=0.18,
+    )
+    assert sc.vix_now == 22.5
+    assert sc.vix_regime == 'expansion'
+    assert sc.vix_pct_vs_7d == pytest.approx(0.18)

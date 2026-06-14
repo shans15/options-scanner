@@ -250,6 +250,9 @@ def _format_ticker_block(best: dict, all_candidates: list[dict]) -> str:
     p4w = best.get('pct_change_4w')
     agree = best.get('weekly_ribbon_agreement')
     label = best.get('label', '')
+    vix_now = best.get('vix_now')
+    vix_regime = best.get('vix_regime')
+    vix_pct_vs_7d = best.get('vix_pct_vs_7d')
 
     # Direction arrow
     arrow = '▲' if setup_dir == 'bullish' else '▼'
@@ -299,6 +302,24 @@ def _format_ticker_block(best: dict, all_candidates: list[dict]) -> str:
     liq_line = f"  liquidity:      vol {vol}  OI {oi}   {flag} {liq_label}{liq_detail}"
 
     lines = [title, ctx_line, best_line, liq_line]
+
+    # VIX-regime line — only render if vix_now is present
+    if vix_now is not None and vix_regime is not None:
+        regime_upper = vix_regime.upper()
+        regime_symbol = '⚠ ' if vix_regime in ('expansion', 'contraction') else ''
+        pct_str = f', {vix_pct_vs_7d*100:+.0f}%' if vix_pct_vs_7d is not None else ''
+        if vix_regime == 'expansion':
+            regime_action = 'equity vol expanding → directional setups have better follow-through'
+        elif vix_regime == 'contraction':
+            regime_action = 'equity vol compressing → directional setups bleed theta; favor shorter DTE'
+        else:
+            regime_action = 'no strong vol regime signal'
+        vix_7d_avg_val = vix_now / (1 + vix_pct_vs_7d) if vix_pct_vs_7d is not None and vix_pct_vs_7d != -1 else None
+        vix_7d_str = f', 7d avg {vix_7d_avg_val:.1f}' if vix_7d_avg_val is not None else ''
+        vix_line = f"  {regime_symbol}VIX_REGIME: {regime_upper} (VIX {vix_now:.1f}{vix_7d_str}{pct_str})"
+        vix_detail = f"    → {regime_action}"
+        lines.append(vix_line)
+        lines.append(vix_detail)
 
     # Fallback — only show if primary is not already liquid (OI < 500)
     if oi < 500:

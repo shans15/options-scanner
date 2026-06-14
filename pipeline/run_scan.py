@@ -24,6 +24,9 @@ from engine.scorer import composite_score, label_from, ScoredCandidate
 from pipeline.universe_builder import build_universe_cached, UniverseFilters
 from pipeline.earnings import has_earnings_within
 
+from data.sources.yahoo_macro_source import YahooMacroSource
+from domain.equity.vix_regime import compute_vix_context
+
 
 log = logging.getLogger(__name__)
 
@@ -83,6 +86,14 @@ def run_scan(config: ScanConfig, sources_override: Optional[list[DataSource]] = 
     universe = build_universe_cached(config.universe_filters, sources)
     candidates: list[ScoredCandidate] = []
     skipped: dict[str, str] = {}
+
+    vix_context = None
+    try:
+        vix_df = YahooMacroSource().fetch_history('^VIX', period='3mo')
+        if not vix_df.empty:
+            vix_context = compute_vix_context(vix_df['close'])
+    except Exception as exc:
+        log.warning("VIX fetch failed (%s); proceeding without vix_regime tag.", exc)
 
     if config.use_technical_filter:
         setups_by_ticker = filter_by_technicals(universe, sources, as_of=config.as_of)
@@ -187,6 +198,9 @@ def run_scan(config: ScanConfig, sources_override: Optional[list[DataSource]] = 
                     pct_change_2w=context.pct_change_2w,
                     pct_change_4w=context.pct_change_4w,
                     weekly_ribbon_agreement=context.weekly_ribbon_agreement,
+                    vix_now=vix_context.vix_now if vix_context else None,
+                    vix_regime=vix_context.regime if vix_context else None,
+                    vix_pct_vs_7d=vix_context.pct_vs_7d_avg if vix_context else None,
                 ))
 
     candidates.sort(key=lambda c: c.composite_score, reverse=True)
