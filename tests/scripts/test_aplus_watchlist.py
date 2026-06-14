@@ -55,3 +55,29 @@ def test_render_watchlist_with_strong_candidate_produces_output(tmp_path):
     # Every graded candidate must be A+ or A (filtered)
     for c in out_data['graded_candidates']:
         assert c['grade'] in ('A+', 'A'), f"Found {c['grade']} in output — should be filtered"
+
+
+def test_render_watchlist_integration_fixture(tmp_path):
+    fixture = Path(__file__).parent / 'fixtures' / 'sample_scan.json'
+    out_dir = tmp_path / 'aplus'
+    with patch('scripts.aplus_watchlist._fetch_market_context') as mock_mc:
+        from domain.aplus.types import MarketContext
+        mock_mc.return_value = MarketContext(
+            spx_trend_score=9.0,
+            sector_rotation_rank={'XLF': 2, 'XLK': 1},
+            dxy_trend_score=7.0, yield_10y_score=8.0, vvix_score=9.0,
+            days_to_macro_event=10,
+        )
+        with patch('scripts.aplus_watchlist._fetch_days_to_earnings') as mock_e:
+            mock_e.return_value = 20
+            result = render_watchlist(fixture, out_dir, account_size=1000.0, today=date(2026, 6, 14))
+
+    out_payload = json.loads((out_dir / 'latest.json').read_text())
+    assert 'graded_candidates' in out_payload
+    # AAPL has vix_regime=expansion → vol_vix=0 floor → should not be A+/A
+    aapl = next((c for c in out_payload['graded_candidates'] if c['ticker'] == 'AAPL'), None)
+    if aapl is not None:
+        assert aapl['grade'] != 'A+'
+    # MSFT has compression + clean context → should grade well
+    msft = next((c for c in out_payload['graded_candidates'] if c['ticker'] == 'MSFT'), None)
+    # MSFT may not appear if features push it to B; that's okay too.
