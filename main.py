@@ -49,10 +49,8 @@ def cmd_scan(args) -> int:
 
     sources_override = None
     if args.tickers:
-        from data.sources.yahooquery_source import YahooQuerySource
-        from data.sources.yfinance_source import YfinanceSource
-        from data.sources.stooq_source import StooqSource
-        sources_override = [YahooQuerySource(), YfinanceSource(), StooqSource()]
+        from data.sources.factory import default_sources
+        sources_override = default_sources()
         import pipeline.run_scan as rs
         rs.build_universe_cached = lambda *a, **kw: [t.strip().upper() for t in args.tickers.split(',')]
 
@@ -88,10 +86,8 @@ def cmd_universe(args) -> int:
         cache_file = Path('cache/universe') / f"universe_{_date.today().isoformat()}.json"
         if cache_file.exists():
             cache_file.unlink()
-        from data.sources.yahooquery_source import YahooQuerySource
-        from data.sources.yfinance_source import YfinanceSource
-        from data.sources.stooq_source import StooqSource
-        sources = [YahooQuerySource(), YfinanceSource(), StooqSource()]
+        from data.sources.factory import default_sources
+        sources = default_sources()
         out = build_universe_cached(UniverseFilters(), sources)
         print(f"Universe rebuilt: {len(out)} tickers")
         print(', '.join(out))

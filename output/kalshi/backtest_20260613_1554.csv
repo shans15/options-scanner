@@ -1,0 +1,1 @@
+strategy,market_ticker,close_time,side,strike,spot_at_open,hours_to_expiry,market_implied_prob,fair_prob,edge,position_size,won,gross_pnl,kalshi_fee,net_pnl,cum_pnl

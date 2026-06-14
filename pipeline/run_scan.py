@@ -6,9 +6,7 @@ import logging
 import numpy as np
 
 from data.sources.base import DataSource
-from data.sources.yahooquery_source import YahooQuerySource
-from data.sources.yfinance_source import YfinanceSource
-from data.sources.stooq_source import StooqSource
+from data.sources.factory import default_sources
 from data.fallback import fetch_with_fallback, DataFetchError
 from data.adapters import to_contract
 
@@ -81,9 +79,7 @@ def _expected_profit_when_itm_long(terminal_prices: np.ndarray, contract, strate
 
 
 def run_scan(config: ScanConfig, sources_override: Optional[list[DataSource]] = None) -> ScanResult:
-    sources = sources_override if sources_override is not None else [
-        YahooQuerySource(), YfinanceSource(), StooqSource()
-    ]
+    sources = sources_override if sources_override is not None else default_sources()
     universe = build_universe_cached(config.universe_filters, sources)
     candidates: list[ScoredCandidate] = []
     skipped: dict[str, str] = {}
