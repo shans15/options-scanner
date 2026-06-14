@@ -35,6 +35,29 @@ The output is a ranked, labelled candidate list: TRADE / WATCHLIST / NO_TRADE �
 
 Each candidate in the output is tagged with the setup that qualified it (`setup_name`, `setup_direction`, `setup_strength`), so you can see *why* the ticker is on the list — not just the option contract.
 
+## A+ Confluence Scorer (optional second layer)
+
+The scanner above ranks contracts. The A+ layer answers a different question: **of the candidates that survived, which ones cluster enough confluence to actually trade with a $1,000 account?**
+
+It reads `output/scans/latest.json` and re-grades each candidate across 5 weighted categories using 20 features, then picks a structure (long premium vs debit spread) based on the IV / liquidity / regime mix.
+
+| Category | Weight | What it looks at |
+|---|---|---|
+| Technical | 25% | Setup type, setup strength, weekly ribbon agreement, ATR-pivot proximity, volume z-score |
+| Vol/VIX | 25% | VIX regime, 30-day VIX z-score, VVIX level, IV percentile |
+| Catalyst | 15% | Days to earnings, days to next FOMC/CPI/PPI/NFP, skip-window blocker |
+| Macro/Breadth | 15% | SPX trend stack, sector rotation rank, DXY trend, 10y yield direction |
+| Liquidity | 20% | Bid-ask spread %, open interest, OI change DoD (v1 placeholder), volume/OI ratio |
+
+**Grades:**
+- **A+** — composite ≥ 90 AND every category ≥ 8 → size 12.5% of account
+- **A** — composite ≥ 80 AND every category ≥ 7 → size 7.5% of account
+- B+ / B / F — filtered out (not in the watchlist)
+
+**Structure selector:** high IV percentile → debit spread (avoid vega bleed). Post-earnings drift + tight spreads → long premium (asymmetric upside). Sector leadership + supportive vol regime → long premium (trend continuation). Else → debit spread (defensive default with defined R:R).
+
+The macro-event calendar lives at `data/sources/macro_calendar.py` and is hardcoded — update it quarterly from fomc.gov / bls.gov.
+
 ## Delta ranges (research-backed)
 
 | Strategy | Delta range | Source |
@@ -52,6 +75,7 @@ options-scanner/
 │       ├── coinbase_source.py     # Coinbase Exchange: spot OHLCV (no auth, 12+ months)
 │       └── hyperliquid_source.py  # Hyperliquid DEX: hourly perp funding rates
 ├── domain/         # Pure logic — Contract, Strategy, Regime, Greeks, TechnicalSetup + detectors
+│   ├── aplus/                  # A+ Confluence Scorer (features, scoring, grading, structure)
 │   └── crypto/
 │       └── features.py         # Funding-rate feature engineering (no lookahead)
 ├── engine/         # PoP models, stress, risk filters, scorer
@@ -59,10 +83,11 @@ options-scanner/
 │       └── walkforward.py      # Expanding-window walk-forward CV splits
 ├── pipeline/       # Universe builder, earnings blackout, technical_filter, run_scan
 ├── scripts/
+│   ├── aplus_watchlist.py         # A+/A confluence-graded daily watchlist
 │   └── btc_funding_validation.py  # Phase 1 edge-validation script
 ├── ui/             # Streamlit dashboard, CSV/JSON exporter
 ├── tests/
-└── main.py         # CLI: scan / dashboard / universe
+└── main.py         # CLI: scan / dashboard / watchlist / aplus_watchlist / universe
 ```
 
 The technical filter (`domain/technical_signals.py` + `pipeline/technical_filter.py`) is the new front-of-pipeline stage. Everything downstream — option chain pull, PoP, stress, scoring — only runs on tickers that produced a setup.
@@ -133,6 +158,12 @@ python -m main watchlist
 # Read a specific scan file
 python -m main watchlist --scan output/scans/scan_20260606_0531.json
 
+# Grade today's scan against the A+ confluence rubric ($1k account by default)
+python -m main aplus_watchlist
+
+# Grade with custom account size + scan path
+python -m main aplus_watchlist --scan output/scans/scan_20260606_0531.json --account-size 2500
+
 # Force universe cache rebuild
 python -m main universe rebuild
 ```
@@ -144,7 +175,7 @@ Dashboard opens at `http://localhost:8501`. It has a sidebar widget to filter th
 ## Tests
 
 ```bash
-pytest                    # ~128 unit + integration tests
+pytest                    # 505 unit + integration tests
 ```
 
 ## Data sources
