@@ -58,6 +58,13 @@ It reads `output/scans/latest.json` and re-grades each candidate across 5 weight
 
 The macro-event calendar lives at `data/sources/macro_calendar.py` and is hardcoded — update it quarterly from fomc.gov / bls.gov.
 
+### Validation
+
+We can't truly backtest the A+ grader at the contract level because historical option chains (for expired contracts) aren't available from free data sources. Instead:
+
+- **Historical backtest of grades only** (`scripts/aplus_backtest_90d.py`) — re-grades 90 days of detected setups using cached OHLCV/sector/VIX data, with a fixture for liquidity. With `--liq good`, A-grade setups in the sample (n=43 over 90 days) showed **55.8% 1-day directional win rate** vs 48.3% baseline (+7.5pp lift, CI [41.1, 69.6] — underpowered but directionally positive). A+ remained unreachable historically because DXY/yield/VVIX scores were neutralized. The strongest single-category lift came from Technical (+4.2%) and Catalyst (+3.0%); Vol/VIX and Macro/Breadth added near-zero signal in this sample.
+- **Forward test via paper trading** (`scripts/aplus_paper_trade.py`) — daily ingest A+/A signals into a JSON store, mark-to-market against live option chains, close at +100% target / -50% stop / expiration. Use this to gather real outcomes over 4–6 weeks (~20 trades) before risking real money.
+
 ## Delta ranges (research-backed)
 
 | Strategy | Delta range | Source |
@@ -84,6 +91,8 @@ options-scanner/
 ├── pipeline/       # Universe builder, earnings blackout, technical_filter, run_scan
 ├── scripts/
 │   ├── aplus_watchlist.py         # A+/A confluence-graded daily watchlist
+│   ├── aplus_backtest_90d.py      # Historical A+ grade win-rate validation
+│   ├── aplus_paper_trade.py       # Daily forward-test (ingest/mark/close/summary)
 │   └── btc_funding_validation.py  # Phase 1 edge-validation script
 ├── ui/             # Streamlit dashboard, CSV/JSON exporter
 ├── tests/
@@ -164,6 +173,17 @@ python -m main aplus_watchlist
 # Grade with custom account size + scan path
 python -m main aplus_watchlist --scan output/scans/scan_20260606_0531.json --account-size 2500
 
+# Historical backtest of A+ grades on the last 90 days of detected setups
+python -m scripts.aplus_backtest_90d                   # neutral liquidity (~6 avg)
+python -m scripts.aplus_backtest_90d --liq good        # good liquidity (~8.75 avg) — isolates other-category edge
+
+# Paper trade tracker — runs ingest + mark + close + summary
+python -m scripts.aplus_paper_trade                    # default: full daily cycle
+python -m scripts.aplus_paper_trade ingest             # open new A+/A positions from latest.json
+python -m scripts.aplus_paper_trade mark               # mark open positions to live chains
+python -m scripts.aplus_paper_trade close              # close at +100% target / -50% stop / expiration
+python -m scripts.aplus_paper_trade summary            # P&L table only
+
 # Force universe cache rebuild
 python -m main universe rebuild
 ```
@@ -175,7 +195,7 @@ Dashboard opens at `http://localhost:8501`. It has a sidebar widget to filter th
 ## Tests
 
 ```bash
-pytest                    # 505 unit + integration tests
+pytest                    # 522 unit + integration tests
 ```
 
 ## Data sources
