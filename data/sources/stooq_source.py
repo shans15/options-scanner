@@ -8,7 +8,8 @@ class StooqSource(DataSource):
     def _url(self, ticker: str) -> str:
         return f"https://stooq.com/q/d/l/?s={ticker.lower()}.us&i=d"
 
-    def fetch_spot(self, ticker: str) -> float:
+    def fetch_spot(self, ticker: str, prefer_extended: bool = True) -> float:
+        # Stooq returns last available daily close. No intraday support.
         df = pd.read_csv(self._url(ticker))
         if df.empty or 'Close' not in df.columns:
             raise RuntimeError(f"stooq returned no Close column for {ticker}")

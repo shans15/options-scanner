@@ -18,6 +18,13 @@ import argparse
 import sys
 import time
 from datetime import datetime, timezone
+from pathlib import Path
+
+try:
+    from dotenv import load_dotenv
+    load_dotenv(Path(__file__).resolve().parents[1] / ".env")
+except ImportError:
+    pass
 
 from data.fallback import fetch_with_fallback, DataFetchError
 from data.sources.factory import default_sources
@@ -71,10 +78,16 @@ def _et_now() -> str:
 
 def render_context(ctx: GexContext, n_zones: int = 5) -> None:
     """Print a formatted GEX report for one ticker."""
+    from data.sources.market_session import current_session, is_extended_hours
+    session = current_session()
     sep = '=' * 70
     print(sep)
     print(f"=== {ctx.ticker} @ {_et_now()} ===")
     print(sep)
+    session_line = f"Session: {session.upper()}"
+    if is_extended_hours(session):
+        session_line += "  (Spot reflects extended-hours quote)"
+    print(session_line)
     print(f"Spot:                ${ctx.spot:,.2f}")
     print(f"Total GEX:           {format_gex_dollars(ctx.total_gex_dollars)}"
           f"   ({_regime_label(ctx.total_gex_dollars)})")

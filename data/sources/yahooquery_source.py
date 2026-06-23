@@ -10,9 +10,24 @@ _DTE_MIN, _DTE_MAX = 3, 45
 
 
 class YahooQuerySource(DataSource):
-    def fetch_spot(self, ticker: str) -> float:
+    def fetch_spot(self, ticker: str, prefer_extended: bool = True) -> float:
+        """Latest price, preferring pre/post market when in those sessions."""
+        from data.sources.market_session import current_session, is_extended_hours
+
         t = Ticker(ticker)
         price_info = t.price.get(ticker, {}) if isinstance(t.price, dict) else {}
+
+        if prefer_extended:
+            session = current_session()
+            if session == "pre_market":
+                pre = price_info.get('preMarketPrice')
+                if pre and float(pre) > 0:
+                    return float(pre)
+            elif session == "post_market":
+                post = price_info.get('postMarketPrice')
+                if post and float(post) > 0:
+                    return float(post)
+
         return float(price_info.get('regularMarketPrice', 0.0))
 
     def fetch_price_history(self, ticker: str, lookback_days: int) -> pd.Series:

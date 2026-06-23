@@ -10,8 +10,28 @@ _DTE_MIN, _DTE_MAX = 3, 45
 
 
 class YfinanceSource(DataSource):
-    def fetch_spot(self, ticker: str) -> float:
-        return float(yf.Ticker(ticker).fast_info.last_price or 0.0)
+    def fetch_spot(self, ticker: str, prefer_extended: bool = True) -> float:
+        """Latest price, preferring pre/post market when in those sessions."""
+        from data.sources.market_session import current_session, is_extended_hours
+
+        t = yf.Ticker(ticker)
+
+        if prefer_extended:
+            session = current_session()
+            try:
+                info = t.info
+                if session == "pre_market":
+                    pre = info.get('preMarketPrice')
+                    if pre and float(pre) > 0:
+                        return float(pre)
+                elif session == "post_market":
+                    post = info.get('postMarketPrice')
+                    if post and float(post) > 0:
+                        return float(post)
+            except Exception:
+                pass  # info call can fail; fall through to fast_info
+
+        return float(t.fast_info.last_price or 0.0)
 
     def fetch_price_history(self, ticker: str, lookback_days: int) -> pd.Series:
         period = '1y' if lookback_days > 180 else '6mo'

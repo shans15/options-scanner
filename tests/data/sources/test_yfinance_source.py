@@ -8,6 +8,8 @@ from data.sources.yfinance_source import YfinanceSource
 def test_fetch_spot_uses_fast_info_last_price():
     with patch('data.sources.yfinance_source.yf.Ticker') as MockTicker:
         instance = MockTicker.return_value
+        # info returns no extended-hours price, so the path always falls through to fast_info
+        instance.info = {}
         instance.fast_info = MagicMock(last_price=635.0)
         assert YfinanceSource().fetch_spot('SPY') == 635.0
 
@@ -38,6 +40,8 @@ def test_fetch_option_chain_iterates_expirations():
         inst = MockTicker.return_value
         inst.options = [exp1, exp2]
         inst.option_chain.side_effect = lambda exp: chain_tuple if exp == exp1 else MagicMock(puts=pd.DataFrame(), calls=pd.DataFrame())
+        # info returns no extended-hours price so fetch_spot falls through to fast_info
+        inst.info = {}
         inst.fast_info = MagicMock(last_price=635.0)
 
         contracts = YfinanceSource().fetch_option_chain('SPY')

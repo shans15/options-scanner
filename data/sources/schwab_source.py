@@ -66,13 +66,34 @@ class SchwabSource(DataSource):
     # DataSource interface
     # ------------------------------------------------------------------
 
-    def fetch_spot(self, ticker: str) -> float:
-        """Latest mid quote for a single ticker."""
-        data = self._request(f"/{ticker}/quotes")
-        quote = data.get(ticker, {}).get("quote", {})
-        # Prefer mid of bid/ask; fall back to lastPrice
-        bid = quote.get("bidPrice") or quote.get("bid") or 0.0
-        ask = quote.get("askPrice") or quote.get("ask") or 0.0
+    def fetch_spot(self, ticker: str, prefer_extended: bool = True) -> float:
+        """Latest mid quote, preferring extended-hours data during pre/post market.
+
+        Requests the 'extended' block from Schwab API and returns extended-hours
+        mid (or last) when in pre_market or post_market session.
+        Falls back to regular-hours quote when extended block has no fresh data.
+        """
+        from data.sources.market_session import current_session, is_extended_hours
+
+        # Request all relevant blocks
+        data = self._request(f"/{ticker}/quotes", params={"fields": "quote,extended,regular"})
+        payload = data.get(ticker, {})
+
+        # Try extended-hours block first if we're in pre/post market
+        if prefer_extended and is_extended_hours(current_session()):
+            ext = payload.get("extended", {})
+            ext_bid = float(ext.get("bidPrice") or 0.0)
+            ext_ask = float(ext.get("askPrice") or 0.0)
+            ext_last = float(ext.get("lastPrice") or 0.0)
+            if ext_bid > 0 and ext_ask > 0:
+                return float((ext_bid + ext_ask) / 2)
+            if ext_last > 0:
+                return ext_last
+
+        # Fall through to regular-hours quote
+        quote = payload.get("quote", {})
+        bid = float(quote.get("bidPrice") or quote.get("bid") or 0.0)
+        ask = float(quote.get("askPrice") or quote.get("ask") or 0.0)
         if bid > 0 and ask > 0:
             return float((bid + ask) / 2)
         return float(quote.get("lastPrice", 0.0) or 0.0)
