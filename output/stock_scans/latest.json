@@ -1,0 +1,4950 @@
+{
+  "scan_timestamp": "20260622_2336",
+  "total_candidates": 130,
+  "candidates": [
+    {
+      "ticker": "LI",
+      "spot": 12.819999694824219,
+      "label": "BEAR",
+      "bullish_score": 0,
+      "bearish_score": 55.0,
+      "net_score": -55.0,
+      "snapshot": {
+        "close": 12.82,
+        "volume_5d_avg": 3114806,
+        "high_52w": 32.03,
+        "low_52w": 12.82
+      },
+      "setups": [
+        {
+          "ticker": "LI",
+          "setup_type": "sma_stack",
+          "direction": "bearish",
+          "strength": 1.0,
+          "spot": 12.819999694824219,
+          "notes": {
+            "ema10": 13.83,
+            "ema20": 14.57,
+            "ema50": 15.94,
+            "ema200": 18.92,
+            "spread_pct": 26.91,
+            "persistence_days_of_20": 20
+          }
+        },
+        {
+          "ticker": "LI",
+          "setup_type": "proximity_52w",
+          "direction": "bearish",
+          "strength": 1.0,
+          "spot": 12.819999694824219,
+          "notes": {
+            "high_52w": 32.03,
+            "low_52w": 12.82,
+            "dist_to_high_pct": 149.81,
+            "dist_to_low_pct": 0.0
+          }
+        }
+      ]
+    },
+    {
+      "ticker": "NFLX",
+      "spot": 72.87999725341797,
+      "label": "BEAR",
+      "bullish_score": 0,
+      "bearish_score": 54.8,
+      "net_score": -54.8,
+      "snapshot": {
+        "close": 72.88,
+        "volume_5d_avg": 64306211,
+        "high_52w": 134.12,
+        "low_52w": 71.81
+      },
+      "setups": [
+        {
+          "ticker": "NFLX",
+          "setup_type": "sma_stack",
+          "direction": "bearish",
+          "strength": 1.0,
+          "spot": 72.87999725341797,
+          "notes": {
+            "ema10": 78.86,
+            "ema20": 81.57,
+            "ema50": 86.1,
+            "ema200": 96.95,
+            "spread_pct": 18.66,
+            "persistence_days_of_20": 20
+          }
+        },
+        {
+          "ticker": "NFLX",
+          "setup_type": "proximity_52w",
+          "direction": "bearish",
+          "strength": 0.706,
+          "spot": 72.87999725341797,
+          "notes": {
+            "high_52w": 134.12,
+            "low_52w": 71.81,
+            "dist_to_high_pct": 84.02,
+            "dist_to_low_pct": 1.47
+          }
+        },
+        {
+          "ticker": "NFLX",
+          "setup_type": "volume_surge",
+          "direction": "bearish",
+          "strength": 0.356,
+          "spot": 72.87999725341797,
+          "notes": {
+            "surge_ratio": 1.53,
+            "avg_5d_volume": 64306211,
+            "avg_20d_volume": 41932872,
+            "5d_price_change_pct": -9.29
+          }
+        }
+      ]
+    },
+    {
+      "ticker": "LRCX",
+      "spot": 409.5400085449219,
+      "label": "BULL",
+      "bullish_score": 54.0,
+      "bearish_score": 0,
+      "net_score": 54.0,
+      "snapshot": {
+        "close": 409.54,
+        "volume_5d_avg": 14638806,
+        "high_52w": 409.75,
+        "low_52w": 90.29
+      },
+      "setups": [
+        {
+          "ticker": "LRCX",
+          "setup_type": "sma_stack",
+          "direction": "bullish",
+          "strength": 0.975,
+          "spot": 409.5400085449219,
+          "notes": {
+            "ema10": 369.39,
+            "ema20": 347.3,
+            "ema50": 309.02,
+            "ema200": 226.52,
+            "spread_pct": 63.07,
+            "persistence_days_of_20": 19
+          }
+        },
+        {
+          "ticker": "LRCX",
+          "setup_type": "proximity_52w",
+          "direction": "bullish",
+          "strength": 0.99,
+          "spot": 409.5400085449219,
+          "notes": {
+            "high_52w": 409.75,
+            "low_52w": 90.29,
+            "dist_to_high_pct": 0.05,
+            "dist_to_low_pct": 77.95
+          }
+        }
+      ]
+    },
+    {
+      "ticker": "AMAT",
+      "spot": 640.1799926757812,
+      "label": "BULL",
+      "bullish_score": 53.5,
+      "bearish_score": 0,
+      "net_score": 53.5,
+      "snapshot": {
+        "close": 640.18,
+        "volume_5d_avg": 12168614,
+        "high_52w": 641.18,
+        "low_52w": 154.47
+      },
+      "setups": [
+        {
+          "ticker": "AMAT",
+          "setup_type": "sma_stack",
+          "direction": "bullish",
+          "strength": 0.975,
+          "spot": 640.1799926757812,
+          "notes": {
+            "ema10": 570.26,
+            "ema20": 528.37,
+            "ema50": 466.05,
+            "ema200": 346.51,
+            "spread_pct": 64.57,
+            "persistence_days_of_20": 19
+          }
+        },
+        {
+          "ticker": "AMAT",
+          "setup_type": "proximity_52w",
+          "direction": "bullish",
+          "strength": 0.969,
+          "spot": 640.1799926757812,
+          "notes": {
+            "high_52w": 641.18,
+            "low_52w": 154.47,
+            "dist_to_high_pct": 0.16,
+            "dist_to_low_pct": 75.87
+          }
+        }
+      ]
+    },
+    {
+      "ticker": "PDD",
+      "spot": 78.11000061035156,
+      "label": "BEAR",
+      "bullish_score": 0,
+      "bearish_score": 53.1,
+      "net_score": -53.1,
+      "snapshot": {
+        "close": 78.11,
+        "volume_5d_avg": 8034433,
+        "high_52w": 139.41,
+        "low_52w": 77.81
+      },
+      "setups": [
+        {
+          "ticker": "PDD",
+          "setup_type": "sma_stack",
+          "direction": "bearish",
+          "strength": 1.0,
+          "spot": 78.11000061035156,
+          "notes": {
+            "ema10": 81.5,
+            "ema20": 84.63,
+            "ema50": 91.02,
+            "ema200": 103.17,
+            "spread_pct": 21.0,
+            "persistence_days_of_20": 20
+          }
+        },
+        {
+          "ticker": "PDD",
+          "setup_type": "proximity_52w",
+          "direction": "bearish",
+          "strength": 0.923,
+          "spot": 78.11000061035156,
+          "notes": {
+            "high_52w": 139.41,
+            "low_52w": 77.81,
+            "dist_to_high_pct": 78.48,
+            "dist_to_low_pct": 0.38
+          }
+        }
+      ]
+    },
+    {
+      "ticker": "KLAC",
+      "spot": 269.1600036621094,
+      "label": "BULL",
+      "bullish_score": 52.9,
+      "bearish_score": 0,
+      "net_score": 52.9,
+      "snapshot": {
+        "close": 269.16,
+        "volume_5d_avg": 16515633,
+        "high_52w": 269.9,
+        "low_52w": 83.22
+      },
+      "setups": [
+        {
+          "ticker": "KLAC",
+          "setup_type": "sma_stack",
+          "direction": "bullish",
+          "strength": 0.975,
+          "spot": 269.1600036621094,
+          "notes": {
+            "ema10": 241.54,
+            "ema20": 225.12,
+            "ema50": 200.23,
+            "ema200": 154.01,
+            "spread_pct": 56.83,
+            "persistence_days_of_20": 19
+          }
+        },
+        {
+          "ticker": "KLAC",
+          "setup_type": "proximity_52w",
+          "direction": "bullish",
+          "strength": 0.945,
+          "spot": 269.1600036621094,
+          "notes": {
+            "high_52w": 269.9,
+            "low_52w": 83.22,
+            "dist_to_high_pct": 0.27,
+            "dist_to_low_pct": 69.08
+          }
+        }
+      ]
+    },
+    {
+      "ticker": "MU",
+      "spot": 1211.3800048828125,
+      "label": "BULL",
+      "bullish_score": 51.8,
+      "bearish_score": 0,
+      "net_score": 51.8,
+      "snapshot": {
+        "close": 1211.38,
+        "volume_5d_avg": 49848796,
+        "high_52w": 1213.56,
+        "low_52w": 103.38
+      },
+      "setups": [
+        {
+          "ticker": "MU",
+          "setup_type": "sma_stack",
+          "direction": "bullish",
+          "strength": 0.925,
+          "spot": 1211.3800048828125,
+          "notes": {
+            "ema10": 1054.01,
+            "ema20": 976.98,
+            "ema50": 802.04,
+            "ema200": 478.41,
+            "spread_pct": 120.32,
+            "persistence_days_of_20": 17
+          }
+        },
+        {
+          "ticker": "MU",
+          "setup_type": "proximity_52w",
+          "direction": "bullish",
+          "strength": 0.964,
+          "spot": 1211.3800048828125,
+          "notes": {
+            "high_52w": 1213.56,
+            "low_52w": 103.38,
+            "dist_to_high_pct": 0.18,
+            "dist_to_low_pct": 91.47
+          }
+        }
+      ]
+    },
+    {
+      "ticker": "T",
+      "spot": 22.100000381469727,
+      "label": "BEAR",
+      "bullish_score": 0,
+      "bearish_score": 51.0,
+      "net_score": -51.0,
+      "snapshot": {
+        "close": 22.1,
+        "volume_5d_avg": 59938396,
+        "high_52w": 29.79,
+        "low_52w": 21.99
+      },
+      "setups": [
+        {
+          "ticker": "T",
+          "setup_type": "sma_stack",
+          "direction": "bearish",
+          "strength": 0.95,
+          "spot": 22.100000381469727,
+          "notes": {
+            "ema10": 22.82,
+            "ema20": 23.39,
+            "ema50": 24.57,
+            "ema200": 26.05,
+            "spread_pct": 12.41,
+            "persistence_days_of_20": 18
+          }
+        },
+        {
+          "ticker": "T",
+          "setup_type": "proximity_52w",
+          "direction": "bearish",
+          "strength": 0.9,
+          "spot": 22.100000381469727,
+          "notes": {
+            "high_52w": 29.79,
+            "low_52w": 21.99,
+            "dist_to_high_pct": 34.8,
+            "dist_to_low_pct": 0.5
+          }
+        }
+      ]
+    },
+    {
+      "ticker": "CAT",
+      "spot": 1022.280029296875,
+      "label": "BULL",
+      "bullish_score": 50.8,
+      "bearish_score": 0,
+      "net_score": 50.8,
+      "snapshot": {
+        "close": 1022.28,
+        "volume_5d_avg": 3625073,
+        "high_52w": 1023.25,
+        "low_52w": 357.73
+      },
+      "setups": [
+        {
+          "ticker": "CAT",
+          "setup_type": "sma_stack",
+          "direction": "bullish",
+          "strength": 0.875,
+          "spot": 1022.280029296875,
+          "notes": {
+            "ema10": 949.16,
+            "ema20": 924.99,
+            "ema50": 875.03,
+            "ema200": 703.21,
+            "spread_pct": 34.98,
+            "persistence_days_of_20": 15
+          }
+        },
+        {
+          "ticker": "CAT",
+          "setup_type": "proximity_52w",
+          "direction": "bullish",
+          "strength": 0.981,
+          "spot": 1022.280029296875,
+          "notes": {
+            "high_52w": 1023.25,
+            "low_52w": 357.73,
+            "dist_to_high_pct": 0.09,
+            "dist_to_low_pct": 65.01
+          }
+        }
+      ]
+    },
+    {
+      "ticker": "BSX",
+      "spot": 44.33000183105469,
+      "label": "BEAR",
+      "bullish_score": 0,
+      "bearish_score": 50.3,
+      "net_score": -50.3,
+      "snapshot": {
+        "close": 44.33,
+        "volume_5d_avg": 19173536,
+        "high_52w": 109.5,
+        "low_52w": 44.05
+      },
+      "setups": [
+        {
+          "ticker": "BSX",
+          "setup_type": "sma_stack",
+          "direction": "bearish",
+          "strength": 0.95,
+          "spot": 44.33000183105469,
+          "notes": {
+            "ema10": 46.58,
+            "ema20": 48.59,
+            "ema50": 54.39,
+            "ema200": 74.95,
+            "spread_pct": 37.86,
+            "persistence_days_of_20": 18
+          }
+        },
+        {
+          "ticker": "BSX",
+          "setup_type": "proximity_52w",
+          "direction": "bearish",
+          "strength": 0.874,
+          "spot": 44.33000183105469,
+          "notes": {
+            "high_52w": 109.5,
+            "low_52w": 44.05,
+            "dist_to_high_pct": 147.01,
+            "dist_to_low_pct": 0.63
+          }
+        }
+      ]
+    },
+    {
+      "ticker": "ADI",
+      "spot": 445.4800109863281,
+      "label": "BULL",
+      "bullish_score": 50.1,
+      "bearish_score": 0,
+      "net_score": 50.1,
+      "snapshot": {
+        "close": 445.48,
+        "volume_5d_avg": 5725923,
+        "high_52w": 445.83,
+        "low_52w": 218.37
+      },
+      "setups": [
+        {
+          "ticker": "ADI",
+          "setup_type": "sma_stack",
+          "direction": "bullish",
+          "strength": 0.85,
+          "spot": 445.4800109863281,
+          "notes": {
+            "ema10": 422.95,
+            "ema20": 417.13,
+            "ema50": 398.67,
+            "ema200": 330.35,
+            "spread_pct": 28.03,
+            "persistence_days_of_20": 14
+          }
+        },
+        {
+          "ticker": "ADI",
+          "setup_type": "proximity_52w",
+          "direction": "bullish",
+          "strength": 0.984,
+          "spot": 445.4800109863281,
+          "notes": {
+            "high_52w": 445.83,
+            "low_52w": 218.37,
+            "dist_to_high_pct": 0.08,
+            "dist_to_low_pct": 50.98
+          }
+        }
+      ]
+    },
+    {
+      "ticker": "CMCSA",
+      "spot": 22.31999969482422,
+      "label": "BEAR",
+      "bullish_score": 0,
+      "bearish_score": 50.0,
+      "net_score": -50.0,
+      "snapshot": {
+        "close": 22.32,
+        "volume_5d_avg": 42779830,
+        "high_52w": 34.36,
+        "low_52w": 22.13
+      },
+      "setups": [
+        {
+          "ticker": "CMCSA",
+          "setup_type": "sma_stack",
+          "direction": "bearish",
+          "strength": 0.975,
+          "spot": 22.31999969482422,
+          "notes": {
+            "ema10": 23.34,
+            "ema20": 23.96,
+            "ema50": 25.45,
+            "ema200": 28.0,
+            "spread_pct": 16.64,
+            "persistence_days_of_20": 19
+          }
+        },
+        {
+          "ticker": "CMCSA",
+          "setup_type": "proximity_52w",
+          "direction": "bearish",
+          "strength": 0.83,
+          "spot": 22.31999969482422,
+          "notes": {
+            "high_52w": 34.36,
+            "low_52w": 22.13,
+            "dist_to_high_pct": 53.93,
+            "dist_to_low_pct": 0.85
+          }
+        }
+      ]
+    },
+    {
+      "ticker": "SMH",
+      "spot": 668.9099731445312,
+      "label": "BULL",
+      "bullish_score": 49.8,
+      "bearish_score": 0,
+      "net_score": 49.8,
+      "snapshot": {
+        "close": 668.91,
+        "volume_5d_avg": 10071831,
+        "high_52w": 671.83,
+        "low_52w": 257.12
+      },
+      "setups": [
+        {
+          "ticker": "SMH",
+          "setup_type": "sma_stack",
+          "direction": "bullish",
+          "strength": 0.9,
+          "spot": 668.9099731445312,
+          "notes": {
+            "ema10": 629.96,
+            "ema20": 610.31,
+            "ema50": 557.96,
+            "ema200": 435.86,
+            "spread_pct": 44.53,
+            "persistence_days_of_20": 16
+          }
+        },
+        {
+          "ticker": "SMH",
+          "setup_type": "proximity_52w",
+          "direction": "bullish",
+          "strength": 0.913,
+          "spot": 668.9099731445312,
+          "notes": {
+            "high_52w": 671.83,
+            "low_52w": 257.12,
+            "dist_to_high_pct": 0.44,
+            "dist_to_low_pct": 61.56
+          }
+        }
+      ]
+    },
+    {
+      "ticker": "ICE",
+      "spot": 131.33999633789062,
+      "label": "BEAR",
+      "bullish_score": 0,
+      "bearish_score": 49.2,
+      "net_score": -49.2,
+      "snapshot": {
+        "close": 131.34,
+        "volume_5d_avg": 5325185,
+        "high_52w": 189.35,
+        "low_52w": 129.83
+      },
+      "setups": [
+        {
+          "ticker": "ICE",
+          "setup_type": "sma_stack",
+          "direction": "bearish",
+          "strength": 1.0,
+          "spot": 131.33999633789062,
+          "notes": {
+            "ema10": 137.7,
+            "ema20": 141.55,
+            "ema50": 148.51,
+            "ema200": 159.48,
+            "spread_pct": 13.66,
+            "persistence_days_of_20": 20
+          }
+        },
+        {
+          "ticker": "ICE",
+          "setup_type": "proximity_52w",
+          "direction": "bearish",
+          "strength": 0.77,
+          "spot": 131.33999633789062,
+          "notes": {
+            "high_52w": 189.35,
+            "low_52w": 129.83,
+            "dist_to_high_pct": 44.17,
+            "dist_to_low_pct": 1.15
+          }
+        }
+      ]
+    },
+    {
+      "ticker": "IWM",
+      "spot": 298.17999267578125,
+      "label": "BULL",
+      "bullish_score": 49.1,
+      "bearish_score": 0,
+      "net_score": 49.1,
+      "snapshot": {
+        "close": 298.18,
+        "volume_5d_avg": 28482081,
+        "high_52w": 299.49,
+        "low_52w": 206.81
+      },
+      "setups": [
+        {
+          "ticker": "IWM",
+          "setup_type": "sma_stack",
+          "direction": "bullish",
+          "strength": 0.875,
+          "spot": 298.17999267578125,
+          "notes": {
+            "ema10": 292.02,
+            "ema20": 289.17,
+            "ema50": 281.5,
+            "ema200": 259.72,
+            "spread_pct": 12.44,
+            "persistence_days_of_20": 15
+          }
+        },
+        {
+          "ticker": "IWM",
+          "setup_type": "proximity_52w",
+          "direction": "bullish",
+          "strength": 0.912,
+          "spot": 298.17999267578125,
+          "notes": {
+            "high_52w": 299.49,
+            "low_52w": 206.81,
+            "dist_to_high_pct": 0.44,
+            "dist_to_low_pct": 30.64
+          }
+        }
+      ]
+    },
+    {
+      "ticker": "BABA",
+      "spot": 104.97000122070312,
+      "label": "BEAR",
+      "bullish_score": 0,
+      "bearish_score": 48.2,
+      "net_score": -48.2,
+      "snapshot": {
+        "close": 104.97,
+        "volume_5d_avg": 12880112,
+        "high_52w": 192.67,
+        "low_52w": 103.71
+      },
+      "setups": [
+        {
+          "ticker": "BABA",
+          "setup_type": "sma_stack",
+          "direction": "bearish",
+          "strength": 0.975,
+          "spot": 104.97000122070312,
+          "notes": {
+            "ema10": 112.18,
+            "ema20": 117.87,
+            "ema50": 126.01,
+            "ema200": 137.01,
+            "spread_pct": 18.12,
+            "persistence_days_of_20": 19
+          }
+        },
+        {
+          "ticker": "BABA",
+          "setup_type": "proximity_52w",
+          "direction": "bearish",
+          "strength": 0.76,
+          "spot": 104.97000122070312,
+          "notes": {
+            "high_52w": 192.67,
+            "low_52w": 103.71,
+            "dist_to_high_pct": 83.55,
+            "dist_to_low_pct": 1.2
+          }
+        }
+      ]
+    },
+    {
+      "ticker": "TXN",
+      "spot": 332.2799987792969,
+      "label": "BULL",
+      "bullish_score": 47.1,
+      "bearish_score": 0,
+      "net_score": 47.1,
+      "snapshot": {
+        "close": 332.28,
+        "volume_5d_avg": 10580319,
+        "high_52w": 334.03,
+        "low_52w": 152.73
+      },
+      "setups": [
+        {
+          "ticker": "TXN",
+          "setup_type": "sma_stack",
+          "direction": "bullish",
+          "strength": 0.825,
+          "spot": 332.2799987792969,
+          "notes": {
+            "ema10": 309.89,
+            "ema20": 303.89,
+            "ema50": 282.92,
+            "ema200": 230.58,
+            "spread_pct": 34.39,
+            "persistence_days_of_20": 13
+          }
+        },
+        {
+          "ticker": "TXN",
+          "setup_type": "proximity_52w",
+          "direction": "bullish",
+          "strength": 0.895,
+          "spot": 332.2799987792969,
+          "notes": {
+            "high_52w": 334.03,
+            "low_52w": 152.73,
+            "dist_to_high_pct": 0.53,
+            "dist_to_low_pct": 54.04
+          }
+        }
+      ]
+    },
+    {
+      "ticker": "ASML",
+      "spot": 1929.25,
+      "label": "BULL",
+      "bullish_score": 46.8,
+      "bearish_score": 0,
+      "net_score": 46.8,
+      "snapshot": {
+        "close": 1929.25,
+        "volume_5d_avg": 2129060,
+        "high_52w": 1958.0,
+        "low_52w": 683.48
+      },
+      "setups": [
+        {
+          "ticker": "ASML",
+          "setup_type": "sma_stack",
+          "direction": "bullish",
+          "strength": 0.975,
+          "spot": 1929.25,
+          "notes": {
+            "ema10": 1843.57,
+            "ema20": 1765.93,
+            "ema50": 1628.09,
+            "ema200": 1322.32,
+            "spread_pct": 39.42,
+            "persistence_days_of_20": 19
+          }
+        },
+        {
+          "ticker": "ASML",
+          "setup_type": "proximity_52w",
+          "direction": "bullish",
+          "strength": 0.702,
+          "spot": 1929.25,
+          "notes": {
+            "high_52w": 1958.0,
+            "low_52w": 683.48,
+            "dist_to_high_pct": 1.49,
+            "dist_to_low_pct": 64.57
+          }
+        }
+      ]
+    },
+    {
+      "ticker": "MS",
+      "spot": 227.08999633789062,
+      "label": "BULL",
+      "bullish_score": 46.8,
+      "bearish_score": 0,
+      "net_score": 46.8,
+      "snapshot": {
+        "close": 227.09,
+        "volume_5d_avg": 7688431,
+        "high_52w": 230.47,
+        "low_52w": 130.9
+      },
+      "setups": [
+        {
+          "ticker": "MS",
+          "setup_type": "sma_stack",
+          "direction": "bullish",
+          "strength": 0.975,
+          "spot": 227.08999633789062,
+          "notes": {
+            "ema10": 218.77,
+            "ema20": 212.91,
+            "ema50": 200.7,
+            "ema200": 177.53,
+            "spread_pct": 23.23,
+            "persistence_days_of_20": 19
+          }
+        },
+        {
+          "ticker": "MS",
+          "setup_type": "proximity_52w",
+          "direction": "bullish",
+          "strength": 0.702,
+          "spot": 227.08999633789062,
+          "notes": {
+            "high_52w": 230.47,
+            "low_52w": 130.9,
+            "dist_to_high_pct": 1.49,
+            "dist_to_low_pct": 42.36
+          }
+        }
+      ]
+    },
+    {
+      "ticker": "INTC",
+      "spot": 140.94000244140625,
+      "label": "BULL",
+      "bullish_score": 46.5,
+      "bearish_score": 0,
+      "net_score": 46.5,
+      "snapshot": {
+        "close": 140.94,
+        "volume_5d_avg": 147816213,
+        "high_52w": 141.45,
+        "low_52w": 18.97
+      },
+      "setups": [
+        {
+          "ticker": "INTC",
+          "setup_type": "sma_stack",
+          "direction": "bullish",
+          "strength": 0.775,
+          "spot": 140.94000244140625,
+          "notes": {
+            "ema10": 124.0,
+            "ema20": 118.38,
+            "ema50": 103.02,
+            "ema200": 64.65,
+            "spread_pct": 91.79,
+            "persistence_days_of_20": 11
+          }
+        },
+        {
+          "ticker": "INTC",
+          "setup_type": "proximity_52w",
+          "direction": "bullish",
+          "strength": 0.928,
+          "spot": 140.94000244140625,
+          "notes": {
+            "high_52w": 141.45,
+            "low_52w": 18.97,
+            "dist_to_high_pct": 0.36,
+            "dist_to_low_pct": 86.54
+          }
+        }
+      ]
+    },
+    {
+      "ticker": "PLTR",
+      "spot": 119.5,
+      "label": "BEAR",
+      "bullish_score": 0,
+      "bearish_score": 46.2,
+      "net_score": -46.2,
+      "snapshot": {
+        "close": 119.5,
+        "volume_5d_avg": 43166765,
+        "high_52w": 207.52,
+        "low_52w": 119.2
+      },
+      "setups": [
+        {
+          "ticker": "PLTR",
+          "setup_type": "sma_stack",
+          "direction": "bearish",
+          "strength": 0.75,
+          "spot": 119.5,
+          "notes": {
+            "ema10": 130.57,
+            "ema20": 134.03,
+            "ema50": 138.44,
+            "ema200": 150.18,
+            "spread_pct": 13.05,
+            "persistence_days_of_20": 10
+          }
+        },
+        {
+          "ticker": "PLTR",
+          "setup_type": "proximity_52w",
+          "direction": "bearish",
+          "strength": 0.95,
+          "spot": 119.5,
+          "notes": {
+            "high_52w": 207.52,
+            "low_52w": 119.2,
+            "dist_to_high_pct": 73.66,
+            "dist_to_low_pct": 0.25
+          }
+        }
+      ]
+    },
+    {
+      "ticker": "XLI",
+      "spot": 181.8000030517578,
+      "label": "BULL",
+      "bullish_score": 46.0,
+      "bearish_score": 0,
+      "net_score": 46.0,
+      "snapshot": {
+        "close": 181.8,
+        "volume_5d_avg": 8454062,
+        "high_52w": 182.92,
+        "low_52w": 141.28
+      },
+      "setups": [
+        {
+          "ticker": "XLI",
+          "setup_type": "sma_stack",
+          "direction": "bullish",
+          "strength": 0.802,
+          "spot": 181.8000030517578,
+          "notes": {
+            "ema10": 178.13,
+            "ema20": 176.23,
+            "ema50": 173.58,
+            "ema200": 164.86,
+            "spread_pct": 8.05,
+            "persistence_days_of_20": 16
+          }
+        },
+        {
+          "ticker": "XLI",
+          "setup_type": "proximity_52w",
+          "direction": "bullish",
+          "strength": 0.877,
+          "spot": 181.8000030517578,
+          "notes": {
+            "high_52w": 182.92,
+            "low_52w": 141.28,
+            "dist_to_high_pct": 0.62,
+            "dist_to_low_pct": 22.29
+          }
+        }
+      ]
+    },
+    {
+      "ticker": "TZA",
+      "spot": 3.9100000858306885,
+      "label": "BEAR",
+      "bullish_score": 0,
+      "bearish_score": 45.6,
+      "net_score": -45.6,
+      "snapshot": {
+        "close": 3.91,
+        "volume_5d_avg": 305937211,
+        "high_52w": 13.56,
+        "low_52w": 3.86
+      },
+      "setups": [
+        {
+          "ticker": "TZA",
+          "setup_type": "sma_stack",
+          "direction": "bearish",
+          "strength": 0.9,
+          "spot": 3.9100000858306885,
+          "notes": {
+            "ema10": 4.2,
+            "ema20": 4.35,
+            "ema50": 4.84,
+            "ema200": 6.75,
+            "spread_pct": 37.8,
+            "persistence_days_of_20": 16
+          }
+        },
+        {
+          "ticker": "TZA",
+          "setup_type": "proximity_52w",
+          "direction": "bearish",
+          "strength": 0.744,
+          "spot": 3.9100000858306885,
+          "notes": {
+            "high_52w": 13.56,
+            "low_52w": 3.86,
+            "dist_to_high_pct": 246.8,
+            "dist_to_low_pct": 1.28
+          }
+        }
+      ]
+    },
+    {
+      "ticker": "GS",
+      "spot": 1106.3699951171875,
+      "label": "BULL",
+      "bullish_score": 45.1,
+      "bearish_score": 0,
+      "net_score": 45.1,
+      "snapshot": {
+        "close": 1106.37,
+        "volume_5d_avg": 2573216,
+        "high_52w": 1125.0,
+        "low_52w": 630.01
+      },
+      "setups": [
+        {
+          "ticker": "GS",
+          "setup_type": "sma_stack",
+          "direction": "bullish",
+          "strength": 0.95,
+          "spot": 1106.3699951171875,
+          "notes": {
+            "ema10": 1074.0,
+            "ema20": 1046.94,
+            "ema50": 991.48,
+            "ema200": 884.2,
+            "spread_pct": 21.47,
+            "persistence_days_of_20": 18
+          }
+        },
+        {
+          "ticker": "GS",
+          "setup_type": "proximity_52w",
+          "direction": "bullish",
+          "strength": 0.663,
+          "spot": 1106.3699951171875,
+          "notes": {
+            "high_52w": 1125.0,
+            "low_52w": 630.01,
+            "dist_to_high_pct": 1.68,
+            "dist_to_low_pct": 43.06
+          }
+        }
+      ]
+    },
+    {
+      "ticker": "ISRG",
+      "spot": 402.95001220703125,
+      "label": "BEAR",
+      "bullish_score": 0,
+      "bearish_score": 45.0,
+      "net_score": -45.0,
+      "snapshot": {
+        "close": 402.95,
+        "volume_5d_avg": 2752689,
+        "high_52w": 603.88,
+        "low_52w": 396.68
+      },
+      "setups": [
+        {
+          "ticker": "ISRG",
+          "setup_type": "sma_stack",
+          "direction": "bearish",
+          "strength": 0.925,
+          "spot": 402.95001220703125,
+          "notes": {
+            "ema10": 411.13,
+            "ema20": 417.52,
+            "ema50": 435.47,
+            "ema200": 478.65,
+            "spread_pct": 14.11,
+            "persistence_days_of_20": 17
+          }
+        },
+        {
+          "ticker": "ISRG",
+          "setup_type": "proximity_52w",
+          "direction": "bearish",
+          "strength": 0.689,
+          "spot": 402.95001220703125,
+          "notes": {
+            "high_52w": 603.88,
+            "low_52w": 396.68,
+            "dist_to_high_pct": 49.86,
+            "dist_to_low_pct": 1.56
+          }
+        }
+      ]
+    },
+    {
+      "ticker": "JCI",
+      "spot": 148.2100067138672,
+      "label": "BULL",
+      "bullish_score": 44.3,
+      "bearish_score": 0,
+      "net_score": 44.3,
+      "snapshot": {
+        "close": 148.21,
+        "volume_5d_avg": 4678860,
+        "high_52w": 149.38,
+        "low_52w": 101.25
+      },
+      "setups": [
+        {
+          "ticker": "JCI",
+          "setup_type": "sma_stack",
+          "direction": "bullish",
+          "strength": 0.775,
+          "spot": 148.2100067138672,
+          "notes": {
+            "ema10": 144.78,
+            "ema20": 143.42,
+            "ema50": 140.97,
+            "ema200": 128.75,
+            "spread_pct": 12.45,
+            "persistence_days_of_20": 11
+          }
+        },
+        {
+          "ticker": "JCI",
+          "setup_type": "proximity_52w",
+          "direction": "bullish",
+          "strength": 0.842,
+          "spot": 148.2100067138672,
+          "notes": {
+            "high_52w": 149.38,
+            "low_52w": 101.25,
+            "dist_to_high_pct": 0.79,
+            "dist_to_low_pct": 31.68
+          }
+        }
+      ]
+    },
+    {
+      "ticker": "CME",
+      "spot": 245.1999969482422,
+      "label": "BEAR",
+      "bullish_score": 0,
+      "bearish_score": 43.5,
+      "net_score": -43.5,
+      "snapshot": {
+        "close": 245.2,
+        "volume_5d_avg": 4669585,
+        "high_52w": 329.16,
+        "low_52w": 244.56
+      },
+      "setups": [
+        {
+          "ticker": "CME",
+          "setup_type": "sma_stack",
+          "direction": "bearish",
+          "strength": 0.661,
+          "spot": 245.1999969482422,
+          "notes": {
+            "ema10": 256.36,
+            "ema20": 263.12,
+            "ema50": 275.77,
+            "ema200": 282.4,
+            "spread_pct": 9.22,
+            "persistence_days_of_20": 8
+          }
+        },
+        {
+          "ticker": "CME",
+          "setup_type": "proximity_52w",
+          "direction": "bearish",
+          "strength": 0.948,
+          "spot": 245.1999969482422,
+          "notes": {
+            "high_52w": 329.16,
+            "low_52w": 244.56,
+            "dist_to_high_pct": 34.24,
+            "dist_to_low_pct": 0.26
+          }
+        }
+      ]
+    },
+    {
+      "ticker": "C",
+      "spot": 145.6699981689453,
+      "label": "BULL",
+      "bullish_score": 43.4,
+      "bearish_score": 0,
+      "net_score": 43.4,
+      "snapshot": {
+        "close": 145.67,
+        "volume_5d_avg": 15748980,
+        "high_52w": 147.96,
+        "low_52w": 77.51
+      },
+      "setups": [
+        {
+          "ticker": "C",
+          "setup_type": "sma_stack",
+          "direction": "bullish",
+          "strength": 0.875,
+          "spot": 145.6699981689453,
+          "notes": {
+            "ema10": 140.12,
+            "ema20": 135.99,
+            "ema50": 129.71,
+            "ema200": 114.78,
+            "spread_pct": 22.08,
+            "persistence_days_of_20": 15
+          }
+        },
+        {
+          "ticker": "C",
+          "setup_type": "proximity_52w",
+          "direction": "bullish",
+          "strength": 0.686,
+          "spot": 145.6699981689453,
+          "notes": {
+            "high_52w": 147.96,
+            "low_52w": 77.51,
+            "dist_to_high_pct": 1.57,
+            "dist_to_low_pct": 46.79
+          }
+        }
+      ]
+    },
+    {
+      "ticker": "QQQ",
+      "spot": 737.9500122070312,
+      "label": "BULL",
+      "bullish_score": 43.2,
+      "bearish_score": 0,
+      "net_score": 43.2,
+      "snapshot": {
+        "close": 737.95,
+        "volume_5d_avg": 47029398,
+        "high_52w": 748.65,
+        "low_52w": 523.65
+      },
+      "setups": [
+        {
+          "ticker": "QQQ",
+          "setup_type": "sma_stack",
+          "direction": "bullish",
+          "strength": 0.85,
+          "spot": 737.9500122070312,
+          "notes": {
+            "ema10": 728.93,
+            "ema20": 723.03,
+            "ema50": 696.68,
+            "ema200": 634.95,
+            "spread_pct": 14.8,
+            "persistence_days_of_20": 14
+          }
+        },
+        {
+          "ticker": "QQQ",
+          "setup_type": "proximity_52w",
+          "direction": "bullish",
+          "strength": 0.71,
+          "spot": 737.9500122070312,
+          "notes": {
+            "high_52w": 748.65,
+            "low_52w": 523.65,
+            "dist_to_high_pct": 1.45,
+            "dist_to_low_pct": 29.04
+          }
+        }
+      ]
+    },
+    {
+      "ticker": "HUBS",
+      "spot": 172.8000030517578,
+      "label": "BEAR",
+      "bullish_score": 0,
+      "bearish_score": 43.2,
+      "net_score": -43.2,
+      "snapshot": {
+        "close": 172.8,
+        "volume_5d_avg": 1968639,
+        "high_52w": 568.16,
+        "low_52w": 170.54
+      },
+      "setups": [
+        {
+          "ticker": "HUBS",
+          "setup_type": "sma_stack",
+          "direction": "bearish",
+          "strength": 0.825,
+          "spot": 172.8000030517578,
+          "notes": {
+            "ema10": 186.64,
+            "ema20": 195.89,
+            "ema50": 212.22,
+            "ema200": 306.95,
+            "spread_pct": 39.19,
+            "persistence_days_of_20": 13
+          }
+        },
+        {
+          "ticker": "HUBS",
+          "setup_type": "proximity_52w",
+          "direction": "bearish",
+          "strength": 0.738,
+          "spot": 172.8000030517578,
+          "notes": {
+            "high_52w": 568.16,
+            "low_52w": 170.54,
+            "dist_to_high_pct": 228.8,
+            "dist_to_low_pct": 1.31
+          }
+        }
+      ]
+    },
+    {
+      "ticker": "ETN",
+      "spot": 435.7799987792969,
+      "label": "BULL",
+      "bullish_score": 43.1,
+      "bearish_score": 0,
+      "net_score": 43.1,
+      "snapshot": {
+        "close": 435.78,
+        "volume_5d_avg": 2529572,
+        "high_52w": 436.74,
+        "low_52w": 311.92
+      },
+      "setups": [
+        {
+          "ticker": "ETN",
+          "setup_type": "sma_stack",
+          "direction": "bullish",
+          "strength": 0.641,
+          "spot": 435.7799987792969,
+          "notes": {
+            "ema10": 411.15,
+            "ema20": 406.52,
+            "ema50": 399.49,
+            "ema200": 374.41,
+            "spread_pct": 9.81,
+            "persistence_days_of_20": 6
+          }
+        },
+        {
+          "ticker": "ETN",
+          "setup_type": "proximity_52w",
+          "direction": "bullish",
+          "strength": 0.956,
+          "spot": 435.7799987792969,
+          "notes": {
+            "high_52w": 436.74,
+            "low_52w": 311.92,
+            "dist_to_high_pct": 0.22,
+            "dist_to_low_pct": 28.42
+          }
+        }
+      ]
+    },
+    {
+      "ticker": "RIOT",
+      "spot": 28.6299991607666,
+      "label": "BULL",
+      "bullish_score": 43.0,
+      "bearish_score": 0,
+      "net_score": 43.0,
+      "snapshot": {
+        "close": 28.63,
+        "volume_5d_avg": 12785177,
+        "high_52w": 30.32,
+        "low_52w": 8.87
+      },
+      "setups": [
+        {
+          "ticker": "RIOT",
+          "setup_type": "sma_stack",
+          "direction": "bullish",
+          "strength": 0.9,
+          "spot": 28.6299991607666,
+          "notes": {
+            "ema10": 27.19,
+            "ema20": 26.29,
+            "ema50": 23.43,
+            "ema200": 18.02,
+            "spread_pct": 50.91,
+            "persistence_days_of_20": 16
+          }
+        },
+        {
+          "ticker": "RIOT",
+          "setup_type": "compression",
+          "direction": "bullish",
+          "strength": 0.638,
+          "spot": 28.6299991607666,
+          "notes": {
+            "current_bbw_pct": 19.54,
+            "threshold_bbw_pct": 27.56,
+            "max_bbw_pct_6mo": 64.57,
+            "compression_days": 11,
+            "ema50_slope_20d_pct": 20.21
+          }
+        }
+      ]
+    },
+    {
+      "ticker": "TSM",
+      "spot": 467.6700134277344,
+      "label": "BULL",
+      "bullish_score": 42.8,
+      "bearish_score": 0,
+      "net_score": 42.8,
+      "snapshot": {
+        "close": 467.67,
+        "volume_5d_avg": 14501517,
+        "high_52w": 476.31,
+        "low_52w": 206.2
+      },
+      "setups": [
+        {
+          "ticker": "TSM",
+          "setup_type": "sma_stack",
+          "direction": "bullish",
+          "strength": 0.9,
+          "spot": 467.6700134277344,
+          "notes": {
+            "ema10": 439.84,
+            "ema20": 430.14,
+            "ema50": 408.75,
+            "ema200": 344.24,
+            "spread_pct": 27.77,
+            "persistence_days_of_20": 16
+          }
+        },
+        {
+          "ticker": "TSM",
+          "setup_type": "proximity_52w",
+          "direction": "bullish",
+          "strength": 0.631,
+          "spot": 467.6700134277344,
+          "notes": {
+            "high_52w": 476.31,
+            "low_52w": 206.2,
+            "dist_to_high_pct": 1.85,
+            "dist_to_low_pct": 55.91
+          }
+        }
+      ]
+    },
+    {
+      "ticker": "BAC",
+      "spot": 57.369998931884766,
+      "label": "BULL",
+      "bullish_score": 42.1,
+      "bearish_score": 0,
+      "net_score": 42.1,
+      "snapshot": {
+        "close": 57.37,
+        "volume_5d_avg": 42871694,
+        "high_52w": 57.98,
+        "low_52w": 44.75
+      },
+      "setups": [
+        {
+          "ticker": "BAC",
+          "setup_type": "sma_stack",
+          "direction": "bullish",
+          "strength": 0.748,
+          "spot": 57.369998931884766,
+          "notes": {
+            "ema10": 55.7,
+            "ema20": 54.51,
+            "ema50": 53.05,
+            "ema200": 51.59,
+            "spread_pct": 7.97,
+            "persistence_days_of_20": 14
+          }
+        },
+        {
+          "ticker": "BAC",
+          "setup_type": "proximity_52w",
+          "direction": "bullish",
+          "strength": 0.787,
+          "spot": 57.369998931884766,
+          "notes": {
+            "high_52w": 57.98,
+            "low_52w": 44.75,
+            "dist_to_high_pct": 1.06,
+            "dist_to_low_pct": 22.0
+          }
+        }
+      ]
+    },
+    {
+      "ticker": "DIA",
+      "spot": 517.0800170898438,
+      "label": "BULL",
+      "bullish_score": 41.9,
+      "bearish_score": 0,
+      "net_score": 41.9,
+      "snapshot": {
+        "close": 517.08,
+        "volume_5d_avg": 6019889,
+        "high_52w": 524.17,
+        "low_52w": 419.62
+      },
+      "setups": [
+        {
+          "ticker": "DIA",
+          "setup_type": "sma_stack",
+          "direction": "bullish",
+          "strength": 0.793,
+          "spot": 517.0800170898438,
+          "notes": {
+            "ema10": 514.26,
+            "ema20": 510.64,
+            "ema50": 501.59,
+            "ema200": 481.26,
+            "spread_pct": 6.86,
+            "persistence_days_of_20": 18
+          }
+        },
+        {
+          "ticker": "DIA",
+          "setup_type": "proximity_52w",
+          "direction": "bullish",
+          "strength": 0.726,
+          "spot": 517.0800170898438,
+          "notes": {
+            "high_52w": 524.17,
+            "low_52w": 419.62,
+            "dist_to_high_pct": 1.37,
+            "dist_to_low_pct": 18.85
+          }
+        }
+      ]
+    },
+    {
+      "ticker": "AMD",
+      "spot": 551.6300048828125,
+      "label": "BULL",
+      "bullish_score": 41.7,
+      "bearish_score": 0,
+      "net_score": 41.7,
+      "snapshot": {
+        "close": 551.63,
+        "volume_5d_avg": 31606611,
+        "high_52w": 562.99,
+        "low_52w": 126.82
+      },
+      "setups": [
+        {
+          "ticker": "AMD",
+          "setup_type": "sma_stack",
+          "direction": "bullish",
+          "strength": 0.9,
+          "spot": 551.6300048828125,
+          "notes": {
+            "ema10": 517.45,
+            "ema20": 496.96,
+            "ema50": 428.3,
+            "ema200": 288.81,
+            "spread_pct": 79.17,
+            "persistence_days_of_20": 16
+          }
+        },
+        {
+          "ticker": "AMD",
+          "setup_type": "proximity_52w",
+          "direction": "bullish",
+          "strength": 0.588,
+          "spot": 551.6300048828125,
+          "notes": {
+            "high_52w": 562.99,
+            "low_52w": 126.82,
+            "dist_to_high_pct": 2.06,
+            "dist_to_low_pct": 77.01
+          }
+        }
+      ]
+    },
+    {
+      "ticker": "D",
+      "spot": 68.04000091552734,
+      "label": "BULL",
+      "bullish_score": 41.7,
+      "bearish_score": 0,
+      "net_score": 41.7,
+      "snapshot": {
+        "close": 68.04,
+        "volume_5d_avg": 9268163,
+        "high_52w": 69.28,
+        "low_52w": 54.25
+      },
+      "setups": [
+        {
+          "ticker": "D",
+          "setup_type": "sma_stack",
+          "direction": "bullish",
+          "strength": 0.859,
+          "spot": 68.04000091552734,
+          "notes": {
+            "ema10": 67.64,
+            "ema20": 66.94,
+            "ema50": 65.38,
+            "ema200": 62.23,
+            "spread_pct": 8.68,
+            "persistence_days_of_20": 17
+          }
+        },
+        {
+          "ticker": "D",
+          "setup_type": "proximity_52w",
+          "direction": "bullish",
+          "strength": 0.636,
+          "spot": 68.04000091552734,
+          "notes": {
+            "high_52w": 69.28,
+            "low_52w": 54.25,
+            "dist_to_high_pct": 1.82,
+            "dist_to_low_pct": 20.27
+          }
+        }
+      ]
+    },
+    {
+      "ticker": "SPGI",
+      "spot": 407.3900146484375,
+      "label": "BEAR",
+      "bullish_score": 0,
+      "bearish_score": 41.2,
+      "net_score": -41.2,
+      "snapshot": {
+        "close": 407.39,
+        "volume_5d_avg": 2018857,
+        "high_52w": 579.05,
+        "low_52w": 381.61
+      },
+      "setups": [
+        {
+          "ticker": "SPGI",
+          "setup_type": "sma_stack",
+          "direction": "bearish",
+          "strength": 0.655,
+          "spot": 407.3900146484375,
+          "notes": {
+            "ema10": 417.62,
+            "ema20": 418.91,
+            "ema50": 423.59,
+            "ema200": 459.38,
+            "spread_pct": 9.09,
+            "persistence_days_of_20": 8
+          }
+        },
+        {
+          "ticker": "SPGI",
+          "setup_type": "compression",
+          "direction": "bearish",
+          "strength": 0.863,
+          "spot": 407.3900146484375,
+          "notes": {
+            "current_bbw_pct": 6.21,
+            "threshold_bbw_pct": 7.8,
+            "max_bbw_pct_6mo": 48.3,
+            "compression_days": 17,
+            "ema50_slope_20d_pct": -1.17
+          }
+        }
+      ]
+    },
+    {
+      "ticker": "STLA",
+      "spot": 6.380000114440918,
+      "label": "BEAR",
+      "bullish_score": 0,
+      "bearish_score": 41.2,
+      "net_score": -41.2,
+      "snapshot": {
+        "close": 6.38,
+        "volume_5d_avg": 21216493,
+        "high_52w": 12.22,
+        "low_52w": 6.28
+      },
+      "setups": [
+        {
+          "ticker": "STLA",
+          "setup_type": "sma_stack",
+          "direction": "bearish",
+          "strength": 0.8,
+          "spot": 6.380000114440918,
+          "notes": {
+            "ema10": 6.74,
+            "ema20": 7.02,
+            "ema50": 7.38,
+            "ema200": 8.48,
+            "spread_pct": 20.54,
+            "persistence_days_of_20": 12
+          }
+        },
+        {
+          "ticker": "STLA",
+          "setup_type": "proximity_52w",
+          "direction": "bearish",
+          "strength": 0.687,
+          "spot": 6.380000114440918,
+          "notes": {
+            "high_52w": 12.22,
+            "low_52w": 6.28,
+            "dist_to_high_pct": 91.54,
+            "dist_to_low_pct": 1.57
+          }
+        }
+      ]
+    },
+    {
+      "ticker": "MCD",
+      "spot": 270.1000061035156,
+      "label": "BEAR",
+      "bullish_score": 0,
+      "bearish_score": 40.9,
+      "net_score": -40.9,
+      "snapshot": {
+        "close": 270.1,
+        "volume_5d_avg": 4737007,
+        "high_52w": 341.75,
+        "low_52w": 270.08
+      },
+      "setups": [
+        {
+          "ticker": "MCD",
+          "setup_type": "sma_stack",
+          "direction": "bearish",
+          "strength": 0.531,
+          "spot": 270.1000061035156,
+          "notes": {
+            "ema10": 280.11,
+            "ema20": 280.85,
+            "ema50": 287.16,
+            "ema200": 299.96,
+            "spread_pct": 6.62,
+            "persistence_days_of_20": 8
+          }
+        },
+        {
+          "ticker": "MCD",
+          "setup_type": "proximity_52w",
+          "direction": "bearish",
+          "strength": 0.999,
+          "spot": 270.1000061035156,
+          "notes": {
+            "high_52w": 341.75,
+            "low_52w": 270.08,
+            "dist_to_high_pct": 26.53,
+            "dist_to_low_pct": 0.01
+          }
+        }
+      ]
+    },
+    {
+      "ticker": "CVS",
+      "spot": 101.30000305175781,
+      "label": "BULL",
+      "bullish_score": 40.8,
+      "bearish_score": 0,
+      "net_score": 40.8,
+      "snapshot": {
+        "close": 101.3,
+        "volume_5d_avg": 9503906,
+        "high_52w": 103.12,
+        "low_52w": 58.5
+      },
+      "setups": [
+        {
+          "ticker": "CVS",
+          "setup_type": "sma_stack",
+          "direction": "bullish",
+          "strength": 0.825,
+          "spot": 101.30000305175781,
+          "notes": {
+            "ema10": 98.92,
+            "ema20": 96.64,
+            "ema50": 90.84,
+            "ema200": 80.89,
+            "spread_pct": 22.29,
+            "persistence_days_of_20": 13
+          }
+        },
+        {
+          "ticker": "CVS",
+          "setup_type": "proximity_52w",
+          "direction": "bullish",
+          "strength": 0.641,
+          "spot": 101.30000305175781,
+          "notes": {
+            "high_52w": 103.12,
+            "low_52w": 58.5,
+            "dist_to_high_pct": 1.8,
+            "dist_to_low_pct": 42.25
+          }
+        }
+      ]
+    },
+    {
+      "ticker": "UUP",
+      "spot": 28.360000610351562,
+      "label": "BULL",
+      "bullish_score": 39.8,
+      "bearish_score": 0,
+      "net_score": 39.8,
+      "snapshot": {
+        "close": 28.36,
+        "volume_5d_avg": 2689538,
+        "high_52w": 28.45,
+        "low_52w": 26.4
+      },
+      "setups": [
+        {
+          "ticker": "UUP",
+          "setup_type": "sma_stack",
+          "direction": "bullish",
+          "strength": 0.546,
+          "spot": 28.360000610351562,
+          "notes": {
+            "ema10": 28.09,
+            "ema20": 27.96,
+            "ema50": 27.77,
+            "ema200": 27.56,
+            "spread_pct": 1.93,
+            "persistence_days_of_20": 18
+          }
+        },
+        {
+          "ticker": "UUP",
+          "setup_type": "proximity_52w",
+          "direction": "bullish",
+          "strength": 0.937,
+          "spot": 28.360000610351562,
+          "notes": {
+            "high_52w": 28.45,
+            "low_52w": 26.4,
+            "dist_to_high_pct": 0.32,
+            "dist_to_low_pct": 6.91
+          }
+        }
+      ]
+    },
+    {
+      "ticker": "EQIX",
+      "spot": 1115.93994140625,
+      "label": "BULL",
+      "bullish_score": 39.6,
+      "bearish_score": 0,
+      "net_score": 39.6,
+      "snapshot": {
+        "close": 1115.94,
+        "volume_5d_avg": 678655,
+        "high_52w": 1128.68,
+        "low_52w": 710.52
+      },
+      "setups": [
+        {
+          "ticker": "EQIX",
+          "setup_type": "sma_stack",
+          "direction": "bullish",
+          "strength": 0.675,
+          "spot": 1115.93994140625,
+          "notes": {
+            "ema10": 1082.14,
+            "ema20": 1075.64,
+            "ema50": 1056.48,
+            "ema200": 945.38,
+            "spread_pct": 14.47,
+            "persistence_days_of_20": 7
+          }
+        },
+        {
+          "ticker": "EQIX",
+          "setup_type": "proximity_52w",
+          "direction": "bullish",
+          "strength": 0.772,
+          "spot": 1115.93994140625,
+          "notes": {
+            "high_52w": 1128.68,
+            "low_52w": 710.52,
+            "dist_to_high_pct": 1.14,
+            "dist_to_low_pct": 36.33
+          }
+        }
+      ]
+    },
+    {
+      "ticker": "MET",
+      "spot": 87.55999755859375,
+      "label": "BULL",
+      "bullish_score": 39.1,
+      "bearish_score": 0,
+      "net_score": 39.1,
+      "snapshot": {
+        "close": 87.56,
+        "volume_5d_avg": 4821371,
+        "high_52w": 89.62,
+        "low_52w": 67.33
+      },
+      "setups": [
+        {
+          "ticker": "MET",
+          "setup_type": "sma_stack",
+          "direction": "bullish",
+          "strength": 0.862,
+          "spot": 87.55999755859375,
+          "notes": {
+            "ema10": 86.25,
+            "ema20": 84.88,
+            "ema50": 81.63,
+            "ema200": 78.59,
+            "spread_pct": 9.74,
+            "persistence_days_of_20": 15
+          }
+        },
+        {
+          "ticker": "MET",
+          "setup_type": "proximity_52w",
+          "direction": "bullish",
+          "strength": 0.529,
+          "spot": 87.55999755859375,
+          "notes": {
+            "high_52w": 89.62,
+            "low_52w": 67.33,
+            "dist_to_high_pct": 2.35,
+            "dist_to_low_pct": 23.1
+          }
+        }
+      ]
+    },
+    {
+      "ticker": "CRM",
+      "spot": 150.1199951171875,
+      "label": "BEAR",
+      "bullish_score": 0,
+      "bearish_score": 39.0,
+      "net_score": -39.0,
+      "snapshot": {
+        "close": 150.12,
+        "volume_5d_avg": 25637664,
+        "high_52w": 276.8,
+        "low_52w": 147.58
+      },
+      "setups": [
+        {
+          "ticker": "CRM",
+          "setup_type": "sma_stack",
+          "direction": "bearish",
+          "strength": 0.75,
+          "spot": 150.1199951171875,
+          "notes": {
+            "ema10": 163.16,
+            "ema20": 170.32,
+            "ema50": 178.17,
+            "ema200": 208.06,
+            "spread_pct": 21.58,
+            "persistence_days_of_20": 10
+          }
+        },
+        {
+          "ticker": "CRM",
+          "setup_type": "proximity_52w",
+          "direction": "bearish",
+          "strength": 0.662,
+          "spot": 150.1199951171875,
+          "notes": {
+            "high_52w": 276.8,
+            "low_52w": 147.58,
+            "dist_to_high_pct": 84.39,
+            "dist_to_low_pct": 1.69
+          }
+        }
+      ]
+    },
+    {
+      "ticker": "MA",
+      "spot": 484.0899963378906,
+      "label": "BEAR",
+      "bullish_score": 0,
+      "bearish_score": 38.9,
+      "net_score": -38.9,
+      "snapshot": {
+        "close": 484.09,
+        "volume_5d_avg": 4005151,
+        "high_52w": 601.77,
+        "low_52w": 464.52
+      },
+      "setups": [
+        {
+          "ticker": "MA",
+          "setup_type": "sma_stack",
+          "direction": "bearish",
+          "strength": 0.641,
+          "spot": 484.0899963378906,
+          "notes": {
+            "ema10": 490.02,
+            "ema20": 491.15,
+            "ema50": 496.92,
+            "ema200": 523.11,
+            "spread_pct": 6.33,
+            "persistence_days_of_20": 13
+          }
+        },
+        {
+          "ticker": "MA",
+          "setup_type": "compression",
+          "direction": "bearish",
+          "strength": 0.786,
+          "spot": 484.0899963378906,
+          "notes": {
+            "current_bbw_pct": 5.8,
+            "threshold_bbw_pct": 6.69,
+            "max_bbw_pct_6mo": 16.22,
+            "compression_days": 23,
+            "ema50_slope_20d_pct": -1.68
+          }
+        }
+      ]
+    },
+    {
+      "ticker": "VXX",
+      "spot": 22.520000457763672,
+      "label": "BEAR",
+      "bullish_score": 0,
+      "bearish_score": 38.7,
+      "net_score": -38.7,
+      "snapshot": {
+        "close": 22.52,
+        "volume_5d_avg": 11626833,
+        "high_52w": 55.57,
+        "low_52w": 21.92
+      },
+      "setups": [
+        {
+          "ticker": "VXX",
+          "setup_type": "sma_stack",
+          "direction": "bearish",
+          "strength": 0.9,
+          "spot": 22.520000457763672,
+          "notes": {
+            "ema10": 23.63,
+            "ema20": 24.53,
+            "ema50": 26.59,
+            "ema200": 31.82,
+            "spread_pct": 25.72,
+            "persistence_days_of_20": 16
+          }
+        },
+        {
+          "ticker": "VXX",
+          "setup_type": "proximity_52w",
+          "direction": "bearish",
+          "strength": 0.467,
+          "spot": 22.520000457763672,
+          "notes": {
+            "high_52w": 55.57,
+            "low_52w": 21.92,
+            "dist_to_high_pct": 146.76,
+            "dist_to_low_pct": 2.66
+          }
+        }
+      ]
+    },
+    {
+      "ticker": "GE",
+      "spot": 355.1199951171875,
+      "label": "BULL",
+      "bullish_score": 38.5,
+      "bearish_score": 0,
+      "net_score": 38.5,
+      "snapshot": {
+        "close": 355.12,
+        "volume_5d_avg": 5314243,
+        "high_52w": 364.7,
+        "low_52w": 238.62
+      },
+      "setups": [
+        {
+          "ticker": "GE",
+          "setup_type": "sma_stack",
+          "direction": "bullish",
+          "strength": 0.9,
+          "spot": 355.1199951171875,
+          "notes": {
+            "ema10": 343.3,
+            "ema20": 331.69,
+            "ema50": 316.88,
+            "ema200": 301.41,
+            "spread_pct": 13.9,
+            "persistence_days_of_20": 16
+          }
+        },
+        {
+          "ticker": "GE",
+          "setup_type": "proximity_52w",
+          "direction": "bullish",
+          "strength": 0.46,
+          "spot": 355.1199951171875,
+          "notes": {
+            "high_52w": 364.7,
+            "low_52w": 238.62,
+            "dist_to_high_pct": 2.7,
+            "dist_to_low_pct": 32.81
+          }
+        }
+      ]
+    },
+    {
+      "ticker": "ROST",
+      "spot": 236.97000122070312,
+      "label": "BULL",
+      "bullish_score": 38.2,
+      "bearish_score": 0,
+      "net_score": 38.2,
+      "snapshot": {
+        "close": 236.97,
+        "volume_5d_avg": 2774686,
+        "high_52w": 242.81,
+        "low_52w": 124.49
+      },
+      "setups": [
+        {
+          "ticker": "ROST",
+          "setup_type": "sma_stack",
+          "direction": "bullish",
+          "strength": 0.85,
+          "spot": 236.97000122070312,
+          "notes": {
+            "ema10": 234.02,
+            "ema20": 231.48,
+            "ema50": 225.52,
+            "ema200": 196.39,
+            "spread_pct": 19.16,
+            "persistence_days_of_20": 14
+          }
+        },
+        {
+          "ticker": "ROST",
+          "setup_type": "proximity_52w",
+          "direction": "bullish",
+          "strength": 0.507,
+          "spot": 236.97000122070312,
+          "notes": {
+            "high_52w": 242.81,
+            "low_52w": 124.49,
+            "dist_to_high_pct": 2.46,
+            "dist_to_low_pct": 47.47
+          }
+        }
+      ]
+    },
+    {
+      "ticker": "SPG",
+      "spot": 214.57000732421875,
+      "label": "BULL",
+      "bullish_score": 37.6,
+      "bearish_score": 0,
+      "net_score": 37.6,
+      "snapshot": {
+        "close": 214.57,
+        "volume_5d_avg": 2820684,
+        "high_52w": 220.44,
+        "low_52w": 155.92
+      },
+      "setups": [
+        {
+          "ticker": "SPG",
+          "setup_type": "sma_stack",
+          "direction": "bullish",
+          "strength": 0.875,
+          "spot": 214.57000732421875,
+          "notes": {
+            "ema10": 212.38,
+            "ema20": 210.07,
+            "ema50": 205.09,
+            "ema200": 191.44,
+            "spread_pct": 10.94,
+            "persistence_days_of_20": 15
+          }
+        },
+        {
+          "ticker": "SPG",
+          "setup_type": "proximity_52w",
+          "direction": "bullish",
+          "strength": 0.453,
+          "spot": 214.57000732421875,
+          "notes": {
+            "high_52w": 220.44,
+            "low_52w": 155.92,
+            "dist_to_high_pct": 2.74,
+            "dist_to_low_pct": 27.33
+          }
+        }
+      ]
+    },
+    {
+      "ticker": "FTNT",
+      "spot": 145.38999938964844,
+      "label": "BULL",
+      "bullish_score": 37.4,
+      "bearish_score": 0,
+      "net_score": 37.4,
+      "snapshot": {
+        "close": 145.39,
+        "volume_5d_avg": 8417405,
+        "high_52w": 150.07,
+        "low_52w": 70.12
+      },
+      "setups": [
+        {
+          "ticker": "FTNT",
+          "setup_type": "sma_stack",
+          "direction": "bullish",
+          "strength": 0.95,
+          "spot": 145.38999938964844,
+          "notes": {
+            "ema10": 144.38,
+            "ema20": 139.37,
+            "ema50": 122.27,
+            "ema200": 98.64,
+            "spread_pct": 46.36,
+            "persistence_days_of_20": 18
+          }
+        },
+        {
+          "ticker": "FTNT",
+          "setup_type": "proximity_52w",
+          "direction": "bullish",
+          "strength": 0.356,
+          "spot": 145.38999938964844,
+          "notes": {
+            "high_52w": 150.07,
+            "low_52w": 70.12,
+            "dist_to_high_pct": 3.22,
+            "dist_to_low_pct": 51.77
+          }
+        }
+      ]
+    },
+    {
+      "ticker": "UNH",
+      "spot": 406.67999267578125,
+      "label": "BULL",
+      "bullish_score": 36.8,
+      "bearish_score": 0,
+      "net_score": 36.8,
+      "snapshot": {
+        "close": 406.68,
+        "volume_5d_avg": 7019579,
+        "high_52w": 415.98,
+        "low_52w": 234.6
+      },
+      "setups": [
+        {
+          "ticker": "UNH",
+          "setup_type": "sma_stack",
+          "direction": "bullish",
+          "strength": 0.775,
+          "spot": 406.67999267578125,
+          "notes": {
+            "ema10": 403.03,
+            "ema20": 396.97,
+            "ema50": 374.22,
+            "ema200": 334.93,
+            "spread_pct": 20.33,
+            "persistence_days_of_20": 11
+          }
+        },
+        {
+          "ticker": "UNH",
+          "setup_type": "proximity_52w",
+          "direction": "bullish",
+          "strength": 0.543,
+          "spot": 406.67999267578125,
+          "notes": {
+            "high_52w": 415.98,
+            "low_52w": 234.6,
+            "dist_to_high_pct": 2.29,
+            "dist_to_low_pct": 42.31
+          }
+        }
+      ]
+    },
+    {
+      "ticker": "SQQQ",
+      "spot": 36.93000030517578,
+      "label": "BEAR",
+      "bullish_score": 0,
+      "bearish_score": 36.7,
+      "net_score": -36.7,
+      "snapshot": {
+        "close": 36.93,
+        "volume_5d_avg": 59044491,
+        "high_52w": 115.8,
+        "low_52w": 35.8
+      },
+      "setups": [
+        {
+          "ticker": "SQQQ",
+          "setup_type": "sma_stack",
+          "direction": "bearish",
+          "strength": 0.9,
+          "spot": 36.93000030517578,
+          "notes": {
+            "ema10": 38.81,
+            "ema20": 40.23,
+            "ema50": 46.86,
+            "ema200": 65.73,
+            "spread_pct": 40.95,
+            "persistence_days_of_20": 16
+          }
+        },
+        {
+          "ticker": "SQQQ",
+          "setup_type": "proximity_52w",
+          "direction": "bearish",
+          "strength": 0.388,
+          "spot": 36.93000030517578,
+          "notes": {
+            "high_52w": 115.8,
+            "low_52w": 35.8,
+            "dist_to_high_pct": 213.57,
+            "dist_to_low_pct": 3.06
+          }
+        }
+      ]
+    },
+    {
+      "ticker": "ON",
+      "spot": 131.5500030517578,
+      "label": "BULL",
+      "bullish_score": 36.2,
+      "bearish_score": 0,
+      "net_score": 36.2,
+      "snapshot": {
+        "close": 131.55,
+        "volume_5d_avg": 12883227,
+        "high_52w": 134.92,
+        "low_52w": 44.56
+      },
+      "setups": [
+        {
+          "ticker": "ON",
+          "setup_type": "sma_stack",
+          "direction": "bullish",
+          "strength": 0.8,
+          "spot": 131.5500030517578,
+          "notes": {
+            "ema10": 121.23,
+            "ema20": 118.87,
+            "ema50": 107.03,
+            "ema200": 77.69,
+            "spread_pct": 56.04,
+            "persistence_days_of_20": 12
+          }
+        },
+        {
+          "ticker": "ON",
+          "setup_type": "proximity_52w",
+          "direction": "bullish",
+          "strength": 0.488,
+          "spot": 131.5500030517578,
+          "notes": {
+            "high_52w": 134.92,
+            "low_52w": 44.56,
+            "dist_to_high_pct": 2.56,
+            "dist_to_low_pct": 66.13
+          }
+        }
+      ]
+    },
+    {
+      "ticker": "ADBE",
+      "spot": 194.89999389648438,
+      "label": "BEAR",
+      "bullish_score": 0,
+      "bearish_score": 36.0,
+      "net_score": -36.0,
+      "snapshot": {
+        "close": 194.9,
+        "volume_5d_avg": 10271032,
+        "high_52w": 392.58,
+        "low_52w": 190.12
+      },
+      "setups": [
+        {
+          "ticker": "ADBE",
+          "setup_type": "sma_stack",
+          "direction": "bearish",
+          "strength": 0.775,
+          "spot": 194.89999389648438,
+          "notes": {
+            "ema10": 211.96,
+            "ema20": 224.92,
+            "ema50": 238.98,
+            "ema200": 284.39,
+            "spread_pct": 25.47,
+            "persistence_days_of_20": 11
+          }
+        },
+        {
+          "ticker": "ADBE",
+          "setup_type": "proximity_52w",
+          "direction": "bearish",
+          "strength": 0.509,
+          "spot": 194.89999389648438,
+          "notes": {
+            "high_52w": 392.58,
+            "low_52w": 190.12,
+            "dist_to_high_pct": 101.43,
+            "dist_to_low_pct": 2.45
+          }
+        }
+      ]
+    },
+    {
+      "ticker": "LIN",
+      "spot": 516.7100219726562,
+      "label": "BULL",
+      "bullish_score": 35.2,
+      "bearish_score": 0,
+      "net_score": 35.2,
+      "snapshot": {
+        "close": 516.71,
+        "volume_5d_avg": 2911934,
+        "high_52w": 525.87,
+        "low_52w": 387.78
+      },
+      "setups": [
+        {
+          "ticker": "LIN",
+          "setup_type": "sma_stack",
+          "direction": "bullish",
+          "strength": 0.636,
+          "spot": 516.7100219726562,
+          "notes": {
+            "ema10": 514.49,
+            "ema20": 511.74,
+            "ema50": 505.27,
+            "ema200": 479.83,
+            "spread_pct": 7.22,
+            "persistence_days_of_20": 11
+          }
+        },
+        {
+          "ticker": "LIN",
+          "setup_type": "proximity_52w",
+          "direction": "bullish",
+          "strength": 0.645,
+          "spot": 516.7100219726562,
+          "notes": {
+            "high_52w": 525.87,
+            "low_52w": 387.78,
+            "dist_to_high_pct": 1.77,
+            "dist_to_low_pct": 24.95
+          }
+        }
+      ]
+    },
+    {
+      "ticker": "MARA",
+      "spot": 14.850000381469727,
+      "label": "BULL",
+      "bullish_score": 34.8,
+      "bearish_score": 0,
+      "net_score": 34.8,
+      "snapshot": {
+        "close": 14.85,
+        "volume_5d_avg": 41411916,
+        "high_52w": 23.45,
+        "low_52w": 6.66
+      },
+      "setups": [
+        {
+          "ticker": "MARA",
+          "setup_type": "sma_stack",
+          "direction": "bullish",
+          "strength": 0.7,
+          "spot": 14.850000381469727,
+          "notes": {
+            "ema10": 14.12,
+            "ema20": 13.8,
+            "ema50": 12.75,
+            "ema200": 12.31,
+            "spread_pct": 14.66,
+            "persistence_days_of_20": 8
+          }
+        },
+        {
+          "ticker": "MARA",
+          "setup_type": "compression",
+          "direction": "bullish",
+          "strength": 0.552,
+          "spot": 14.850000381469727,
+          "notes": {
+            "current_bbw_pct": 18.51,
+            "threshold_bbw_pct": 23.6,
+            "max_bbw_pct_6mo": 59.0,
+            "compression_days": 7,
+            "ema50_slope_20d_pct": 12.52
+          }
+        }
+      ]
+    },
+    {
+      "ticker": "XLK",
+      "spot": 192.14999389648438,
+      "label": "BULL",
+      "bullish_score": 34.1,
+      "bearish_score": 0,
+      "net_score": 34.1,
+      "snapshot": {
+        "close": 192.15,
+        "volume_5d_avg": 12091960,
+        "high_52w": 198.73,
+        "low_52w": 119.38
+      },
+      "setups": [
+        {
+          "ticker": "XLK",
+          "setup_type": "sma_stack",
+          "direction": "bullish",
+          "strength": 0.875,
+          "spot": 192.14999389648438,
+          "notes": {
+            "ema10": 187.78,
+            "ema20": 185.13,
+            "ema50": 174.46,
+            "ema200": 152.32,
+            "spread_pct": 23.28,
+            "persistence_days_of_20": 15
+          }
+        },
+        {
+          "ticker": "XLK",
+          "setup_type": "proximity_52w",
+          "direction": "bullish",
+          "strength": 0.315,
+          "spot": 192.14999389648438,
+          "notes": {
+            "high_52w": 198.73,
+            "low_52w": 119.38,
+            "dist_to_high_pct": 3.42,
+            "dist_to_low_pct": 37.87
+          }
+        }
+      ]
+    },
+    {
+      "ticker": "TMUS",
+      "spot": 180.05999755859375,
+      "label": "BEAR",
+      "bullish_score": 0,
+      "bearish_score": 33.7,
+      "net_score": -33.7,
+      "snapshot": {
+        "close": 180.06,
+        "volume_5d_avg": 7097365,
+        "high_52w": 261.56,
+        "low_52w": 174.02
+      },
+      "setups": [
+        {
+          "ticker": "TMUS",
+          "setup_type": "sma_stack",
+          "direction": "bearish",
+          "strength": 0.85,
+          "spot": 180.05999755859375,
+          "notes": {
+            "ema10": 183.29,
+            "ema20": 184.91,
+            "ema50": 189.93,
+            "ema200": 204.51,
+            "spread_pct": 10.38,
+            "persistence_days_of_20": 14
+          }
+        },
+        {
+          "ticker": "TMUS",
+          "setup_type": "proximity_52w",
+          "direction": "bearish",
+          "strength": 0.329,
+          "spot": 180.05999755859375,
+          "notes": {
+            "high_52w": 261.56,
+            "low_52w": 174.02,
+            "dist_to_high_pct": 45.26,
+            "dist_to_low_pct": 3.35
+          }
+        }
+      ]
+    },
+    {
+      "ticker": "XPEV",
+      "spot": 13.350000381469727,
+      "label": "BEAR",
+      "bullish_score": 0,
+      "bearish_score": 33.3,
+      "net_score": -33.3,
+      "snapshot": {
+        "close": 13.35,
+        "volume_5d_avg": 8153546,
+        "high_52w": 28.24,
+        "low_52w": 12.97
+      },
+      "setups": [
+        {
+          "ticker": "XPEV",
+          "setup_type": "sma_stack",
+          "direction": "bearish",
+          "strength": 0.75,
+          "spot": 13.350000381469727,
+          "notes": {
+            "ema10": 14.28,
+            "ema20": 14.97,
+            "ema50": 15.93,
+            "ema200": 18.07,
+            "spread_pct": 21.01,
+            "persistence_days_of_20": 10
+          }
+        },
+        {
+          "ticker": "XPEV",
+          "setup_type": "proximity_52w",
+          "direction": "bearish",
+          "strength": 0.431,
+          "spot": 13.350000381469727,
+          "notes": {
+            "high_52w": 28.24,
+            "low_52w": 12.97,
+            "dist_to_high_pct": 111.5,
+            "dist_to_low_pct": 2.85
+          }
+        }
+      ]
+    },
+    {
+      "ticker": "ANET",
+      "spot": 174.55999755859375,
+      "label": "BULL",
+      "bullish_score": 33.2,
+      "bearish_score": 0,
+      "net_score": 33.2,
+      "snapshot": {
+        "close": 174.56,
+        "volume_5d_avg": 8102829,
+        "high_52w": 179.8,
+        "low_52w": 85.58
+      },
+      "setups": [
+        {
+          "ticker": "ANET",
+          "setup_type": "sma_stack",
+          "direction": "bullish",
+          "strength": 0.775,
+          "spot": 174.55999755859375,
+          "notes": {
+            "ema10": 165.65,
+            "ema20": 162.13,
+            "ema50": 156.18,
+            "ema200": 140.29,
+            "spread_pct": 18.08,
+            "persistence_days_of_20": 11
+          }
+        },
+        {
+          "ticker": "ANET",
+          "setup_type": "proximity_52w",
+          "direction": "bullish",
+          "strength": 0.4,
+          "spot": 174.55999755859375,
+          "notes": {
+            "high_52w": 179.8,
+            "low_52w": 85.58,
+            "dist_to_high_pct": 3.0,
+            "dist_to_low_pct": 50.97
+          }
+        }
+      ]
+    },
+    {
+      "ticker": "JPM",
+      "spot": 331.4800109863281,
+      "label": "BULL",
+      "bullish_score": 32.3,
+      "bearish_score": 0,
+      "net_score": 32.3,
+      "snapshot": {
+        "close": 331.48,
+        "volume_5d_avg": 12318405,
+        "high_52w": 338.09,
+        "low_52w": 272.11
+      },
+      "setups": [
+        {
+          "ticker": "JPM",
+          "setup_type": "sma_stack",
+          "direction": "bullish",
+          "strength": 0.576,
+          "spot": 331.4800109863281,
+          "notes": {
+            "ema10": 322.12,
+            "ema20": 315.85,
+            "ema50": 309.55,
+            "ema200": 303.83,
+            "spread_pct": 6.02,
+            "persistence_days_of_20": 11
+          }
+        },
+        {
+          "ticker": "JPM",
+          "setup_type": "proximity_52w",
+          "direction": "bullish",
+          "strength": 0.601,
+          "spot": 331.4800109863281,
+          "notes": {
+            "high_52w": 338.09,
+            "low_52w": 272.11,
+            "dist_to_high_pct": 1.99,
+            "dist_to_low_pct": 17.91
+          }
+        }
+      ]
+    },
+    {
+      "ticker": "MCHP",
+      "spot": 102.70999908447266,
+      "label": "BULL",
+      "bullish_score": 31.9,
+      "bearish_score": 0,
+      "net_score": 31.9,
+      "snapshot": {
+        "close": 102.71,
+        "volume_5d_avg": 11967644,
+        "high_52w": 105.91,
+        "low_52w": 48.52
+      },
+      "setups": [
+        {
+          "ticker": "MCHP",
+          "setup_type": "sma_stack",
+          "direction": "bullish",
+          "strength": 0.75,
+          "spot": 102.70999908447266,
+          "notes": {
+            "ema10": 96.73,
+            "ema20": 95.24,
+            "ema50": 90.37,
+            "ema200": 77.42,
+            "spread_pct": 24.94,
+            "persistence_days_of_20": 10
+          }
+        },
+        {
+          "ticker": "MCHP",
+          "setup_type": "proximity_52w",
+          "direction": "bullish",
+          "strength": 0.377,
+          "spot": 102.70999908447266,
+          "notes": {
+            "high_52w": 105.91,
+            "low_52w": 48.52,
+            "dist_to_high_pct": 3.12,
+            "dist_to_low_pct": 52.76
+          }
+        }
+      ]
+    },
+    {
+      "ticker": "AAL",
+      "spot": 16.079999923706055,
+      "label": "BULL",
+      "bullish_score": 31.6,
+      "bearish_score": 0,
+      "net_score": 31.6,
+      "snapshot": {
+        "close": 16.08,
+        "volume_5d_avg": 149714132,
+        "high_52w": 16.59,
+        "low_52w": 10.09
+      },
+      "setups": [
+        {
+          "ticker": "AAL",
+          "setup_type": "sma_stack",
+          "direction": "bullish",
+          "strength": 0.75,
+          "spot": 16.079999923706055,
+          "notes": {
+            "ema10": 15.17,
+            "ema20": 14.55,
+            "ema50": 13.59,
+            "ema200": 12.92,
+            "spread_pct": 17.36,
+            "persistence_days_of_20": 10
+          }
+        },
+        {
+          "ticker": "AAL",
+          "setup_type": "proximity_52w",
+          "direction": "bullish",
+          "strength": 0.366,
+          "spot": 16.079999923706055,
+          "notes": {
+            "high_52w": 16.59,
+            "low_52w": 10.09,
+            "dist_to_high_pct": 3.17,
+            "dist_to_low_pct": 37.25
+          }
+        }
+      ]
+    },
+    {
+      "ticker": "PWR",
+      "spot": 740.1400146484375,
+      "label": "BULL",
+      "bullish_score": 31.4,
+      "bearish_score": 0,
+      "net_score": 31.4,
+      "snapshot": {
+        "close": 740.14,
+        "volume_5d_avg": 1381450,
+        "high_52w": 788.75,
+        "low_52w": 358.38
+      },
+      "setups": [
+        {
+          "ticker": "PWR",
+          "setup_type": "sma_stack",
+          "direction": "bullish",
+          "strength": 0.6,
+          "spot": 740.1400146484375,
+          "notes": {
+            "ema10": 712.17,
+            "ema20": 710.13,
+            "ema50": 684.73,
+            "ema200": 557.65,
+            "spread_pct": 27.71,
+            "persistence_days_of_20": 4
+          }
+        },
+        {
+          "ticker": "PWR",
+          "setup_type": "compression",
+          "direction": "bullish",
+          "strength": 0.534,
+          "spot": 740.1400146484375,
+          "notes": {
+            "current_bbw_pct": 12.35,
+            "threshold_bbw_pct": 12.89,
+            "max_bbw_pct_6mo": 44.7,
+            "compression_days": 5,
+            "ema50_slope_20d_pct": 4.11
+          }
+        }
+      ]
+    },
+    {
+      "ticker": "NKE",
+      "spot": 43.189998626708984,
+      "label": "BEAR",
+      "bullish_score": 0,
+      "bearish_score": 30.5,
+      "net_score": -30.5,
+      "snapshot": {
+        "close": 43.19,
+        "volume_5d_avg": 21193194,
+        "high_52w": 80.17,
+        "low_52w": 41.35
+      },
+      "setups": [
+        {
+          "ticker": "NKE",
+          "setup_type": "sma_stack",
+          "direction": "bearish",
+          "strength": 0.6,
+          "spot": 43.189998626708984,
+          "notes": {
+            "ema10": 44.46,
+            "ema20": 44.47,
+            "ema50": 45.81,
+            "ema200": 55.13,
+            "spread_pct": 19.35,
+            "persistence_days_of_20": 4
+          }
+        },
+        {
+          "ticker": "NKE",
+          "setup_type": "compression",
+          "direction": "bearish",
+          "strength": 0.501,
+          "spot": 43.189998626708984,
+          "notes": {
+            "current_bbw_pct": 10.46,
+            "threshold_bbw_pct": 10.5,
+            "max_bbw_pct_6mo": 39.55,
+            "compression_days": 3,
+            "ema50_slope_20d_pct": -2.76
+          }
+        }
+      ]
+    },
+    {
+      "ticker": "WDAY",
+      "spot": 113.04000091552734,
+      "label": "BEAR",
+      "bullish_score": 0,
+      "bearish_score": 30.4,
+      "net_score": -30.4,
+      "snapshot": {
+        "close": 113.04,
+        "volume_5d_avg": 6414410,
+        "high_52w": 249.85,
+        "low_52w": 110.36
+      },
+      "setups": [
+        {
+          "ticker": "WDAY",
+          "setup_type": "sma_stack",
+          "direction": "bearish",
+          "strength": 0.575,
+          "spot": 113.04000091552734,
+          "notes": {
+            "ema10": 126.33,
+            "ema20": 129.81,
+            "ema50": 131.78,
+            "ema200": 166.61,
+            "spread_pct": 24.18,
+            "persistence_days_of_20": 3
+          }
+        },
+        {
+          "ticker": "WDAY",
+          "setup_type": "proximity_52w",
+          "direction": "bearish",
+          "strength": 0.526,
+          "spot": 113.04000091552734,
+          "notes": {
+            "high_52w": 249.85,
+            "low_52w": 110.36,
+            "dist_to_high_pct": 121.03,
+            "dist_to_low_pct": 2.37
+          }
+        }
+      ]
+    },
+    {
+      "ticker": "HUM",
+      "spot": 360.7200012207031,
+      "label": "BULL",
+      "bullish_score": 30.0,
+      "bearish_score": 0,
+      "net_score": 30.0,
+      "snapshot": {
+        "close": 360.72,
+        "volume_5d_avg": 1945726,
+        "high_52w": 380.86,
+        "low_52w": 163.11
+      },
+      "setups": [
+        {
+          "ticker": "HUM",
+          "setup_type": "sma_stack",
+          "direction": "bullish",
+          "strength": 1.0,
+          "spot": 360.7200012207031,
+          "notes": {
+            "ema10": 360.28,
+            "ema20": 344.02,
+            "ema50": 299.38,
+            "ema200": 253.06,
+            "spread_pct": 42.37,
+            "persistence_days_of_20": 20
+          }
+        }
+      ]
+    },
+    {
+      "ticker": "MRVL",
+      "spot": 307.8599853515625,
+      "label": "NEUTRAL",
+      "bullish_score": 29.2,
+      "bearish_score": 0,
+      "net_score": 29.2,
+      "snapshot": {
+        "close": 307.86,
+        "volume_5d_avg": 92471663,
+        "high_52w": 329.88,
+        "low_52w": 61.44
+      },
+      "setups": [
+        {
+          "ticker": "MRVL",
+          "setup_type": "sma_stack",
+          "direction": "bullish",
+          "strength": 0.975,
+          "spot": 307.8599853515625,
+          "notes": {
+            "ema10": 287.48,
+            "ema20": 264.46,
+            "ema50": 213.43,
+            "ema200": 133.09,
+            "spread_pct": 116.01,
+            "persistence_days_of_20": 19
+          }
+        }
+      ]
+    },
+    {
+      "ticker": "MSFT",
+      "spot": 367.3399963378906,
+      "label": "NEUTRAL",
+      "bullish_score": 0,
+      "bearish_score": 28.7,
+      "net_score": -28.7,
+      "snapshot": {
+        "close": 367.34,
+        "volume_5d_avg": 41911405,
+        "high_52w": 555.45,
+        "low_52w": 356.28
+      },
+      "setups": [
+        {
+          "ticker": "MSFT",
+          "setup_type": "sma_stack",
+          "direction": "bearish",
+          "strength": 0.625,
+          "spot": 367.3399963378906,
+          "notes": {
+            "ema10": 390.83,
+            "ema20": 401.49,
+            "ema50": 408.18,
+            "ema200": 437.65,
+            "spread_pct": 10.7,
+            "persistence_days_of_20": 5
+          }
+        },
+        {
+          "ticker": "MSFT",
+          "setup_type": "proximity_52w",
+          "direction": "bearish",
+          "strength": 0.398,
+          "spot": 367.3399963378906,
+          "notes": {
+            "high_52w": 555.45,
+            "low_52w": 356.28,
+            "dist_to_high_pct": 51.21,
+            "dist_to_low_pct": 3.01
+          }
+        }
+      ]
+    },
+    {
+      "ticker": "CARR",
+      "spot": 71.8499984741211,
+      "label": "NEUTRAL",
+      "bullish_score": 27.8,
+      "bearish_score": 0,
+      "net_score": 27.8,
+      "snapshot": {
+        "close": 71.85,
+        "volume_5d_avg": 5284932,
+        "high_52w": 81.09,
+        "low_52w": 50.24
+      },
+      "setups": [
+        {
+          "ticker": "CARR",
+          "setup_type": "sma_stack",
+          "direction": "bullish",
+          "strength": 0.925,
+          "spot": 71.8499984741211,
+          "notes": {
+            "ema10": 70.07,
+            "ema20": 68.52,
+            "ema50": 65.69,
+            "ema200": 62.82,
+            "spread_pct": 11.55,
+            "persistence_days_of_20": 17
+          }
+        }
+      ]
+    },
+    {
+      "ticker": "PANW",
+      "spot": 286.3999938964844,
+      "label": "NEUTRAL",
+      "bullish_score": 27.8,
+      "bearish_score": 0,
+      "net_score": 27.8,
+      "snapshot": {
+        "close": 286.4,
+        "volume_5d_avg": 7233916,
+        "high_52w": 302.95,
+        "low_52w": 139.57
+      },
+      "setups": [
+        {
+          "ticker": "PANW",
+          "setup_type": "sma_stack",
+          "direction": "bullish",
+          "strength": 0.925,
+          "spot": 286.3999938964844,
+          "notes": {
+            "ema10": 279.89,
+            "ema20": 269.87,
+            "ema50": 238.97,
+            "ema200": 202.77,
+            "spread_pct": 38.03,
+            "persistence_days_of_20": 17
+          }
+        }
+      ]
+    },
+    {
+      "ticker": "UVXY",
+      "spot": 25.860000610351562,
+      "label": "NEUTRAL",
+      "bullish_score": 0,
+      "bearish_score": 27.8,
+      "net_score": -27.8,
+      "snapshot": {
+        "close": 25.86,
+        "volume_5d_avg": 6237054,
+        "high_52w": 116.8,
+        "low_52w": 24.68
+      },
+      "setups": [
+        {
+          "ticker": "UVXY",
+          "setup_type": "sma_stack",
+          "direction": "bearish",
+          "strength": 0.925,
+          "spot": 25.860000610351562,
+          "notes": {
+            "ema10": 27.74,
+            "ema20": 29.46,
+            "ema50": 33.69,
+            "ema200": 47.63,
+            "spread_pct": 41.75,
+            "persistence_days_of_20": 17
+          }
+        }
+      ]
+    },
+    {
+      "ticker": "TRV",
+      "spot": 310.6099853515625,
+      "label": "NEUTRAL",
+      "bullish_score": 27.5,
+      "bearish_score": 0,
+      "net_score": 27.5,
+      "snapshot": {
+        "close": 310.61,
+        "volume_5d_avg": 2849461,
+        "high_52w": 313.66,
+        "low_52w": 249.19
+      },
+      "setups": [
+        {
+          "ticker": "TRV",
+          "setup_type": "proximity_52w",
+          "direction": "bullish",
+          "strength": 0.804,
+          "spot": 310.6099853515625,
+          "notes": {
+            "high_52w": 313.66,
+            "low_52w": 249.19,
+            "dist_to_high_pct": 0.98,
+            "dist_to_low_pct": 19.77
+          }
+        },
+        {
+          "ticker": "TRV",
+          "setup_type": "volume_surge",
+          "direction": "bullish",
+          "strength": 0.372,
+          "spot": 310.6099853515625,
+          "notes": {
+            "surge_ratio": 1.56,
+            "avg_5d_volume": 2849461,
+            "avg_20d_volume": 1828250,
+            "5d_price_change_pct": 2.02
+          }
+        }
+      ]
+    },
+    {
+      "ticker": "ARM",
+      "spot": 407.7200012207031,
+      "label": "NEUTRAL",
+      "bullish_score": 27.0,
+      "bearish_score": 0,
+      "net_score": 27.0,
+      "snapshot": {
+        "close": 407.72,
+        "volume_5d_avg": 16312448,
+        "high_52w": 452.7,
+        "low_52w": 100.02
+      },
+      "setups": [
+        {
+          "ticker": "ARM",
+          "setup_type": "sma_stack",
+          "direction": "bullish",
+          "strength": 0.9,
+          "spot": 407.7200012207031,
+          "notes": {
+            "ema10": 390.94,
+            "ema20": 359.97,
+            "ema50": 290.54,
+            "ema200": 193.09,
+            "spread_pct": 102.47,
+            "persistence_days_of_20": 16
+          }
+        }
+      ]
+    },
+    {
+      "ticker": "COIN",
+      "spot": 164.83999633789062,
+      "label": "NEUTRAL",
+      "bullish_score": 0,
+      "bearish_score": 27.0,
+      "net_score": -27.0,
+      "snapshot": {
+        "close": 164.84,
+        "volume_5d_avg": 8364651,
+        "high_52w": 444.65,
+        "low_52w": 139.36
+      },
+      "setups": [
+        {
+          "ticker": "COIN",
+          "setup_type": "sma_stack",
+          "direction": "bearish",
+          "strength": 0.9,
+          "spot": 164.83999633789062,
+          "notes": {
+            "ema10": 165.06,
+            "ema20": 169.73,
+            "ema50": 179.7,
+            "ema200": 224.08,
+            "spread_pct": 26.34,
+            "persistence_days_of_20": 16
+          }
+        }
+      ]
+    },
+    {
+      "ticker": "CIFR",
+      "spot": 28.139999389648438,
+      "label": "NEUTRAL",
+      "bullish_score": 27.0,
+      "bearish_score": 0,
+      "net_score": 27.0,
+      "snapshot": {
+        "close": 28.14,
+        "volume_5d_avg": 24860507,
+        "high_52w": 30.14,
+        "low_52w": 3.29
+      },
+      "setups": [
+        {
+          "ticker": "CIFR",
+          "setup_type": "sma_stack",
+          "direction": "bullish",
+          "strength": 0.9,
+          "spot": 28.139999389648438,
+          "notes": {
+            "ema10": 25.98,
+            "ema20": 24.6,
+            "ema50": 21.89,
+            "ema200": 16.64,
+            "spread_pct": 56.09,
+            "persistence_days_of_20": 16
+          }
+        }
+      ]
+    },
+    {
+      "ticker": "TLRY",
+      "spot": 4.590000152587891,
+      "label": "NEUTRAL",
+      "bullish_score": 0,
+      "bearish_score": 27.0,
+      "net_score": -27.0,
+      "snapshot": {
+        "close": 4.59,
+        "volume_5d_avg": 3714542,
+        "high_52w": 23.2,
+        "low_52w": 3.5
+      },
+      "setups": [
+        {
+          "ticker": "TLRY",
+          "setup_type": "sma_stack",
+          "direction": "bearish",
+          "strength": 0.9,
+          "spot": 4.590000152587891,
+          "notes": {
+            "ema10": 4.9,
+            "ema20": 5.1,
+            "ema50": 5.66,
+            "ema200": 7.27,
+            "spread_pct": 32.65,
+            "persistence_days_of_20": 16
+          }
+        }
+      ]
+    },
+    {
+      "ticker": "HUT",
+      "spot": 121.04000091552734,
+      "label": "NEUTRAL",
+      "bullish_score": 26.2,
+      "bearish_score": 0,
+      "net_score": 26.2,
+      "snapshot": {
+        "close": 121.04,
+        "volume_5d_avg": 3976509,
+        "high_52w": 140.8,
+        "low_52w": 15.26
+      },
+      "setups": [
+        {
+          "ticker": "HUT",
+          "setup_type": "sma_stack",
+          "direction": "bullish",
+          "strength": 0.875,
+          "spot": 121.04000091552734,
+          "notes": {
+            "ema10": 119.73,
+            "ema20": 116.32,
+            "ema50": 101.36,
+            "ema200": 65.94,
+            "spread_pct": 81.57,
+            "persistence_days_of_20": 15
+          }
+        }
+      ]
+    },
+    {
+      "ticker": "PYPL",
+      "spot": 42.34000015258789,
+      "label": "NEUTRAL",
+      "bullish_score": 0,
+      "bearish_score": 26.2,
+      "net_score": -26.2,
+      "snapshot": {
+        "close": 42.34,
+        "volume_5d_avg": 20298565,
+        "high_52w": 79.5,
+        "low_52w": 38.46
+      },
+      "setups": [
+        {
+          "ticker": "PYPL",
+          "setup_type": "sma_stack",
+          "direction": "bearish",
+          "strength": 0.875,
+          "spot": 42.34000015258789,
+          "notes": {
+            "ema10": 42.38,
+            "ema20": 42.95,
+            "ema50": 44.63,
+            "ema200": 52.91,
+            "spread_pct": 19.89,
+            "persistence_days_of_20": 15
+          }
+        }
+      ]
+    },
+    {
+      "ticker": "FCX",
+      "spot": 69.20999908447266,
+      "label": "NEUTRAL",
+      "bullish_score": 26.2,
+      "bearish_score": 0,
+      "net_score": 26.2,
+      "snapshot": {
+        "close": 69.21,
+        "volume_5d_avg": 13904329,
+        "high_52w": 72.28,
+        "low_52w": 35.15
+      },
+      "setups": [
+        {
+          "ticker": "FCX",
+          "setup_type": "sma_stack",
+          "direction": "bullish",
+          "strength": 0.875,
+          "spot": 69.20999908447266,
+          "notes": {
+            "ema10": 68.04,
+            "ema20": 66.81,
+            "ema50": 64.66,
+            "ema200": 56.8,
+            "spread_pct": 19.8,
+            "persistence_days_of_20": 15
+          }
+        }
+      ]
+    },
+    {
+      "ticker": "ZS",
+      "spot": 124.05999755859375,
+      "label": "NEUTRAL",
+      "bullish_score": 0,
+      "bearish_score": 25.5,
+      "net_score": -25.5,
+      "snapshot": {
+        "close": 124.06,
+        "volume_5d_avg": 6012922,
+        "high_52w": 336.99,
+        "low_52w": 114.62
+      },
+      "setups": [
+        {
+          "ticker": "ZS",
+          "setup_type": "sma_stack",
+          "direction": "bearish",
+          "strength": 0.85,
+          "spot": 124.05999755859375,
+          "notes": {
+            "ema10": 128.38,
+            "ema20": 134.05,
+            "ema50": 142.35,
+            "ema200": 194.53,
+            "spread_pct": 34.01,
+            "persistence_days_of_20": 14
+          }
+        }
+      ]
+    },
+    {
+      "ticker": "CLSK",
+      "spot": 17.450000762939453,
+      "label": "NEUTRAL",
+      "bullish_score": 25.5,
+      "bearish_score": 0,
+      "net_score": 25.5,
+      "snapshot": {
+        "close": 17.45,
+        "volume_5d_avg": 20537069,
+        "high_52w": 23.61,
+        "low_52w": 8.0
+      },
+      "setups": [
+        {
+          "ticker": "CLSK",
+          "setup_type": "sma_stack",
+          "direction": "bullish",
+          "strength": 0.85,
+          "spot": 17.450000762939453,
+          "notes": {
+            "ema10": 16.87,
+            "ema20": 16.44,
+            "ema50": 14.84,
+            "ema200": 12.65,
+            "spread_pct": 33.35,
+            "persistence_days_of_20": 14
+          }
+        }
+      ]
+    },
+    {
+      "ticker": "LCID",
+      "spot": 5.159999847412109,
+      "label": "NEUTRAL",
+      "bullish_score": 0,
+      "bearish_score": 25.5,
+      "net_score": -25.5,
+      "snapshot": {
+        "close": 5.16,
+        "volume_5d_avg": 12567291,
+        "high_52w": 33.7,
+        "low_52w": 4.47
+      },
+      "setups": [
+        {
+          "ticker": "LCID",
+          "setup_type": "sma_stack",
+          "direction": "bearish",
+          "strength": 0.85,
+          "spot": 5.159999847412109,
+          "notes": {
+            "ema10": 5.26,
+            "ema20": 5.49,
+            "ema50": 6.41,
+            "ema200": 11.25,
+            "spread_pct": 53.25,
+            "persistence_days_of_20": 14
+          }
+        }
+      ]
+    },
+    {
+      "ticker": "NXPI",
+      "spot": 323.239990234375,
+      "label": "NEUTRAL",
+      "bullish_score": 24.0,
+      "bearish_score": 0,
+      "net_score": 24.0,
+      "snapshot": {
+        "close": 323.24,
+        "volume_5d_avg": 4595268,
+        "high_52w": 339.95,
+        "low_52w": 183.0
+      },
+      "setups": [
+        {
+          "ticker": "NXPI",
+          "setup_type": "sma_stack",
+          "direction": "bullish",
+          "strength": 0.8,
+          "spot": 323.239990234375,
+          "notes": {
+            "ema10": 309.2,
+            "ema20": 306.12,
+            "ema50": 285.89,
+            "ema200": 244.41,
+            "spread_pct": 26.51,
+            "persistence_days_of_20": 12
+          }
+        }
+      ]
+    },
+    {
+      "ticker": "QCOM",
+      "spot": 221.89999389648438,
+      "label": "NEUTRAL",
+      "bullish_score": 24.0,
+      "bearish_score": 0,
+      "net_score": 24.0,
+      "snapshot": {
+        "close": 221.9,
+        "volume_5d_avg": 22138359,
+        "high_52w": 259.92,
+        "low_52w": 121.99
+      },
+      "setups": [
+        {
+          "ticker": "QCOM",
+          "setup_type": "sma_stack",
+          "direction": "bullish",
+          "strength": 0.8,
+          "spot": 221.89999389648438,
+          "notes": {
+            "ema10": 218.16,
+            "ema20": 216.58,
+            "ema50": 198.79,
+            "ema200": 170.5,
+            "spread_pct": 27.95,
+            "persistence_days_of_20": 12
+          }
+        }
+      ]
+    },
+    {
+      "ticker": "MSTR",
+      "spot": 109.45999908447266,
+      "label": "NEUTRAL",
+      "bullish_score": 0,
+      "bearish_score": 24.0,
+      "net_score": -24.0,
+      "snapshot": {
+        "close": 109.46,
+        "volume_5d_avg": 23000399,
+        "high_52w": 457.22,
+        "low_52w": 104.17
+      },
+      "setups": [
+        {
+          "ticker": "MSTR",
+          "setup_type": "sma_stack",
+          "direction": "bearish",
+          "strength": 0.8,
+          "spot": 109.45999908447266,
+          "notes": {
+            "ema10": 120.85,
+            "ema20": 130.95,
+            "ema50": 143.72,
+            "ema200": 193.18,
+            "spread_pct": 37.44,
+            "persistence_days_of_20": 12
+          }
+        }
+      ]
+    },
+    {
+      "ticker": "META",
+      "spot": 563.8499755859375,
+      "label": "NEUTRAL",
+      "bullish_score": 0,
+      "bearish_score": 23.9,
+      "net_score": -23.9,
+      "snapshot": {
+        "close": 563.85,
+        "volume_5d_avg": 18702608,
+        "high_52w": 796.25,
+        "low_52w": 520.26
+      },
+      "setups": [
+        {
+          "ticker": "META",
+          "setup_type": "sma_stack",
+          "direction": "bearish",
+          "strength": 0.796,
+          "spot": 563.8499755859375,
+          "notes": {
+            "ema10": 581.16,
+            "ema20": 591.46,
+            "ema50": 607.71,
+            "ema200": 645.21,
+            "spread_pct": 9.93,
+            "persistence_days_of_20": 12
+          }
+        }
+      ]
+    },
+    {
+      "ticker": "NOC",
+      "spot": 507.3299865722656,
+      "label": "NEUTRAL",
+      "bullish_score": 0,
+      "bearish_score": 23.2,
+      "net_score": -23.2,
+      "snapshot": {
+        "close": 507.33,
+        "volume_5d_avg": 1168847,
+        "high_52w": 774.0,
+        "low_52w": 481.28
+      },
+      "setups": [
+        {
+          "ticker": "NOC",
+          "setup_type": "sma_stack",
+          "direction": "bearish",
+          "strength": 0.775,
+          "spot": 507.3299865722656,
+          "notes": {
+            "ema10": 536.6,
+            "ema20": 544.28,
+            "ema50": 573.71,
+            "ema200": 601.06,
+            "spread_pct": 10.72,
+            "persistence_days_of_20": 11
+          }
+        }
+      ]
+    },
+    {
+      "ticker": "TOST",
+      "spot": 24.260000228881836,
+      "label": "NEUTRAL",
+      "bullish_score": 0,
+      "bearish_score": 23.2,
+      "net_score": -23.2,
+      "snapshot": {
+        "close": 24.26,
+        "volume_5d_avg": 10558357,
+        "high_52w": 49.66,
+        "low_52w": 22.26
+      },
+      "setups": [
+        {
+          "ticker": "TOST",
+          "setup_type": "sma_stack",
+          "direction": "bearish",
+          "strength": 0.775,
+          "spot": 24.260000228881836,
+          "notes": {
+            "ema10": 24.68,
+            "ema20": 24.84,
+            "ema50": 25.72,
+            "ema200": 31.08,
+            "spread_pct": 20.58,
+            "persistence_days_of_20": 11
+          }
+        }
+      ]
+    },
+    {
+      "ticker": "PSA",
+      "spot": 320.2200012207031,
+      "label": "NEUTRAL",
+      "bullish_score": 23.1,
+      "bearish_score": 0,
+      "net_score": 23.1,
+      "snapshot": {
+        "close": 320.22,
+        "volume_5d_avg": 1001748,
+        "high_52w": 331.79,
+        "low_52w": 256.54
+      },
+      "setups": [
+        {
+          "ticker": "PSA",
+          "setup_type": "sma_stack",
+          "direction": "bullish",
+          "strength": 0.771,
+          "spot": 320.2200012207031,
+          "notes": {
+            "ema10": 317.5,
+            "ema20": 313.79,
+            "ema50": 306.45,
+            "ema200": 294.21,
+            "spread_pct": 7.91,
+            "persistence_days_of_20": 15
+          }
+        }
+      ]
+    },
+    {
+      "ticker": "LOW",
+      "spot": 214.39999389648438,
+      "label": "NEUTRAL",
+      "bullish_score": 0,
+      "bearish_score": 22.4,
+      "net_score": -22.4,
+      "snapshot": {
+        "close": 214.4,
+        "volume_5d_avg": 3594664,
+        "high_52w": 293.06,
+        "low_52w": 203.4
+      },
+      "setups": [
+        {
+          "ticker": "LOW",
+          "setup_type": "sma_stack",
+          "direction": "bearish",
+          "strength": 0.746,
+          "spot": 214.39999389648438,
+          "notes": {
+            "ema10": 217.78,
+            "ema20": 217.9,
+            "ema50": 224.77,
+            "ema200": 237.82,
+            "spread_pct": 8.43,
+            "persistence_days_of_20": 13
+          }
+        }
+      ]
+    },
+    {
+      "ticker": "SOUN",
+      "spot": 6.880000114440918,
+      "label": "NEUTRAL",
+      "bullish_score": 0,
+      "bearish_score": 21.8,
+      "net_score": -21.8,
+      "snapshot": {
+        "close": 6.88,
+        "volume_5d_avg": 26197115,
+        "high_52w": 22.17,
+        "low_52w": 5.83
+      },
+      "setups": [
+        {
+          "ticker": "SOUN",
+          "setup_type": "sma_stack",
+          "direction": "bearish",
+          "strength": 0.725,
+          "spot": 6.880000114440918,
+          "notes": {
+            "ema10": 7.19,
+            "ema20": 7.51,
+            "ema50": 7.86,
+            "ema200": 9.47,
+            "spread_pct": 24.12,
+            "persistence_days_of_20": 9
+          }
+        }
+      ]
+    },
+    {
+      "ticker": "MCO",
+      "spot": 447.3299865722656,
+      "label": "NEUTRAL",
+      "bullish_score": 21.3,
+      "bearish_score": 0,
+      "net_score": 21.3,
+      "snapshot": {
+        "close": 447.33,
+        "volume_5d_avg": 1293888,
+        "high_52w": 546.88,
+        "low_52w": 402.28
+      },
+      "setups": [
+        {
+          "ticker": "MCO",
+          "setup_type": "compression",
+          "direction": "bullish",
+          "strength": 0.854,
+          "spot": 447.3299865722656,
+          "notes": {
+            "current_bbw_pct": 5.35,
+            "threshold_bbw_pct": 7.81,
+            "max_bbw_pct_6mo": 37.25,
+            "compression_days": 17,
+            "ema50_slope_20d_pct": 0.25
+          }
+        }
+      ]
+    },
+    {
+      "ticker": "REGN",
+      "spot": 612.5,
+      "label": "NEUTRAL",
+      "bullish_score": 0,
+      "bearish_score": 21.3,
+      "net_score": -21.3,
+      "snapshot": {
+        "close": 612.5,
+        "volume_5d_avg": 1459760,
+        "high_52w": 821.11,
+        "low_52w": 507.61
+      },
+      "setups": [
+        {
+          "ticker": "REGN",
+          "setup_type": "sma_stack",
+          "direction": "bearish",
+          "strength": 0.709,
+          "spot": 612.5,
+          "notes": {
+            "ema10": 613.74,
+            "ema20": 625.01,
+            "ema50": 663.51,
+            "ema200": 679.54,
+            "spread_pct": 9.68,
+            "persistence_days_of_20": 9
+          }
+        }
+      ]
+    },
+    {
+      "ticker": "HII",
+      "spot": 278.19000244140625,
+      "label": "NEUTRAL",
+      "bullish_score": 0,
+      "bearish_score": 21.0,
+      "net_score": -21.0,
+      "snapshot": {
+        "close": 278.19,
+        "volume_5d_avg": 611427,
+        "high_52w": 460.0,
+        "low_52w": 228.69
+      },
+      "setups": [
+        {
+          "ticker": "HII",
+          "setup_type": "sma_stack",
+          "direction": "bearish",
+          "strength": 0.7,
+          "spot": 278.19000244140625,
+          "notes": {
+            "ema10": 292.81,
+            "ema20": 301.03,
+            "ema50": 326.97,
+            "ema200": 337.95,
+            "spread_pct": 13.36,
+            "persistence_days_of_20": 8
+          }
+        }
+      ]
+    },
+    {
+      "ticker": "CSX",
+      "spot": 46.20000076293945,
+      "label": "NEUTRAL",
+      "bullish_score": 20.3,
+      "bearish_score": 0,
+      "net_score": 20.3,
+      "snapshot": {
+        "close": 46.2,
+        "volume_5d_avg": 13756974,
+        "high_52w": 48.03,
+        "low_52w": 31.8
+      },
+      "setups": [
+        {
+          "ticker": "CSX",
+          "setup_type": "compression",
+          "direction": "bullish",
+          "strength": 0.814,
+          "spot": 46.20000076293945,
+          "notes": {
+            "current_bbw_pct": 6.18,
+            "threshold_bbw_pct": 6.83,
+            "max_bbw_pct_6mo": 19.97,
+            "compression_days": 23,
+            "ema50_slope_20d_pct": 3.71
+          }
+        }
+      ]
+    },
+    {
+      "ticker": "SHOP",
+      "spot": 107.9800033569336,
+      "label": "NEUTRAL",
+      "bullish_score": 0,
+      "bearish_score": 19.5,
+      "net_score": -19.5,
+      "snapshot": {
+        "close": 107.98,
+        "volume_5d_avg": 7896560,
+        "high_52w": 182.19,
+        "low_52w": 94.0
+      },
+      "setups": [
+        {
+          "ticker": "SHOP",
+          "setup_type": "sma_stack",
+          "direction": "bearish",
+          "strength": 0.65,
+          "spot": 107.9800033569336,
+          "notes": {
+            "ema10": 109.97,
+            "ema20": 110.46,
+            "ema50": 113.45,
+            "ema200": 126.12,
+            "spread_pct": 12.81,
+            "persistence_days_of_20": 6
+          }
+        }
+      ]
+    },
+    {
+      "ticker": "ELV",
+      "spot": 394.82000732421875,
+      "label": "NEUTRAL",
+      "bullish_score": 19.3,
+      "bearish_score": 0,
+      "net_score": 19.3,
+      "snapshot": {
+        "close": 394.82,
+        "volume_5d_avg": 1641401,
+        "high_52w": 426.98,
+        "low_52w": 273.71
+      },
+      "setups": [
+        {
+          "ticker": "ELV",
+          "setup_type": "compression",
+          "direction": "bullish",
+          "strength": 0.773,
+          "spot": 394.82000732421875,
+          "notes": {
+            "current_bbw_pct": 10.49,
+            "threshold_bbw_pct": 11.86,
+            "max_bbw_pct_6mo": 33.58,
+            "compression_days": 18,
+            "ema50_slope_20d_pct": 6.9
+          }
+        }
+      ]
+    },
+    {
+      "ticker": "TXT",
+      "spot": 86.94000244140625,
+      "label": "NEUTRAL",
+      "bullish_score": 19.2,
+      "bearish_score": 0,
+      "net_score": 19.2,
+      "snapshot": {
+        "close": 86.94,
+        "volume_5d_avg": 2073311,
+        "high_52w": 101.57,
+        "low_52w": 75.8
+      },
+      "setups": [
+        {
+          "ticker": "TXT",
+          "setup_type": "compression",
+          "direction": "bullish",
+          "strength": 0.768,
+          "spot": 86.94000244140625,
+          "notes": {
+            "current_bbw_pct": 7.22,
+            "threshold_bbw_pct": 8.63,
+            "max_bbw_pct_6mo": 20.47,
+            "compression_days": 19,
+            "ema50_slope_20d_pct": 0.37
+          }
+        }
+      ]
+    },
+    {
+      "ticker": "TJX",
+      "spot": 164.1699981689453,
+      "label": "NEUTRAL",
+      "bullish_score": 18.4,
+      "bearish_score": 0,
+      "net_score": 18.4,
+      "snapshot": {
+        "close": 164.17,
+        "volume_5d_avg": 5954215,
+        "high_52w": 170.0,
+        "low_52w": 119.84
+      },
+      "setups": [
+        {
+          "ticker": "TJX",
+          "setup_type": "sma_stack",
+          "direction": "bullish",
+          "strength": 0.615,
+          "spot": 164.1699981689453,
+          "notes": {
+            "ema10": 164.14,
+            "ema20": 161.89,
+            "ema50": 159.02,
+            "ema200": 151.57,
+            "spread_pct": 8.29,
+            "persistence_days_of_20": 8
+          }
+        }
+      ]
+    },
+    {
+      "ticker": "V",
+      "spot": 326.6000061035156,
+      "label": "NEUTRAL",
+      "bullish_score": 18.2,
+      "bearish_score": 0,
+      "net_score": 18.2,
+      "snapshot": {
+        "close": 326.6,
+        "volume_5d_avg": 10536136,
+        "high_52w": 359.66,
+        "low_52w": 293.89
+      },
+      "setups": [
+        {
+          "ticker": "V",
+          "setup_type": "compression",
+          "direction": "bullish",
+          "strength": 0.73,
+          "spot": 326.6000061035156,
+          "notes": {
+            "current_bbw_pct": 5.9,
+            "threshold_bbw_pct": 6.83,
+            "max_bbw_pct_6mo": 15.41,
+            "compression_days": 18,
+            "ema50_slope_20d_pct": 0.75
+          }
+        }
+      ]
+    },
+    {
+      "ticker": "MPC",
+      "spot": 247.2899932861328,
+      "label": "NEUTRAL",
+      "bullish_score": 18.0,
+      "bearish_score": 0,
+      "net_score": 18.0,
+      "snapshot": {
+        "close": 247.29,
+        "volume_5d_avg": 2962861,
+        "high_52w": 272.46,
+        "low_52w": 158.0
+      },
+      "setups": [
+        {
+          "ticker": "MPC",
+          "setup_type": "compression",
+          "direction": "bullish",
+          "strength": 0.721,
+          "spot": 247.2899932861328,
+          "notes": {
+            "current_bbw_pct": 12.61,
+            "threshold_bbw_pct": 13.99,
+            "max_bbw_pct_6mo": 29.15,
+            "compression_days": 19,
+            "ema50_slope_20d_pct": 4.18
+          }
+        }
+      ]
+    },
+    {
+      "ticker": "AFRM",
+      "spot": 72.19999694824219,
+      "label": "NEUTRAL",
+      "bullish_score": 18.0,
+      "bearish_score": 0,
+      "net_score": 18.0,
+      "snapshot": {
+        "close": 72.2,
+        "volume_5d_avg": 5336289,
+        "high_52w": 100.0,
+        "low_52w": 42.1
+      },
+      "setups": [
+        {
+          "ticker": "AFRM",
+          "setup_type": "sma_stack",
+          "direction": "bullish",
+          "strength": 0.599,
+          "spot": 72.19999694824219,
+          "notes": {
+            "ema10": 70.38,
+            "ema20": 68.98,
+            "ema50": 65.47,
+            "ema200": 64.28,
+            "spread_pct": 9.48,
+            "persistence_days_of_20": 5
+          }
+        }
+      ]
+    },
+    {
+      "ticker": "CVNA",
+      "spot": 66.66999816894531,
+      "label": "NEUTRAL",
+      "bullish_score": 0,
+      "bearish_score": 17.6,
+      "net_score": -17.6,
+      "snapshot": {
+        "close": 66.67,
+        "volume_5d_avg": 12241907,
+        "high_52w": 97.38,
+        "low_52w": 54.46
+      },
+      "setups": [
+        {
+          "ticker": "CVNA",
+          "setup_type": "sma_stack",
+          "direction": "bearish",
+          "strength": 0.588,
+          "spot": 66.66999816894531,
+          "notes": {
+            "ema10": 66.99,
+            "ema20": 67.93,
+            "ema50": 69.59,
+            "ema200": 71.45,
+            "spread_pct": 6.25,
+            "persistence_days_of_20": 11
+          }
+        }
+      ]
+    },
+    {
+      "ticker": "KKR",
+      "spot": 96.9000015258789,
+      "label": "NEUTRAL",
+      "bullish_score": 0,
+      "bearish_score": 17.3,
+      "net_score": -17.3,
+      "snapshot": {
+        "close": 96.9,
+        "volume_5d_avg": 4026828,
+        "high_52w": 153.87,
+        "low_52w": 82.67
+      },
+      "setups": [
+        {
+          "ticker": "KKR",
+          "setup_type": "compression",
+          "direction": "bearish",
+          "strength": 0.692,
+          "spot": 96.9000015258789,
+          "notes": {
+            "current_bbw_pct": 7.86,
+            "threshold_bbw_pct": 11.93,
+            "max_bbw_pct_6mo": 36.8,
+            "compression_days": 11,
+            "ema50_slope_20d_pct": -1.7
+          }
+        }
+      ]
+    },
+    {
+      "ticker": "BBY",
+      "spot": 76.01000213623047,
+      "label": "NEUTRAL",
+      "bullish_score": 16.5,
+      "bearish_score": 0,
+      "net_score": 16.5,
+      "snapshot": {
+        "close": 76.01,
+        "volume_5d_avg": 4090302,
+        "high_52w": 84.99,
+        "low_52w": 55.1
+      },
+      "setups": [
+        {
+          "ticker": "BBY",
+          "setup_type": "sma_stack",
+          "direction": "bullish",
+          "strength": 0.55,
+          "spot": 76.01000213623047,
+          "notes": {
+            "ema10": 74.84,
+            "ema20": 72.42,
+            "ema50": 68.14,
+            "ema200": 67.78,
+            "spread_pct": 10.41,
+            "persistence_days_of_20": 2
+          }
+        }
+      ]
+    },
+    {
+      "ticker": "LNG",
+      "spot": 230.85000610351562,
+      "label": "NEUTRAL",
+      "bullish_score": 0,
+      "bearish_score": 16.4,
+      "net_score": -16.4,
+      "snapshot": {
+        "close": 230.85,
+        "volume_5d_avg": 2503452,
+        "high_52w": 300.89,
+        "low_52w": 186.2
+      },
+      "setups": [
+        {
+          "ticker": "LNG",
+          "setup_type": "compression",
+          "direction": "bearish",
+          "strength": 0.655,
+          "spot": 230.85000610351562,
+          "notes": {
+            "current_bbw_pct": 9.0,
+            "threshold_bbw_pct": 11.55,
+            "max_bbw_pct_6mo": 29.12,
+            "compression_days": 12,
+            "ema50_slope_20d_pct": -3.83
+          }
+        }
+      ]
+    },
+    {
+      "ticker": "PFE",
+      "spot": 25.079999923706055,
+      "label": "NEUTRAL",
+      "bullish_score": 0,
+      "bearish_score": 15.9,
+      "net_score": -15.9,
+      "snapshot": {
+        "close": 25.08,
+        "volume_5d_avg": 51539548,
+        "high_52w": 28.75,
+        "low_52w": 23.11
+      },
+      "setups": [
+        {
+          "ticker": "PFE",
+          "setup_type": "compression",
+          "direction": "bearish",
+          "strength": 0.635,
+          "spot": 25.079999923706055,
+          "notes": {
+            "current_bbw_pct": 5.25,
+            "threshold_bbw_pct": 5.39,
+            "max_bbw_pct_6mo": 11.06,
+            "compression_days": 16,
+            "ema50_slope_20d_pct": -1.4
+          }
+        }
+      ]
+    },
+    {
+      "ticker": "UPS",
+      "spot": 107.23999786376953,
+      "label": "NEUTRAL",
+      "bullish_score": 15.9,
+      "bearish_score": 0,
+      "net_score": 15.9,
+      "snapshot": {
+        "close": 107.24,
+        "volume_5d_avg": 6674184,
+        "high_52w": 122.41,
+        "low_52w": 82.0
+      },
+      "setups": [
+        {
+          "ticker": "UPS",
+          "setup_type": "sma_stack",
+          "direction": "bullish",
+          "strength": 0.529,
+          "spot": 107.23999786376953,
+          "notes": {
+            "ema10": 106.95,
+            "ema20": 106.19,
+            "ema50": 104.65,
+            "ema200": 101.79,
+            "spread_pct": 5.07,
+            "persistence_days_of_20": 11
+          }
+        }
+      ]
+    },
+    {
+      "ticker": "VRT",
+      "spot": 357.9599914550781,
+      "label": "NEUTRAL",
+      "bullish_score": 15.8,
+      "bearish_score": 0,
+      "net_score": 15.8,
+      "snapshot": {
+        "close": 357.96,
+        "volume_5d_avg": 6122363,
+        "high_52w": 379.93,
+        "low_52w": 110.06
+      },
+      "setups": [
+        {
+          "ticker": "VRT",
+          "setup_type": "sma_stack",
+          "direction": "bullish",
+          "strength": 0.525,
+          "spot": 357.9599914550781,
+          "notes": {
+            "ema10": 320.4,
+            "ema20": 318.7,
+            "ema50": 311.2,
+            "ema200": 241.86,
+            "spread_pct": 32.47,
+            "persistence_days_of_20": 1
+          }
+        }
+      ]
+    },
+    {
+      "ticker": "NOW",
+      "spot": 93.01000213623047,
+      "label": "NEUTRAL",
+      "bullish_score": 0,
+      "bearish_score": 15.8,
+      "net_score": -15.8,
+      "snapshot": {
+        "close": 93.01,
+        "volume_5d_avg": 26707788,
+        "high_52w": 211.48,
+        "low_52w": 81.24
+      },
+      "setups": [
+        {
+          "ticker": "NOW",
+          "setup_type": "sma_stack",
+          "direction": "bearish",
+          "strength": 0.525,
+          "spot": 93.01000213623047,
+          "notes": {
+            "ema10": 101.17,
+            "ema20": 103.59,
+            "ema50": 103.78,
+            "ema200": 129.41,
+            "spread_pct": 21.82,
+            "persistence_days_of_20": 1
+          }
+        }
+      ]
+    },
+    {
+      "ticker": "BBAI",
+      "spot": 3.8299999237060547,
+      "label": "NEUTRAL",
+      "bullish_score": 0,
+      "bearish_score": 15.8,
+      "net_score": -15.8,
+      "snapshot": {
+        "close": 3.83,
+        "volume_5d_avg": 29479555,
+        "high_52w": 9.39,
+        "low_52w": 3.01
+      },
+      "setups": [
+        {
+          "ticker": "BBAI",
+          "setup_type": "sma_stack",
+          "direction": "bearish",
+          "strength": 0.525,
+          "spot": 3.8299999237060547,
+          "notes": {
+            "ema10": 4.05,
+            "ema20": 4.16,
+            "ema50": 4.18,
+            "ema200": 4.72,
+            "spread_pct": 14.28,
+            "persistence_days_of_20": 1
+          }
+        }
+      ]
+    },
+    {
+      "ticker": "NVO",
+      "spot": 45.880001068115234,
+      "label": "NEUTRAL",
+      "bullish_score": 15.8,
+      "bearish_score": 0,
+      "net_score": 15.8,
+      "snapshot": {
+        "close": 45.88,
+        "volume_5d_avg": 10655947,
+        "high_52w": 71.8,
+        "low_52w": 35.12
+      },
+      "setups": [
+        {
+          "ticker": "NVO",
+          "setup_type": "compression",
+          "direction": "bullish",
+          "strength": 0.633,
+          "spot": 45.880001068115234,
+          "notes": {
+            "current_bbw_pct": 11.3,
+            "threshold_bbw_pct": 13.54,
+            "max_bbw_pct_6mo": 53.39,
+            "compression_days": 8,
+            "ema50_slope_20d_pct": 0.85
+          }
+        }
+      ]
+    },
+    {
+      "ticker": "EMR",
+      "spot": 150.2100067138672,
+      "label": "NEUTRAL",
+      "bullish_score": 15.6,
+      "bearish_score": 0,
+      "net_score": 15.6,
+      "snapshot": {
+        "close": 150.21,
+        "volume_5d_avg": 3311094,
+        "high_52w": 165.15,
+        "low_52w": 122.64
+      },
+      "setups": [
+        {
+          "ticker": "EMR",
+          "setup_type": "sma_stack",
+          "direction": "bullish",
+          "strength": 0.519,
+          "spot": 150.2100067138672,
+          "notes": {
+            "ema10": 146.2,
+            "ema20": 143.62,
+            "ema50": 141.26,
+            "ema200": 138.73,
+            "spread_pct": 5.39,
+            "persistence_days_of_20": 10
+          }
+        }
+      ]
+    },
+    {
+      "ticker": "JD",
+      "spot": 27.020000457763672,
+      "label": "NEUTRAL",
+      "bullish_score": 0,
+      "bearish_score": 15.6,
+      "net_score": -15.6,
+      "snapshot": {
+        "close": 27.02,
+        "volume_5d_avg": 8011849,
+        "high_52w": 36.86,
+        "low_52w": 24.51
+      },
+      "setups": [
+        {
+          "ticker": "JD",
+          "setup_type": "sma_stack",
+          "direction": "bearish",
+          "strength": 0.519,
+          "spot": 27.020000457763672,
+          "notes": {
+            "ema10": 28.17,
+            "ema20": 28.81,
+            "ema50": 29.37,
+            "ema200": 29.93,
+            "spread_pct": 5.89,
+            "persistence_days_of_20": 9
+          }
+        }
+      ]
+    },
+    {
+      "ticker": "SPY",
+      "spot": 744.3900146484375,
+      "label": "NEUTRAL",
+      "bullish_score": 14.2,
+      "bearish_score": 0,
+      "net_score": 14.2,
+      "snapshot": {
+        "close": 744.39,
+        "volume_5d_avg": 67849602,
+        "high_52w": 760.4,
+        "low_52w": 591.89
+      },
+      "setups": [
+        {
+          "ticker": "SPY",
+          "setup_type": "proximity_52w",
+          "direction": "bullish",
+          "strength": 0.57,
+          "spot": 744.3900146484375,
+          "notes": {
+            "high_52w": 760.4,
+            "low_52w": 591.89,
+            "dist_to_high_pct": 2.15,
+            "dist_to_low_pct": 20.49
+          }
+        }
+      ]
+    },
+    {
+      "ticker": "ALL",
+      "spot": 222.55999755859375,
+      "label": "NEUTRAL",
+      "bullish_score": 13.6,
+      "bearish_score": 0,
+      "net_score": 13.6,
+      "snapshot": {
+        "close": 222.56,
+        "volume_5d_avg": 2098519,
+        "high_52w": 227.62,
+        "low_52w": 188.08
+      },
+      "setups": [
+        {
+          "ticker": "ALL",
+          "setup_type": "proximity_52w",
+          "direction": "bullish",
+          "strength": 0.545,
+          "spot": 222.55999755859375,
+          "notes": {
+            "high_52w": 227.62,
+            "low_52w": 188.08,
+            "dist_to_high_pct": 2.27,
+            "dist_to_low_pct": 15.49
+          }
+        }
+      ]
+    },
+    {
+      "ticker": "EXC",
+      "spot": 45.939998626708984,
+      "label": "NEUTRAL",
+      "bullish_score": 0,
+      "bearish_score": 13.6,
+      "net_score": -13.6,
+      "snapshot": {
+        "close": 45.94,
+        "volume_5d_avg": 8887656,
+        "high_52w": 50.65,
+        "low_52w": 42.23
+      },
+      "setups": [
+        {
+          "ticker": "EXC",
+          "setup_type": "compression",
+          "direction": "bearish",
+          "strength": 0.544,
+          "spot": 45.939998626708984,
+          "notes": {
+            "current_bbw_pct": 4.88,
+            "threshold_bbw_pct": 6.22,
+            "max_bbw_pct_6mo": 18.73,
+            "compression_days": 5,
+            "ema50_slope_20d_pct": -0.7
+          }
+        }
+      ]
+    },
+    {
+      "ticker": "APD",
+      "spot": 283.1099853515625,
+      "label": "NEUTRAL",
+      "bullish_score": 0,
+      "bearish_score": 13.5,
+      "net_score": -13.5,
+      "snapshot": {
+        "close": 283.11,
+        "volume_5d_avg": 1643676,
+        "high_52w": 307.96,
+        "low_52w": 229.11
+      },
+      "setups": [
+        {
+          "ticker": "APD",
+          "setup_type": "compression",
+          "direction": "bearish",
+          "strength": 0.54,
+          "spot": 283.1099853515625,
+          "notes": {
+            "current_bbw_pct": 5.05,
+            "threshold_bbw_pct": 7.64,
+            "max_bbw_pct_6mo": 18.92,
+            "compression_days": 5,
+            "ema50_slope_20d_pct": -2.12
+          }
+        }
+      ]
+    },
+    {
+      "ticker": "ABT",
+      "spot": 87.83000183105469,
+      "label": "NEUTRAL",
+      "bullish_score": 0,
+      "bearish_score": 13.3,
+      "net_score": -13.3,
+      "snapshot": {
+        "close": 87.83,
+        "volume_5d_avg": 17389527,
+        "high_52w": 139.06,
+        "low_52w": 81.97
+      },
+      "setups": [
+        {
+          "ticker": "ABT",
+          "setup_type": "compression",
+          "direction": "bearish",
+          "strength": 0.533,
+          "spot": 87.83000183105469,
+          "notes": {
+            "current_bbw_pct": 8.1,
+            "threshold_bbw_pct": 8.16,
+            "max_bbw_pct_6mo": 29.11,
+            "compression_days": 5,
+            "ema50_slope_20d_pct": -3.59
+          }
+        }
+      ]
+    },
+    {
+      "ticker": "FDX",
+      "spot": 328.7799987792969,
+      "label": "NEUTRAL",
+      "bullish_score": 13.2,
+      "bearish_score": 0,
+      "net_score": 13.2,
+      "snapshot": {
+        "close": 328.78,
+        "volume_5d_avg": 1886891,
+        "high_52w": 345.37,
+        "low_52w": 174.13
+      },
+      "setups": [
+        {
+          "ticker": "FDX",
+          "setup_type": "compression",
+          "direction": "bullish",
+          "strength": 0.528,
+          "spot": 328.7799987792969,
+          "notes": {
+            "current_bbw_pct": 7.48,
+            "threshold_bbw_pct": 11.24,
+            "max_bbw_pct_6mo": 33.9,
+            "compression_days": 3,
+            "ema50_slope_20d_pct": 5.37
+          }
+        }
+      ]
+    },
+    {
+      "ticker": "MMM",
+      "spot": 163.22000122070312,
+      "label": "NEUTRAL",
+      "bullish_score": 13.0,
+      "bearish_score": 0,
+      "net_score": 13.0,
+      "snapshot": {
+        "close": 163.22,
+        "volume_5d_avg": 4068096,
+        "high_52w": 177.41,
+        "low_52w": 139.34
+      },
+      "setups": [
+        {
+          "ticker": "MMM",
+          "setup_type": "compression",
+          "direction": "bullish",
+          "strength": 0.518,
+          "spot": 163.22000122070312,
+          "notes": {
+            "current_bbw_pct": 9.11,
+            "threshold_bbw_pct": 9.32,
+            "max_bbw_pct_6mo": 20.88,
+            "compression_days": 9,
+            "ema50_slope_20d_pct": 2.69
+          }
+        }
+      ]
+    },
+    {
+      "ticker": "AIG",
+      "spot": 76.37000274658203,
+      "label": "NEUTRAL",
+      "bullish_score": 0,
+      "bearish_score": 12.9,
+      "net_score": -12.9,
+      "snapshot": {
+        "close": 76.37,
+        "volume_5d_avg": 4518132,
+        "high_52w": 87.29,
+        "low_52w": 71.25
+      },
+      "setups": [
+        {
+          "ticker": "AIG",
+          "setup_type": "compression",
+          "direction": "bearish",
+          "strength": 0.515,
+          "spot": 76.37000274658203,
+          "notes": {
+            "current_bbw_pct": 6.42,
+            "threshold_bbw_pct": 8.24,
+            "max_bbw_pct_6mo": 30.76,
+            "compression_days": 2,
+            "ema50_slope_20d_pct": -1.45
+          }
+        }
+      ]
+    },
+    {
+      "ticker": "AEP",
+      "spot": 130.3000030517578,
+      "label": "NEUTRAL",
+      "bullish_score": 0,
+      "bearish_score": 12.7,
+      "net_score": -12.7,
+      "snapshot": {
+        "close": 130.3,
+        "volume_5d_avg": 6651909,
+        "high_52w": 139.44,
+        "low_52w": 101.15
+      },
+      "setups": [
+        {
+          "ticker": "AEP",
+          "setup_type": "compression",
+          "direction": "bearish",
+          "strength": 0.506,
+          "spot": 130.3000030517578,
+          "notes": {
+            "current_bbw_pct": 5.53,
+            "threshold_bbw_pct": 5.65,
+            "max_bbw_pct_6mo": 17.08,
+            "compression_days": 5,
+            "ema50_slope_20d_pct": -1.09
+          }
+        }
+      ]
+    },
+    {
+      "ticker": "BKNG",
+      "spot": 167.77000427246094,
+      "label": "NEUTRAL",
+      "bullish_score": 0,
+      "bearish_score": 12.6,
+      "net_score": -12.6,
+      "snapshot": {
+        "close": 167.77,
+        "volume_5d_avg": 9859032,
+        "high_52w": 233.58,
+        "low_52w": 150.14
+      },
+      "setups": [
+        {
+          "ticker": "BKNG",
+          "setup_type": "compression",
+          "direction": "bearish",
+          "strength": 0.503,
+          "spot": 167.77000427246094,
+          "notes": {
+            "current_bbw_pct": 10.09,
+            "threshold_bbw_pct": 12.19,
+            "max_bbw_pct_6mo": 38.52,
+            "compression_days": 3,
+            "ema50_slope_20d_pct": -0.7
+          }
+        }
+      ]
+    },
+    {
+      "ticker": "EOG",
+      "spot": 132.8300018310547,
+      "label": "NEUTRAL",
+      "bullish_score": 12.5,
+      "bearish_score": 0,
+      "net_score": 12.5,
+      "snapshot": {
+        "close": 132.83,
+        "volume_5d_avg": 5912094,
+        "high_52w": 151.87,
+        "low_52w": 101.59
+      },
+      "setups": [
+        {
+          "ticker": "EOG",
+          "setup_type": "compression",
+          "direction": "bullish",
+          "strength": 0.501,
+          "spot": 132.8300018310547,
+          "notes": {
+            "current_bbw_pct": 10.1,
+            "threshold_bbw_pct": 11.12,
+            "max_bbw_pct_6mo": 20.29,
+            "compression_days": 10,
+            "ema50_slope_20d_pct": 0.22
+          }
+        }
+      ]
+    },
+    {
+      "ticker": "PSX",
+      "spot": 168.41000366210938,
+      "label": "NEUTRAL",
+      "bullish_score": 17.7,
+      "bearish_score": 6.8,
+      "net_score": 10.9,
+      "snapshot": {
+        "close": 168.41,
+        "volume_5d_avg": 3707792,
+        "high_52w": 190.61,
+        "low_52w": 118.0
+      },
+      "setups": [
+        {
+          "ticker": "PSX",
+          "setup_type": "compression",
+          "direction": "bullish",
+          "strength": 0.709,
+          "spot": 168.41000366210938,
+          "notes": {
+            "current_bbw_pct": 12.77,
+            "threshold_bbw_pct": 12.96,
+            "max_bbw_pct_6mo": 26.35,
+            "compression_days": 21,
+            "ema50_slope_20d_pct": 2.06
+          }
+        },
+        {
+          "ticker": "PSX",
+          "setup_type": "volume_surge",
+          "direction": "bearish",
+          "strength": 0.341,
+          "spot": 168.41000366210938,
+          "notes": {
+            "surge_ratio": 1.51,
+            "avg_5d_volume": 3707792,
+            "avg_20d_volume": 2453718,
+            "5d_price_change_pct": -6.15
+          }
+        }
+      ]
+    },
+    {
+      "ticker": "TIP",
+      "spot": 108.94000244140625,
+      "label": "NEUTRAL",
+      "bullish_score": 9.8,
+      "bearish_score": 0,
+      "net_score": 9.8,
+      "snapshot": {
+        "close": 108.94,
+        "volume_5d_avg": 1663759,
+        "high_52w": 112.26,
+        "low_52w": 108.94
+      },
+      "setups": [
+        {
+          "ticker": "TIP",
+          "setup_type": "proximity_52w",
+          "direction": "bullish",
+          "strength": 0.39,
+          "spot": 108.94000244140625,
+          "notes": {
+            "high_52w": 112.26,
+            "low_52w": 108.94,
+            "dist_to_high_pct": 3.05,
+            "dist_to_low_pct": 0.0
+          }
+        }
+      ]
+    },
+    {
+      "ticker": "ROKU",
+      "spot": 135.1999969482422,
+      "label": "NEUTRAL",
+      "bullish_score": 24.0,
+      "bearish_score": 20.0,
+      "net_score": 4.0,
+      "snapshot": {
+        "close": 135.2,
+        "volume_5d_avg": 17419506,
+        "high_52w": 148.88,
+        "low_52w": 77.64
+      },
+      "setups": [
+        {
+          "ticker": "ROKU",
+          "setup_type": "sma_stack",
+          "direction": "bullish",
+          "strength": 0.8,
+          "spot": 135.1999969482422,
+          "notes": {
+            "ema10": 133.38,
+            "ema20": 130.11,
+            "ema50": 122.67,
+            "ema200": 106.68,
+            "spread_pct": 25.03,
+            "persistence_days_of_20": 12
+          }
+        },
+        {
+          "ticker": "ROKU",
+          "setup_type": "volume_surge",
+          "direction": "bearish",
+          "strength": 1.0,
+          "spot": 135.1999969482422,
+          "notes": {
+            "surge_ratio": 2.62,
+            "avg_5d_volume": 17419506,
+            "avg_20d_volume": 6650206,
+            "5d_price_change_pct": -5.89
+          }
+        }
+      ]
+    }
+  ]
+}
