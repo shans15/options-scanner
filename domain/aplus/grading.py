@@ -4,7 +4,7 @@ Per spec docs/superpowers/specs/2026-06-29-aplus-rebalance-design.md.
 
 Thresholds (percentile-derived from the 90-day backtest):
     A+ : composite >= 75 AND every category >= 6 AND vix_regime != 'expansion'
-    A  : composite >= 73 AND every category >= 6 AND vix_regime != 'expansion'
+    A  : composite >= 74 AND every category >= 6 AND vix_regime != 'expansion'
     B+ : composite >= 67
     B  : composite >= 60
     F  : composite <  60  OR  vix_regime == 'expansion'
@@ -42,7 +42,7 @@ def assign_grade(cs: CategoryScores, vix_regime: Optional[str] = None) -> Grade:
 
     if composite >= 75.0 and _all_categories_at_least(cs, 6.0):
         return 'A+'
-    if composite >= 73.0 and _all_categories_at_least(cs, 6.0):
+    if composite >= 74.0 and _all_categories_at_least(cs, 6.0):
         return 'A'
     if composite >= 67.0:
         return 'B+'

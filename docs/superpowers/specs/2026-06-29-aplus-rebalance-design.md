@@ -63,7 +63,7 @@ Cutoffs are now defined by the empirical composite distribution rather than fixe
 ```
 Grade  Composite cutoff   Empirical %ile    Category floor    Other gates
 A+     ≥ 75               top 5%            every cat ≥ 6     not vix expansion
-A      ≥ 73               top 15%           every cat ≥ 6     not vix expansion
+A      ≥ 74               top 15%           every cat ≥ 6     not vix expansion
 B+     ≥ 67               top 50%           none              display only
 B      ≥ 60               next 30%          none              display only
 F      < 60   OR vix_regime = 'expansion'

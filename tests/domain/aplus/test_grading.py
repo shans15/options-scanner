@@ -28,10 +28,10 @@ def test_a_plus_blocked_by_expansion_regime():
 
 
 # ----- A -----
-def test_a_when_composite_between_73_and_75_with_floors_met():
+def test_a_when_composite_between_74_and_75_with_floors_met():
     # tech=8 v=6 c=8 m=6 l=7 → composite = 0.35*8 + 0.10*6 + 0.25*8 + 0.10*6 + 0.20*7 = 7.4 → *10 = 74.0
     cs = _cs(t=8.0, v=6.0, c=8.0, m=6.0, l=7.0)
-    assert 73.0 <= cs.composite() < 75.0
+    assert 74.0 <= cs.composite() < 75.0
     assert assign_grade(cs) == 'A'
 
 
@@ -90,3 +90,12 @@ def test_unknown_vix_regime_string_does_not_trigger_kill():
     cs = _cs(8.0, 8.0, 8.0, 8.0, 8.0)
     # Defensive: only the literal 'expansion' kills.
     assert assign_grade(cs, vix_regime='something_else') == 'A+'
+
+
+def test_composite_at_old_a_threshold_is_now_b_plus():
+    # Composite 73.5: under previous A threshold (>=73) this was A; under
+    # current threshold (>=74) it lands at B+.  Values: t=8 v=6 c=8 m=6 l=6.5
+    # → 0.35*8 + 0.10*6 + 0.25*8 + 0.10*6 + 0.20*6.5 = 7.35 → *10 = 73.5
+    cs = _cs(t=8.0, v=6.0, c=8.0, m=6.0, l=6.5)
+    assert 73.0 <= cs.composite() < 74.0
+    assert assign_grade(cs) == 'B+'
