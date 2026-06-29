@@ -3,6 +3,7 @@
 **Date:** 2026-06-14
 **Author:** Sarthak (with Claude)
 **Status:** Approved (architecture sign-off received)
+**Updated:** 2026-06-29 — Sizing rules ($1k account) and grade thresholds in this document are **superseded** by `docs/superpowers/specs/2026-06-29-aplus-rebalance-design.md`. The architecture, features, structure selector, and forward-test protocol described below remain authoritative.
 
 ## Goal
 
