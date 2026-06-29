@@ -31,7 +31,23 @@ from domain.aplus.types import MarketContext, TradeStructure, GradedCandidate
 
 
 _GRADE_RANK = {'A+': 5, 'A': 4, 'B+': 3, 'B': 2, 'F': 1}
-_SIZING_PCT = {'A+': 0.125, 'A': 0.075, 'B+': 0.0, 'B': 0.0, 'F': 0.0}
+
+# Per spec 2026-06-29-aplus-rebalance-design.md — $10k account sizing.
+# Midpoints of the 7-10% (A+) and 4-5% (A) bands.
+_SIZING_PCT = {'A+': 0.085, 'A': 0.045, 'B+': 0.0, 'B': 0.0, 'F': 0.0}
+
+# Documented operating rules surfaced in the output JSON.  The script does
+# not track open positions; the trader applies these rules manually.
+_OPS_RULES: dict = {
+    'max_concurrent_positions': 5,
+    'max_daily_new_entries': 2,
+    'max_same_ticker_positions': 2,
+    'max_consecutive_losses_before_cooldown': 3,
+    'cooldown_hours': 48,
+    'max_daily_drawdown_pct': -0.03,
+    'max_weekly_drawdown_pct': -0.07,
+    'vix_expansion_blocks_new_entries': True,
+}
 
 
 def render_watchlist(
@@ -57,7 +73,7 @@ def render_watchlist(
         days_to_earn = _fetch_days_to_earnings(ticker)
         fs = extract_features(cand, mc, days_to_earnings=days_to_earn)
         cs = score_categories(fs)
-        grade = assign_grade(cs)
+        grade = assign_grade(cs, vix_regime=cand.get('vix_regime'))
         if grade not in ('A+', 'A'):
             continue
         structure, rationale = select_structure(fs)
@@ -86,6 +102,7 @@ def render_watchlist(
         'timestamp': today.isoformat(),
         'account_size': account_size,
         'graded_candidates': [_serialize(g) for g in graded],
+        'operations_rules': _OPS_RULES,
     }
     (out_dir / 'latest.json').write_text(json.dumps(out_data, indent=2, default=str))
 

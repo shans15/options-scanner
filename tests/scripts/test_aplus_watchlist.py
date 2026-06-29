@@ -56,6 +56,14 @@ def test_render_watchlist_with_strong_candidate_produces_output(tmp_path):
     for c in out_data['graded_candidates']:
         assert c['grade'] in ('A+', 'A'), f"Found {c['grade']} in output — should be filtered"
 
+    # New sizing per 2026-06-29 spec: A+=8.5%, A=4.5%
+    for c in out_data['graded_candidates']:
+        assert c['grade'] in ('A+', 'A'), f"Found {c['grade']} in output — should be filtered"
+        if c['grade'] == 'A+':
+            assert c['sizing_pct'] == 0.085, c
+        if c['grade'] == 'A':
+            assert c['sizing_pct'] == 0.045, c
+
 
 def test_render_watchlist_integration_fixture(tmp_path):
     fixture = Path(__file__).parent / 'fixtures' / 'sample_scan.json'
@@ -81,3 +89,55 @@ def test_render_watchlist_integration_fixture(tmp_path):
     # MSFT has compression + clean context → should grade well
     msft = next((c for c in out_payload['graded_candidates'] if c['ticker'] == 'MSFT'), None)
     # MSFT may not appear if features push it to B; that's okay too.
+
+
+def test_render_watchlist_emits_operations_rules_block(tmp_path):
+    scan_file = tmp_path / 'scan.json'
+    scan_file.write_text(json.dumps(_scan_payload()))
+    out_dir = tmp_path / 'aplus'
+
+    with patch('scripts.aplus_watchlist._fetch_market_context') as mock_mc:
+        from domain.aplus.types import MarketContext
+        mock_mc.return_value = MarketContext(
+            spx_trend_score=9.0, sector_rotation_rank={'XLF': 2},
+            dxy_trend_score=7.0, yield_10y_score=8.0, vvix_score=9.0,
+            days_to_macro_event=8,
+        )
+        with patch('scripts.aplus_watchlist._fetch_days_to_earnings') as mock_e:
+            mock_e.return_value = 15
+            render_watchlist(scan_file, out_dir, account_size=10000.0, today=date(2026, 6, 29))
+
+    out_data = json.loads((out_dir / 'latest.json').read_text())
+    rules = out_data.get('operations_rules')
+    assert rules is not None
+    assert rules['max_concurrent_positions'] == 5
+    assert rules['max_daily_new_entries'] == 2
+    assert rules['max_same_ticker_positions'] == 2
+    assert rules['max_consecutive_losses_before_cooldown'] == 3
+    assert rules['cooldown_hours'] == 48
+    assert rules['max_daily_drawdown_pct'] == -0.03
+    assert rules['max_weekly_drawdown_pct'] == -0.07
+    assert rules['vix_expansion_blocks_new_entries'] is True
+
+
+def test_render_watchlist_filters_expansion_regime(tmp_path):
+    payload = _scan_payload()
+    payload['candidates'][0]['vix_regime'] = 'expansion'
+    scan_file = tmp_path / 'scan.json'
+    scan_file.write_text(json.dumps(payload))
+    out_dir = tmp_path / 'aplus'
+
+    with patch('scripts.aplus_watchlist._fetch_market_context') as mock_mc:
+        from domain.aplus.types import MarketContext
+        mock_mc.return_value = MarketContext(
+            spx_trend_score=9.0, sector_rotation_rank={'XLF': 2},
+            dxy_trend_score=7.0, yield_10y_score=8.0, vvix_score=9.0,
+            days_to_macro_event=8,
+        )
+        with patch('scripts.aplus_watchlist._fetch_days_to_earnings') as mock_e:
+            mock_e.return_value = 15
+            render_watchlist(scan_file, out_dir, account_size=10000.0, today=date(2026, 6, 29))
+
+    out_data = json.loads((out_dir / 'latest.json').read_text())
+    # Expansion candidate must be filtered out (forced to F by grading)
+    assert out_data['graded_candidates'] == []
