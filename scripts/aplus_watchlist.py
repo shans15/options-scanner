@@ -53,7 +53,7 @@ _OPS_RULES: dict = {
 def render_watchlist(
     scan_path: Path,
     out_dir: Path,
-    account_size: float = 1000.0,
+    account_size: float = 10000.0,
     today: Optional[date] = None,
 ) -> list[GradedCandidate]:
     """Read scan JSON, grade candidates, write output. Returns the graded list."""
@@ -172,7 +172,7 @@ def main(argv: list[str]) -> int:
     p = argparse.ArgumentParser(description="A+ confluence watchlist")
     p.add_argument('--scan', type=str, default='output/scans/latest.json')
     p.add_argument('--out', type=str, default='output/aplus')
-    p.add_argument('--account-size', type=float, default=1000.0)
+    p.add_argument('--account-size', type=float, default=10000.0)
     args = p.parse_args(argv)
     render_watchlist(Path(args.scan), Path(args.out), args.account_size)
     return 0
