@@ -36,12 +36,17 @@ class CategoryScores:
     liquidity: float
 
     def composite(self) -> float:
-        """Weighted composite, scaled to [0, 100]."""
+        """Weighted composite, scaled to [0, 100].
+
+        Weights are lift-derived from the 90-day backtest (top-vs-bottom
+        tertile 1-day win-rate lift). See:
+          docs/superpowers/specs/2026-06-29-aplus-rebalance-design.md
+        """
         return (
-            0.25 * self.technical
-            + 0.25 * self.vol_vix
-            + 0.15 * self.catalyst
-            + 0.15 * self.macro_breadth
+            0.35 * self.technical
+            + 0.10 * self.vol_vix
+            + 0.25 * self.catalyst
+            + 0.10 * self.macro_breadth
             + 0.20 * self.liquidity
         ) * 10.0
 

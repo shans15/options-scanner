@@ -37,7 +37,7 @@ def test_score_categories_all_zeros_gives_zero():
 
 
 def test_score_categories_partial_weights_correctly():
-    # Technical=10, others=0 → composite = 25 * 10 = 25.0 (25% weight × 10 × 10 normalize)
+    # Technical=10, others=0 → composite = 35 * 10 (new weights) = 35.0
     fs = _build_fs(0.0)
     fs.values['tech_setup_type'] = 10.0
     fs.values['tech_setup_strength'] = 10.0
@@ -47,7 +47,7 @@ def test_score_categories_partial_weights_correctly():
     cs = score_categories(fs)
     assert cs.technical == 10.0
     assert cs.vol_vix == 0.0
-    assert cs.composite() == 25.0
+    assert cs.composite() == 35.0
 
 
 def test_score_categories_handles_missing_keys_as_neutral():
@@ -56,3 +56,20 @@ def test_score_categories_handles_missing_keys_as_neutral():
     cs = score_categories(fs)
     # Only one of five technical features is present; others default to 5.
     assert 4.5 < cs.technical < 7.0
+
+
+def test_composite_weights_match_spec():
+    """Verify the 2026-06-29 lift-derived weights are applied exactly."""
+    from domain.aplus.types import CategoryScores
+    # Only technical 10 → 35
+    assert CategoryScores(10.0, 0.0, 0.0, 0.0, 0.0).composite() == 35.0
+    # Only vol_vix 10 → 10
+    assert CategoryScores(0.0, 10.0, 0.0, 0.0, 0.0).composite() == 10.0
+    # Only catalyst 10 → 25
+    assert CategoryScores(0.0, 0.0, 10.0, 0.0, 0.0).composite() == 25.0
+    # Only macro 10 → 10
+    assert CategoryScores(0.0, 0.0, 0.0, 10.0, 0.0).composite() == 10.0
+    # Only liquidity 10 → 20
+    assert CategoryScores(0.0, 0.0, 0.0, 0.0, 10.0).composite() == 20.0
+    # All 10 → 100
+    assert CategoryScores(10.0, 10.0, 10.0, 10.0, 10.0).composite() == 100.0
