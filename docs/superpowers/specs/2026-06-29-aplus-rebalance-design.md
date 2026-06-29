@@ -108,7 +108,7 @@ No new modules. Files changed:
 
 ```
 domain/aplus/grading.py        — accept vix_regime, apply hard kill, new thresholds
-domain/aplus/scoring.py        — new weights in CategoryScores.composite()
+domain/aplus/types.py          — new weights in CategoryScores.composite()
 scripts/aplus_watchlist.py     — pass vix_regime to assign_grade, update _SIZING_PCT,
                                   update concurrent/daily/cooldown rules
 scripts/aplus_backtest_90d.py  — pass vix_regime to assign_grade
@@ -119,7 +119,7 @@ docs/superpowers/specs/2026-06-14-aplus-confluence-scorer-design.md
                               — front-matter pointer to this spec
 ```
 
-No edits to features.py, structure.py, market_context.py, or types.py.
+No edits to features.py, structure.py, market_context.py, or types.py beyond the composite() weights update.
 
 ## Data flow (unchanged)
 
@@ -128,7 +128,7 @@ output/scans/latest.json
    ↓
 domain/aplus/features.py  — same feature extraction
    ↓
-domain/aplus/scoring.py   — new weights in composite()
+domain/aplus/types.py     — new weights in composite()
    ↓
 domain/aplus/grading.py   — new thresholds + vix expansion hard kill
    ↓
