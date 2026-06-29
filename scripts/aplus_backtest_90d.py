@@ -280,7 +280,7 @@ def grade_row(row: dict, helpers: dict, liq_profile: str = "neutral") -> dict:
 
     fs = extract_features(candidate, mc, days_to_earnings=None)
     cs = score_categories(fs)
-    grade = assign_grade(cs)
+    grade = assign_grade(cs, vix_regime=candidate.get('vix_regime'))
 
     return {
         **row,
