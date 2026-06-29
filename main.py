@@ -5,6 +5,12 @@ import sys
 from datetime import date
 from pathlib import Path
 
+try:
+    from dotenv import load_dotenv
+    load_dotenv(Path(__file__).resolve().parent / ".env")
+except ImportError:
+    pass
+
 from pipeline.run_scan import run_scan, ScanConfig
 from pipeline.universe_builder import UniverseFilters, build_universe_cached
 from ui.exporter import write_scan
@@ -111,7 +117,7 @@ def main() -> int:
     sub = p.add_subparsers(dest='cmd', required=True)
 
     s = sub.add_parser('scan', help='Run an EOD scan')
-    s.add_argument('--top', type=int, default=50)
+    s.add_argument('--top', type=int, default=500)
     s.add_argument('--min-volume', type=int, default=1_000_000)
     s.add_argument('--tickers', type=str, default=None, help='Comma-separated override list')
     s.add_argument('--then-dashboard', action='store_true')

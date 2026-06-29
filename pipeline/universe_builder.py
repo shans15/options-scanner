@@ -14,6 +14,9 @@ from pipeline.universe import KNOWN_GOOD_FALLBACK
 log = logging.getLogger(__name__)
 
 
+SP500_FILE = Path('data/universe/sp500_constituents.json')
+
+
 @dataclass(frozen=True)
 class UniverseFilters:
     min_avg_volume: int = 1_000_000
@@ -23,10 +26,13 @@ class UniverseFilters:
 
 
 def fetch_sp500_constituents() -> list[str]:
-    url = 'https://en.wikipedia.org/wiki/List_of_S%26P_500_companies'
-    tables = pd.read_html(url)
-    symbols = tables[0]['Symbol'].astype(str).tolist()
-    return [s.replace('.', '-') for s in symbols]
+    """Read the committed constituent snapshot.  Refresh via
+    ``python -m scripts.refresh_sp500`` (intended cadence: monthly)."""
+    if not SP500_FILE.exists():
+        raise FileNotFoundError(
+            f"{SP500_FILE} missing — run `python -m scripts.refresh_sp500`."
+        )
+    return json.loads(SP500_FILE.read_text())
 
 
 def _avg_volume_30d(history: pd.Series) -> float:
@@ -35,35 +41,19 @@ def _avg_volume_30d(history: pd.Series) -> float:
 
 
 def build_universe(filters: UniverseFilters, sources: list[DataSource]) -> list[str]:
+    """Return the committed S&P 500 list capped to ``top_n``.
+
+    The committed snapshot is treated as pre-vetted — no live volume or chain
+    pre-filter.  The per-ticker scan loop already skips names with missing
+    data, and free chain sources (yahooquery/yfinance) return spuriously empty
+    chains often enough that pre-filtering hides real candidates.
+    """
     try:
         candidates = fetch_sp500_constituents()
     except Exception as e:
-        # Wikipedia scrape failed; live filtering is unreliable in this state.
-        # Return the curated KNOWN_GOOD_FALLBACK directly — it is pre-vetted and
-        # exists precisely so we can serve a sensible universe without live data.
-        log.warning("S&P 500 fetch failed (%s); using KNOWN_GOOD_FALLBACK (no live filtering)", e)
+        log.warning("Local constituent file unavailable (%s); using KNOWN_GOOD_FALLBACK", e)
         return list(KNOWN_GOOD_FALLBACK[: filters.top_n])
-
-    qualified: list[tuple[str, float]] = []
-    for t in candidates:
-        try:
-            hist = fetch_with_fallback(sources, 'fetch_price_history', t, 30)
-        except DataFetchError:
-            continue
-        avg_vol = _avg_volume_30d(hist)
-        if avg_vol < filters.min_avg_volume:
-            continue
-        if filters.require_options_chain:
-            try:
-                chain = fetch_with_fallback(sources[:2], 'fetch_option_chain', t)
-            except DataFetchError:
-                continue
-            if not chain:
-                continue
-        qualified.append((t, avg_vol))
-
-    qualified.sort(key=lambda x: x[1], reverse=True)
-    return [t for t, _ in qualified[: filters.top_n]]
+    return candidates[: filters.top_n]
 
 
 def build_universe_cached(
