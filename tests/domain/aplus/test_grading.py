@@ -93,9 +93,9 @@ def test_unknown_vix_regime_string_does_not_trigger_kill():
 
 
 def test_composite_at_old_a_threshold_is_now_b_plus():
-    # Composite 73.5: under previous A threshold (>=73) this was A; under
-    # current threshold (>=74) it lands at B+.  Values: t=8 v=6 c=8 m=6 l=6.5
-    # → 0.35*8 + 0.10*6 + 0.25*8 + 0.10*6 + 0.20*6.5 = 7.35 → *10 = 73.5
+    # Composite 73.0: at the previous A threshold of 73 this was A; under the
+    # current threshold of 74 it lands at B+.  Values: t=8 v=6 c=8 m=6 l=6.5
+    # → 0.35*8 + 0.10*6 + 0.25*8 + 0.10*6 + 0.20*6.5 = 7.30 → *10 = 73.0
     cs = _cs(t=8.0, v=6.0, c=8.0, m=6.0, l=6.5)
     assert 73.0 <= cs.composite() < 74.0
     assert assign_grade(cs) == 'B+'
