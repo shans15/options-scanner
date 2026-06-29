@@ -9,11 +9,18 @@ Usage:
 """
 from __future__ import annotations
 import argparse
+import functools
 import json
 import sys
 from datetime import date
 from pathlib import Path
 from typing import Optional
+
+try:
+    from dotenv import load_dotenv
+    load_dotenv(Path(__file__).resolve().parents[1] / ".env")
+except ImportError:
+    pass
 
 from domain.aplus.features import extract_features
 from domain.aplus.scoring import score_categories
@@ -129,9 +136,11 @@ def _fetch_market_context(today: date) -> MarketContext:
     return build_market_context(today=today, setup_direction='bullish')
 
 
+@functools.lru_cache(maxsize=None)
 def _fetch_days_to_earnings(ticker: str) -> Optional[int]:
     """Return calendar days to next earnings, or None if unknown.
-    Reuses the existing earnings infrastructure when available."""
+    Cached per-ticker so a 1000-candidate scan across N tickers makes N network
+    calls, not 1000."""
     try:
         from pipeline.earnings import has_earnings_within
         for d in (3, 7, 14, 30, 60):

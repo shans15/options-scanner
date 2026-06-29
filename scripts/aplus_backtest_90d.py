@@ -32,6 +32,12 @@ _ROOT = Path(__file__).resolve().parents[1]
 if str(_ROOT) not in sys.path:
     sys.path.insert(0, str(_ROOT))
 
+try:
+    from dotenv import load_dotenv
+    load_dotenv(_ROOT / ".env")
+except ImportError:
+    pass
+
 from data.sources.macro_calendar import days_to_next_event
 from data.sources.yahoo_macro_source import YahooMacroSource
 from domain.aplus.features import extract_features
