@@ -30,7 +30,7 @@ from domain.value.volume_overlay import compute_volume_overlay
 from domain.value.short_overlay import compute_short_overlay
 from domain.value.scoring import assign_role1, assign_role2
 from domain.value.report import build_report
-from domain.value.types import ValuationSnapshot
+from domain.value.types import ValuationSnapshot, MispricingReport
 
 
 _UNIVERSE_FILES: dict[str, Path] = {
@@ -46,19 +46,27 @@ def _load_universe(name: str) -> list[str]:
     return json.loads(path.read_text())
 
 
-def _cache_path(cache_dir: Path, universe: str) -> Path:
+def _cache_path(cache_dir: Path) -> Path:
     ym = datetime.utcnow().strftime('%Y-%m')
     return cache_dir / f'fundamentals_{ym}.parquet'
+
+
+def _prior_month_yyyy_mm(today) -> str:
+    """Return the calendar year-month string for the month preceding `today`."""
+    y, m = today.year, today.month - 1
+    if m == 0:
+        y -= 1
+        m = 12
+    return f'{y:04d}-{m:02d}'
 
 
 def _load_or_fetch_fundamentals(
     constituents: list[str],
     cache_dir: Path,
-    universe: str,
     use_cache: bool,
 ) -> dict[str, dict]:
     cache_dir.mkdir(parents=True, exist_ok=True)
-    cache_file = _cache_path(cache_dir, universe)
+    cache_file = _cache_path(cache_dir)
     if use_cache and cache_file.exists():
         df = pd.read_parquet(cache_file)
         return {row['ticker']: row.to_dict() for _, row in df.iterrows()}
@@ -108,9 +116,9 @@ def run_watchlist(
     top_n: int = 20,
     use_cache: bool = True,
     prior_report_path: Optional[Path] = None,
-):
+) -> MispricingReport:
     """Execute the full pipeline.  Returns MispricingReport."""
-    raw_rows = _load_or_fetch_fundamentals(constituents, cache_dir, universe_name, use_cache)
+    raw_rows = _load_or_fetch_fundamentals(constituents, cache_dir, use_cache)
 
     prior_si: dict[str, float] = {}
     if prior_report_path and prior_report_path.exists():
@@ -172,7 +180,7 @@ def run_watchlist(
     }
     (out_dir / 'latest.json').write_text(json.dumps(payload, indent=2, default=str))
     ym = datetime.utcnow().strftime('%Y-%m')
-    (out_dir / f'value_report_{ym}.json').write_text(json.dumps(payload, default=str))
+    (out_dir / f'value_report_{ym}.json').write_text(json.dumps(payload, indent=2, default=str))
 
     _print_summary(report)
     return report
@@ -213,12 +221,6 @@ def main(argv: list[str] | None = None) -> int:
         return 1
 
     from datetime import date
-    def _prior_month_yyyy_mm(today: date) -> str:
-        y, m = today.year, today.month - 1
-        if m == 0:
-            y -= 1
-            m = 12
-        return f'{y:04d}-{m:02d}'
     prior_ym = _prior_month_yyyy_mm(date.today())
     prior_path = args.out / f'value_report_{prior_ym}.json'
 
