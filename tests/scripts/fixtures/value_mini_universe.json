@@ -1,0 +1,3 @@
+[
+  {"ticker":"A","sector":"Technology","price":10.0,"forward_eps":2.5,"revenue_ttm":1e9,"revenue_ttm_1y_ago":0.8e9,"eps_ttm":2.0,"eps_ttm_1y_ago":1.5,"book_value_per_share":5.0,"enterprise_value":2e9,"ebitda_ttm":2e8,"shares_short":50e6,"float_shares":500e6,"avg_daily_volume_30d":1e6,"volume_5d_avg":1.2e6,"volume_20d_avg":1e6,"price_1y_ago":8.0}
+]
