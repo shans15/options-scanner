@@ -68,7 +68,10 @@ def build_report(
     top_n: int = 20,
 ) -> MispricingReport:
     all_snaps = list(snapshots)
-    graded = [s for s in all_snaps if s.skip_reason is None and s.role1 is not None]
+    graded = [
+        s for s in all_snaps
+        if s.skip_reason is None and s.role1 is not None and s.role2 is not None
+    ]
     skipped = [s for s in all_snaps if s.skip_reason is not None]
 
     skipped_reasons = Counter(s.skip_reason for s in skipped)

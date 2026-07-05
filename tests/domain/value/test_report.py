@@ -95,3 +95,40 @@ def test_snapshot_to_dict_has_all_keys():
     assert 'priority' in d
     assert 'fundamental_trend' in d
     assert 'sector_multiples' in d
+
+
+def test_snapshot_with_role1_but_no_role2_excluded_from_graded():
+    """Defensive: if a snapshot has role1 but not role2 (unlikely but possible),
+    it must not enter the graded set, or role2 sort would crash."""
+    v = ValuationInputs(
+        ticker='PARTIAL', sector='Technology', price=100.0,
+        forward_eps=5.0, revenue_ttm=1e9, revenue_ttm_1y_ago=8e8,
+        eps_ttm=5.0, eps_ttm_1y_ago=4.0, book_value_per_share=20.0,
+        enterprise_value=1e10, ebitda_ttm=1e9,
+        shares_short=100_000_000, float_shares=1_000_000_000,
+        avg_daily_volume_30d=1e7, volume_5d_avg=1.2e7, volume_20d_avg=1e7,
+        price_1y_ago=80.0,
+    )
+    partial = ValuationSnapshot(
+        ticker='PARTIAL', inputs=v,
+        sector_relative=SectorRelativeResult(score=8.0, ratios_used=3),
+        fundamental_divergence=None,
+        volume=VolumeOverlayResult(score=10.0, tag='RISING'),
+        short_overlay=ShortOverlayResult(score=10.0),
+        role1=Role1Score(combined_rank_score=8.0, priority='HIGH_PRIORITY'),
+        role2=None,          # <-- the guard case
+        skip_reason=None,
+    )
+    normal = _snap('OK', rank=7.0, composite=70.0)
+
+    r = build_report(
+        snapshots=[partial, normal],
+        universe_name='russell2000',
+        universe_size=2,
+        run_timestamp_utc='2026-07-02T00:00:00Z',
+        top_n=5,
+    )
+    # PARTIAL should NOT appear in role2_ranked_longs
+    tickers = [x['ticker'] for x in r.role2_ranked_longs]
+    assert 'PARTIAL' not in tickers
+    assert 'OK' in tickers
