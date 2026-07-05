@@ -6,12 +6,11 @@ should depend only on this file for type information.
 Per spec docs/superpowers/specs/2026-07-02-fundamental-value-scanner-design.md
 """
 from __future__ import annotations
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import Literal, Optional
 
 
 VolumeTag = Literal['RISING', 'FLAT', 'DECLINING']
-Direction = Literal['long', 'short']
 Role1Priority = Literal[
     'HIGH_PRIORITY_SQUEEZE',
     'HIGH_PRIORITY',
@@ -53,6 +52,7 @@ class ValuationInputs:
 
 @dataclass(frozen=True)
 class SectorRelativeResult:
+    """Methodology A output — sector-relative multiples score plus per-ratio breakdown."""
     score: float                       # 0-10
     pe_fwd: Optional[float] = None
     pe_fwd_peer_median: Optional[float] = None
@@ -70,6 +70,7 @@ class SectorRelativeResult:
 
 @dataclass(frozen=True)
 class FundamentalDivergenceResult:
+    """Methodology B output — fundamental growth vs price growth divergence."""
     score: float                       # 0-10
     revenue_growth_yoy_pct: Optional[float] = None
     eps_growth_yoy_pct: Optional[float] = None
@@ -79,6 +80,7 @@ class FundamentalDivergenceResult:
 
 @dataclass(frozen=True)
 class VolumeOverlayResult:
+    """Volume overlay — 5d/20d ratio tag + score used by both roles."""
     score: float                       # 0, 5, or 10
     tag: VolumeTag
     ratio: Optional[float] = None
@@ -88,6 +90,7 @@ class VolumeOverlayResult:
 
 @dataclass(frozen=True)
 class ShortOverlayResult:
+    """Direction-aware short-interest overlay (tag + score + supporting metrics)."""
     score: float                       # 0-10 (direction-aware)
     short_interest_pct: Optional[float] = None
     days_to_cover: Optional[float] = None
@@ -96,14 +99,16 @@ class ShortOverlayResult:
 
 @dataclass(frozen=True)
 class Role1Score:
+    """Role 1 output — mispricing rank + priority tag."""
     combined_rank_score: float         # 0-10 (mean of sector_rel + fund_div where available)
     priority: Role1Priority
 
 
 @dataclass(frozen=True)
 class Role2Score:
+    """Role 2 output — weighted composite score + component breakdown."""
     composite_score: float             # 0-100
-    component_breakdown: dict          # {'sector_relative': 8.5, ...}
+    component_breakdown: dict[str, float]          # {'sector_relative': 8.5, ...}
 
 
 @dataclass(frozen=True)
@@ -129,7 +134,7 @@ class MispricingReport:
     graded_size: int
     skipped: int
     skipped_reasons: dict[str, int]
-    role1_ranked_longs: list[dict]
-    role1_ranked_shorts: list[dict]
-    role2_ranked_longs: list[dict]
-    role2_ranked_shorts: list[dict]
+    role1_ranked_longs: list[dict[str, object]]
+    role1_ranked_shorts: list[dict[str, object]]
+    role2_ranked_longs: list[dict[str, object]]
+    role2_ranked_shorts: list[dict[str, object]]
