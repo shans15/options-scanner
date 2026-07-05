@@ -61,3 +61,25 @@ def test_short_interest_delta_none_when_no_prior():
     v = _v(shares_short=180_000_000, float_shares=1_000_000_000)
     r = compute_short_overlay(v, base_rank=8.0, prior_short_interest_pct=None)
     assert r.short_interest_delta_pp is None
+
+
+def test_long_direction_medium_si_scores_six():
+    """Long lean (rank >= 5), SI 8% (in 5-15% band) → score 6."""
+    v = _v(shares_short=80_000_000, float_shares=1_000_000_000)
+    r = compute_short_overlay(v, base_rank=8.0, prior_short_interest_pct=None)
+    assert r.short_interest_pct == 8.0
+    assert r.score == 6.0
+
+
+def test_short_direction_medium_si_scores_four():
+    """Short lean (rank < 5), SI 8% (in 5-15% band) → score 4."""
+    v = _v(shares_short=80_000_000, float_shares=1_000_000_000)
+    r = compute_short_overlay(v, base_rank=2.0, prior_short_interest_pct=None)
+    assert r.score == 4.0
+
+
+def test_days_to_cover_none_when_zero_volume():
+    """avg_daily_volume_30d = 0 → days_to_cover is None (avoid div/0)."""
+    v = _v(shares_short=10_000_000, float_shares=100_000_000, avg_vol=0)
+    r = compute_short_overlay(v, base_rank=5.0, prior_short_interest_pct=None)
+    assert r.days_to_cover is None
